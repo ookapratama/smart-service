@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ProductsService;
-use App\Http\Requests\ProductsRequest;
-use Illuminate\Http\Request;
-
-use App\Services\FileUploadService;
 use App\Exports\ProductsExport;
+use App\Helpers\ResponseHelper;
+use App\Http\Requests\ProductsRequest;
 use App\Imports\ProductsImport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Media;
+use App\Services\FileUploadService;
+use App\Services\ProductsService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductsController extends Controller
 {
@@ -25,6 +26,7 @@ class ProductsController extends Controller
     public function index()
     {
         $data = $this->service->all();
+
         return view('pages.products.index', compact('data'));
     }
 
@@ -47,7 +49,7 @@ class ProductsController extends Controller
             $media = $this->fileUploadService->upload($request->file('cover'), 'products', 'public', [
                 'width' => 500,
                 'height' => 500,
-                'crop' => true
+                'crop' => true,
             ]);
             $data['cover'] = $media->path;
         }
@@ -64,6 +66,7 @@ class ProductsController extends Controller
     public function show($id)
     {
         $data = $this->service->find($id);
+
         return view('pages.products.show', compact('data'));
     }
 
@@ -73,6 +76,7 @@ class ProductsController extends Controller
     public function edit($id)
     {
         $data = $this->service->find($id);
+
         return view('pages.products.edit', compact('data'));
     }
 
@@ -87,7 +91,7 @@ class ProductsController extends Controller
             $media = $this->fileUploadService->upload($request->file('cover'), 'products', 'public', [
                 'width' => 500,
                 'height' => 500,
-                'crop' => true
+                'crop' => true,
             ]);
             $data['cover'] = $media->path;
         }
@@ -104,11 +108,11 @@ class ProductsController extends Controller
     public function destroy($id)
     {
         $product = $this->service->find($id);
-        
+
         // Delete cover image if exists
         if ($product->cover) {
             // Find media by path
-            $media = \App\Models\Media::where('path', $product->cover)->first();
+            $media = Media::where('path', $product->cover)->first();
             if ($media) {
                 $this->fileUploadService->delete($media);
             }
@@ -117,7 +121,7 @@ class ProductsController extends Controller
         $this->service->delete($id);
 
         if (request()->wantsJson()) {
-            return \App\Helpers\ResponseHelper::success(null, 'Produk berhasil dihapus!');
+            return ResponseHelper::success(null, 'Produk berhasil dihapus!');
         }
 
         return redirect()->route('products.index')
@@ -129,7 +133,7 @@ class ProductsController extends Controller
      */
     public function exportExcel()
     {
-        return Excel::download(new ProductsExport, 'daftar-produk-' . date('Y-m-d') . '.xlsx');
+        return Excel::download(new ProductsExport, 'daftar-produk-'.date('Y-m-d').'.xlsx');
     }
 
     /**
@@ -139,8 +143,8 @@ class ProductsController extends Controller
     {
         $products = $this->service->all();
         $pdf = Pdf::loadView('pages.products.pdf', compact('products'));
-        
-        return $pdf->download('daftar-produk-' . date('Y-m-d') . '.pdf');
+
+        return $pdf->download('daftar-produk-'.date('Y-m-d').'.pdf');
     }
 
     /**
@@ -149,14 +153,17 @@ class ProductsController extends Controller
     public function importExcel(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
+            'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         try {
             Excel::import(new ProductsImport, $request->file('file'));
+
             return redirect()->back()->with('success', 'Data produk berhasil diimpor!');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
+            report($e);
+
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimpor data. Silakan periksa format file dan coba lagi.');
         }
     }
 }

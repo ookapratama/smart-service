@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\SettingRequest;
 use App\Services\FileUploadService;
 use App\Services\SettingService;
-use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
@@ -19,7 +19,6 @@ class SettingController extends Controller
     public function index()
     {
         $groupedSettings = $this->service->getAllGrouped();
-        $settings = SettingService::class; // For class access in view if needed
 
         return view('pages.settings.index', compact('groupedSettings'));
     }
@@ -27,7 +26,7 @@ class SettingController extends Controller
     /**
      * Update settings
      */
-    public function update(Request $request)
+    public function update(SettingRequest $request)
     {
         $data = $request->except(['_token', 'app_logo', 'app_favicon']);
 

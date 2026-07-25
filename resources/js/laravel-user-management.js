@@ -388,19 +388,19 @@ $(function () {
           url: `${baseUrl}user-list/${user_id}`,
           success: function () {
             dt_user.draw();
-          },
-          error: function (error) {
-            console.log(error);
-          }
-        });
 
-        // success sweetalert
-        Swal.fire({
-          icon: 'success',
-          title: 'Deleted!',
-          text: 'The user has been deleted!',
-          customClass: {
-            confirmButton: 'btn btn-success'
+            // success sweetalert
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'The user has been deleted!',
+              customClass: {
+                confirmButton: 'btn btn-success'
+              }
+            });
+          },
+          error: function () {
+            window.AlertHandler.showError('The user could not be deleted. Please try again.');
           }
         });
       } else if (result.dismiss === Swal.DismissReason.cancel) {

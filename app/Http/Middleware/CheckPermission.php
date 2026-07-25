@@ -11,37 +11,42 @@ class CheckPermission
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next, string $menuSlug): Response
     {
         $actionMap = [
-            'index'        => 'read',
-            'show'         => 'read',
-            'create'       => 'create',
-            'store'        => 'create',
-            'edit'         => 'update',
-            'update'       => 'update',
-            'destroy'      => 'delete',
-            'exportExcel'  => 'read',
-            'exportPdf'    => 'read',
-            'importExcel'  => 'create',
-            'clearCache'   => 'update',
-            'health'       => 'read',
-            'backup'       => 'create',
+            'index' => 'read',
+            'show' => 'read',
+            'create' => 'create',
+            'store' => 'create',
+            'edit' => 'update',
+            'update' => 'update',
+            'destroy' => 'delete',
+            'health' => 'read',
+            'backup' => 'create',
+        ];
+
+        // Full route-name map, checked before the suffix map
+        $routeNameMap = [
+            'products.export.excel' => 'read',
+            'products.export.pdf' => 'read',
+            'products.import.excel' => 'create',
+            'settings.clear-cache' => 'update',
         ];
 
         $routeName = $request->route()->getName();
         $routeParts = explode('.', $routeName);
         $method = end($routeParts);
 
-        $action = $actionMap[$method] ?? 'read';
+        $action = $routeNameMap[$routeName] ?? $actionMap[$method] ?? null;
 
-        // Additional handling for custom routes like permission.index
-        if ($routeName === 'permission.index') $action = 'read';
-        if ($routeName === 'permission.update') $action = 'update';
+        // Fail closed: unknown routes are denied instead of defaulting to read
+        if ($action === null) {
+            abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk tindakan ini.');
+        }
 
-        if (!$request->user() || !$request->user()->hasPermission($menuSlug, $action)) {
+        if (! $request->user() || ! $request->user()->hasPermission($menuSlug, $action)) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk tindakan ini.');
         }
 

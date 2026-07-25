@@ -12,7 +12,7 @@ class UserRequest extends BaseRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'role_id' => 'required|exists:roles,id',
-            'avatar' => 'nullable|image|max:2048',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
 
         // Password required only on create
@@ -22,7 +22,7 @@ class UserRequest extends BaseRequest
         } else {
             // On update, password is optional
             $rules['password'] = 'nullable|string|min:6|max:255';
-            $rules['email'] .= '|unique:users,email,' . $userId;
+            $rules['email'] .= '|unique:users,email,'.$userId;
         }
 
         return $rules;
@@ -40,19 +40,5 @@ class UserRequest extends BaseRequest
             'role_id.required' => 'Role wajib dipilih',
             'role_id.exists' => 'Role yang dipilih tidak valid',
         ];
-    }
-
-    /**
-     * Handle failed validation for web requests
-     */
-    protected function failedValidation(\Illuminate\Contracts\Validation\Validator $validator)
-    {
-        // If request expects JSON, use API-style response
-        if ($this->expectsJson()) {
-            parent::failedValidation($validator);
-        }
-
-        // Otherwise, redirect back with errors (web-style)
-        throw new \Illuminate\Validation\ValidationException($validator);
     }
 }
