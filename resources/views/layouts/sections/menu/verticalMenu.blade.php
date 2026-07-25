@@ -3,60 +3,64 @@
    $configData = Helper::appClasses();
 
    // Helper function to check if a menu item or any of its children is active (recursive)
-   function isMenuItemActive($item, $currentRouteName, $currentUrl)
-   {
-       // Check if this item itself is active
-       $itemPath = isset($item->path) ? ltrim($item->path, '/') : null;
-       $itemUrl = isset($item->url) ? ltrim($item->url, '/') : null;
+   if (!function_exists('isMenuItemActive')) {
+       function isMenuItemActive($item, $currentRouteName, $currentUrl)
+       {
+           // Check if this item itself is active
+           $itemPath = isset($item->path) ? ltrim($item->path, '/') : null;
+           $itemUrl = isset($item->url) ? ltrim($item->url, '/') : null;
 
-       // Direct match by route name/slug
-       if ($currentRouteName === $item->slug) {
-           return true;
-       }
-
-       // Match by path - but handle root path "/" specially to avoid matching everything
-       if ($itemPath !== null && $itemPath !== '') {
-           if (request()->is($itemPath) || request()->is($itemPath . '/*')) {
+           // Direct match by route name/slug
+           if ($currentRouteName === $item->slug) {
                return true;
            }
-       } elseif ($itemPath === '' && $currentUrl === '/') {
-           // Special case for root path "/"
-           return true;
-       }
 
-       // Match by url
-       if ($itemUrl !== null && $itemUrl !== '') {
-           if (request()->is($itemUrl) || request()->is($itemUrl . '/*')) {
+           // Match by path - but handle root path "/" specially to avoid matching everything
+           if ($itemPath !== null && $itemPath !== '') {
+               if (request()->is($itemPath) || request()->is($itemPath . '/*')) {
+                   return true;
+               }
+           } elseif ($itemPath === '' && $currentUrl === '/') {
+               // Special case for root path "/"
                return true;
            }
-       } elseif ($itemUrl === '' && $currentUrl === '/') {
-           // Special case for root url "/"
-           return true;
-       }
 
-       return false;
+           // Match by url
+           if ($itemUrl !== null && $itemUrl !== '') {
+               if (request()->is($itemUrl) || request()->is($itemUrl . '/*')) {
+                   return true;
+               }
+           } elseif ($itemUrl === '' && $currentUrl === '/') {
+               // Special case for root url "/"
+               return true;
+           }
+
+           return false;
+       }
    }
 
    // Helper function to check if any child (recursive) is active
-   function hasActiveChild($item, $currentRouteName, $currentUrl)
-   {
-       $children = $item->submenu ?? ($item->children ?? []);
+   if (!function_exists('hasActiveChild')) {
+       function hasActiveChild($item, $currentRouteName, $currentUrl)
+       {
+           $children = $item->submenu ?? ($item->children ?? []);
 
-       if (!is_array($children) && !is_object($children)) {
+           if (!is_array($children) && !is_object($children)) {
+               return false;
+           }
+
+           foreach ($children as $child) {
+               if (isMenuItemActive($child, $currentRouteName, $currentUrl)) {
+                   return true;
+               }
+               // Recursively check grandchildren
+               if (hasActiveChild($child, $currentRouteName, $currentUrl)) {
+                   return true;
+               }
+           }
+
            return false;
        }
-
-       foreach ($children as $child) {
-           if (isMenuItemActive($child, $currentRouteName, $currentUrl)) {
-               return true;
-           }
-           // Recursively check grandchildren
-           if (hasActiveChild($child, $currentRouteName, $currentUrl)) {
-               return true;
-           }
-       }
-
-       return false;
    }
 @endphp
 

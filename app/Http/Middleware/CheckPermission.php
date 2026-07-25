@@ -33,6 +33,7 @@ class CheckPermission
             'products.export.pdf' => 'read',
             'products.import.excel' => 'create',
             'settings.clear-cache' => 'update',
+            'tiket.update-status' => 'update',
         ];
 
         $routeName = $request->route()->getName();

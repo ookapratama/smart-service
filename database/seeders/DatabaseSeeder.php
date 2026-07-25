@@ -13,9 +13,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleAndMenuSeeder::class,
+            InstansiSeeder::class,
             UserSeeder::class,
             SettingSeeder::class,
+            JenisSuratSeeder::class,
+            KategoriPengaduanSeeder::class,
             ExtraMenuSeeder::class,
+            S3MenuSeeder::class,
         ]);
     }
 }

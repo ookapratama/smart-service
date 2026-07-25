@@ -3,6 +3,17 @@
 namespace App\Providers;
 
 use App\Helpers\ViewConfigHelper;
+use App\Models\Pengaduan;
+use App\Models\PengajuanSurat;
+use App\Repositories\MenuRepository;
+use App\Repositories\ProductsRepository;
+use App\Repositories\RoleRepository;
+use App\Repositories\UserRepository;
+use App\Services\SettingService;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -13,22 +24,42 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(
+            \App\Contracts\Repositories\TiketRepository::class,
+            \App\Repositories\TiketRepository::class
+        );
+        $this->app->bind(
+            \App\Contracts\Repositories\PemohonRepository::class,
+            \App\Repositories\PemohonRepository::class
+        );
+        $this->app->bind(
+            \App\Contracts\Repositories\KategoriPengaduanRepository::class,
+            \App\Repositories\KategoriPengaduanRepository::class
+        );
+        $this->app->bind(
+            \App\Contracts\Repositories\JenisSuratRepository::class,
+            \App\Repositories\JenisSuratRepository::class
+        );
+        $this->app->bind(
+            \App\Contracts\Repositories\InstansiRepository::class,
+            \App\Repositories\InstansiRepository::class
+        );
         // Repository bindings (contract => concrete)
         $this->app->bind(
             \App\Contracts\Repositories\UserRepository::class,
-            \App\Repositories\UserRepository::class
+            UserRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\RoleRepository::class,
-            \App\Repositories\RoleRepository::class
+            RoleRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\MenuRepository::class,
-            \App\Repositories\MenuRepository::class
+            MenuRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\ProductsRepository::class,
-            \App\Repositories\ProductsRepository::class
+            ProductsRepository::class
         );
     }
 
@@ -37,19 +68,25 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Stable polymorphic aliases for tiket 'detail' and media 'mediable' morphs
+        Relation::enforceMorphMap([
+            'pengajuan_surat' => PengajuanSurat::class,
+            'pengaduan' => Pengaduan::class,
+        ]);
+
         // Define Gates for authorization
-        \Illuminate\Support\Facades\Gate::before(function ($user, $ability) {
+        Gate::before(function ($user, $ability) {
             if ($user->role && $user->role->slug === 'super-admin') {
                 return true;
             }
         });
 
-        \Illuminate\Support\Facades\Gate::define('access', function ($user, $slug, $action) {
+        Gate::define('access', function ($user, $slug, $action) {
             return $user->hasPermission($slug, $action);
         });
 
         // Use Bootstrap 5 for pagination
-        \Illuminate\Pagination\Paginator::useBootstrapFive();
+        Paginator::useBootstrapFive();
 
         // Create Helper alias for ViewConfigHelper
         if (! class_exists('Helper')) {
@@ -57,7 +94,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // Blade directive for settings
-        \Illuminate\Support\Facades\Blade::directive('setting', function ($expression) {
+        Blade::directive('setting', function ($expression) {
             return "<?php echo get_setting($expression); ?>";
         });
 
@@ -86,7 +123,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Share template variables config from Database or defaults
-        $settingService = app(\App\Services\SettingService::class);
+        $settingService = app(SettingService::class);
 
         config([
             'variables' => [

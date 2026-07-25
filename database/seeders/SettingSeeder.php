@@ -96,7 +96,7 @@ class SettingSeeder extends Seeder
 
         foreach ($settings as $setting) {
             DB::table('settings')->updateOrInsert(
-                ['key' => $setting['key']],
+                ['instansi_id' => null, 'key' => $setting['key']],
                 array_merge($setting, ['created_at' => now(), 'updated_at' => now()])
             );
         }

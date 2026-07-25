@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
-
-use App\Traits\LogsActivity;
 
 class Media extends Model
 {
     use LogsActivity;
+
     protected $fillable = [
         'user_id',
         'filename',
@@ -21,6 +22,8 @@ class Media extends Model
         'path',
         'collection',
         'meta',
+        'mediable_type',
+        'mediable_id',
     ];
 
     protected $casts = [
@@ -34,6 +37,11 @@ class Media extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function mediable(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     /**
@@ -51,8 +59,11 @@ class Media extends Model
     {
         $bytes = $this->size;
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        for ($i = 0; $bytes > 1024; $i++) $bytes /= 1024;
-        return round($bytes, 2) . ' ' . $units[$i];
+        for ($i = 0; $bytes > 1024; $i++) {
+            $bytes /= 1024;
+        }
+
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**

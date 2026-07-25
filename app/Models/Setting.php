@@ -10,6 +10,7 @@ class Setting extends Model
     use LogsActivity;
 
     protected $fillable = [
+        'instansi_id',
         'key',
         'value',
         'group',
@@ -23,6 +24,7 @@ class Setting extends Model
     public static function getByKey(string $key, $default = null)
     {
         $setting = self::where('key', $key)->first();
+
         return $setting ? $setting->value : $default;
     }
 }
