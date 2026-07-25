@@ -34,6 +34,7 @@ class CheckPermission
             'products.import.excel' => 'create',
             'settings.clear-cache' => 'update',
             'tiket.update-status' => 'update',
+            'instansi.wilayah-sync' => 'update',
         ];
 
         $routeName = $request->route()->getName();

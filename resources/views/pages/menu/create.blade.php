@@ -2,6 +2,18 @@
 
 @section('title', 'Tambah Menu')
 
+@section('vendor-style')
+@vite(['resources/assets/vendor/libs/select2/select2.scss'])
+@endsection
+
+@section('vendor-script')
+@vite(['resources/assets/vendor/libs/select2/select2.js'])
+@endsection
+
+@section('page-script')
+@vite(['resources/assets/js/select2-init.js'])
+@endsection
+
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
   <div class="d-flex justify-content-between align-items-center mb-4">
@@ -18,7 +30,7 @@
         <div class="row">
           <div class="col-md-6 mb-4">
             <div class="form-floating form-floating-outline">
-              <select name="parent_id" id="parent_id" class="form-select">
+              <select name="parent_id" id="parent_id" class="select2 form-select">
                 <option value="">No Parent (Root)</option>
                 @foreach($parentMenus as $pm)
                   <option value="{{ $pm->id }}">{{ $pm->name }}</option>

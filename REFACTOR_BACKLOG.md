@@ -16,6 +16,7 @@ Known tech debt in this base, recorded during the initial cleanup pass. HIGH-sev
 
 ## Low
 
+- **`wilayah:sync` is fully sequential — one full national sync takes 10-90+ minutes.** ~514 kecamatan requests are made one at a time (with a 100ms courtesy delay), and wall-clock time is dominated by wilayah.id's own response latency, which varied a lot in practice. A future improvement: batch the district-level fetches with Laravel's `Http::pool()` (e.g. 10-20 concurrent requests) to cut this to a few minutes. Not urgent — it's a one-time/rare command, and the sync is idempotent and safe to rerun if interrupted.
 - **Repeated avatar-URL expression.** `$x->avatar ? asset('storage/'.$x->avatar) : asset('assets/img/avatars/1.png')` appears in 6+ places. Add a `User::getAvatarUrlAttribute()` accessor or an `<x-avatar>` component (note `Media::getUrlAttribute()` already exists).
 - **`Products` model is plural.** Laravel convention is singular `Product`; the plural propagates through `ProductsService/Repository/Request`. Cosmetic, but the base sets the example new code copies.
 - **Commented-out stubs.** `prepareForValidation` body in `BaseRequest`; `defaultLanguage` config in `ViewConfigHelper`.
@@ -40,3 +41,10 @@ Known tech debt in this base, recorded during the initial cleanup pass. HIGH-sev
 - ✅ `Tiket` deliberately given **monitoring + status-transition only** (index/show/update-status), not generic create/edit — `detail_type`/`detail_id` are non-nullable morphs, so a generic form would crash on save; real ticket creation belongs to the Phase 3 submission flow. `TiketService::updateStatus()` validates transitions via `TiketStatus::transitions()` and writes a `status_log` row.
 - ✅ Sidebar menu + RBAC seeded via new `S3MenuSeeder` (Instansi top-level; Master Data > Jenis Surat, Kategori Pengaduan; Pelayanan > Tiket, Data Pemohon), wired into `DatabaseSeeder`.
 - ✅ New regression tests: `tests/Feature/S3CrudSmokeTest.php` (6 tests covering all 5 modules end-to-end, including the status-transition guard).
+
+## Added (2026-07-25 — wilayah.id sync)
+
+- ✅ **New `wilayah` reference table** (provinsi/kabupaten-kota/kecamatan, ~7,837 rows), synced from https://wilayah.id/api/ via `WilayahSyncService` + `php artisan wilayah:sync`. Deliberately separate from `instansi` — see `CLAUDE.md`.
+- ✅ Cascading dropdown endpoint `GET /wilayah/{code}/children`, wired into the Instansi create/edit forms to autofill Name/Kode from official data.
+- ✅ 5 new Pest tests (`tests/Feature/WilayahSyncTest.php`), all using `Http::fake()` — no live network calls in the suite.
+- ✅ **"Sinkronkan Data Wilayah" button** on `instansi/index.blade.php`, dispatching `App\Jobs\SyncWilayahJob` to the queue (not synchronous — the sync can take well over an hour). Status (`idle`/`running`/`failed`) + last-synced timestamp + failed-request count tracked via cache, shared between the button and the `wilayah:sync` CLI command so status is accurate regardless of trigger. 4 new Pest tests (`tests/Feature/WilayahSyncButtonTest.php`) using `Queue::fake()`.

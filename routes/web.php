@@ -17,6 +17,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes
@@ -68,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('system/health', [SystemController::class, 'health'])->name('system.health')->middleware('check.permission:system.health');
     Route::get('system/backup', [SystemController::class, 'backup'])->name('system.backup')->middleware('check.permission:system.health');
     Route::resource('instansi', InstansiController::class)->middleware('check.permission:instansi.index');
+    Route::post('instansi/wilayah/sync', [InstansiController::class, 'syncWilayah'])->name('instansi.wilayah-sync')->middleware('check.permission:instansi.index');
     Route::resource('jenis-surat', JenisSuratController::class)->middleware('check.permission:jenis-surat.index');
     Route::resource('kategori-pengaduan', KategoriPengaduanController::class)->middleware('check.permission:kategori-pengaduan.index');
     Route::resource('pemohon', PemohonController::class)->middleware('check.permission:pemohon.index');
@@ -76,4 +78,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('tiket', [TiketController::class, 'index'])->name('tiket.index')->middleware('check.permission:tiket.index');
     Route::get('tiket/{id}', [TiketController::class, 'show'])->name('tiket.show')->middleware('check.permission:tiket.index');
     Route::post('tiket/{id}/status', [TiketController::class, 'updateStatus'])->name('tiket.update-status')->middleware('check.permission:tiket.index');
+
+    // Wilayah: cascading dropdown data (read-only reference, no separate permission)
+    Route::get('wilayah/{parentCode}/children', [WilayahController::class, 'children'])
+        ->name('wilayah.children')
+        ->where('parentCode', '[a-zA-Z0-9.]+');
 });

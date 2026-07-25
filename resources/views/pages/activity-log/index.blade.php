@@ -2,6 +2,18 @@
 
 @section('title', 'Activity Log')
 
+@section('vendor-style')
+@vite(['resources/assets/vendor/libs/select2/select2.scss'])
+@endsection
+
+@section('vendor-script')
+@vite(['resources/assets/vendor/libs/select2/select2.js'])
+@endsection
+
+@section('page-script')
+@vite(['resources/assets/js/select2-init.js'])
+@endsection
+
 @section('content')
    <div class="container-xxl flex-grow-1 container-p-y">
       {{-- Header --}}
@@ -35,7 +47,7 @@
                   </div>
                   <div class="col-md-3">
                      <label class="form-label">User</label>
-                     <select name="user_id" class="form-select">
+                     <select name="user_id" class="select2 form-select">
                         <option value="">Semua User</option>
                         @foreach ($users as $user)
                            <option value="{{ $user->id }}"

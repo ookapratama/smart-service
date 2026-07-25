@@ -2,7 +2,16 @@
 
 @section('title', 'Edit User')
 
+@section('vendor-style')
+@vite(['resources/assets/vendor/libs/select2/select2.scss'])
+@endsection
+
+@section('vendor-script')
+@vite(['resources/assets/vendor/libs/select2/select2.js'])
+@endsection
+
 @section('page-script')
+   @vite(['resources/assets/js/select2-init.js'])
    @include('pages.user._avatar-script')
 @endsection
 
@@ -55,7 +64,7 @@
 
                   <div class="col-md-6 mb-4">
                      <div class="form-floating form-floating-outline">
-                        <select class="form-select @error('role_id') is-invalid @enderror" id="role_id" name="role_id"
+                        <select class="select2 form-select @error('role_id') is-invalid @enderror" id="role_id" name="role_id"
                            required>
                            <option value="">Pilih Role</option>
                            @foreach ($roles as $role)

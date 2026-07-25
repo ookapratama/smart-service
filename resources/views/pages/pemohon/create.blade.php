@@ -2,6 +2,18 @@
 
 @section('title', 'Tambah Pemohon')
 
+@section('vendor-style')
+@vite(['resources/assets/vendor/libs/select2/select2.scss'])
+@endsection
+
+@section('vendor-script')
+@vite(['resources/assets/vendor/libs/select2/select2.js'])
+@endsection
+
+@section('page-script')
+@vite(['resources/assets/js/select2-init.js'])
+@endsection
+
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="fw-bold mb-4">
@@ -21,7 +33,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="instansi_id">Instansi</label>
-                                <select class="form-select @error('instansi_id') is-invalid @enderror" id="instansi_id" name="instansi_id" required>
+                                <select class="select2 form-select @error('instansi_id') is-invalid @enderror" id="instansi_id" name="instansi_id" required>
                                     <option value="">-- Pilih Instansi --</option>
                                     @foreach ($instansiList as $instansi)
                                         <option value="{{ $instansi->id }}" {{ old('instansi_id') == $instansi->id ? 'selected' : '' }}>

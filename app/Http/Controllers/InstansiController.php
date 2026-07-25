@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\InstansiRequest;
+use App\Jobs\SyncWilayahJob;
 use App\Models\Instansi;
 use App\Services\InstansiService;
+use App\Services\WilayahSyncService;
 
 class InstansiController extends Controller
 {
     public function __construct(
-        protected InstansiService $service
+        protected InstansiService $service,
+        protected WilayahSyncService $wilayahSyncService
     ) {}
 
     /**
@@ -19,8 +22,23 @@ class InstansiController extends Controller
     public function index()
     {
         $data = $this->service->all()->load('parent');
+        $wilayahSync = $this->wilayahSyncService->currentStatus();
 
-        return view('pages.instansi.index', compact('data'));
+        return view('pages.instansi.index', compact('data', 'wilayahSync'));
+    }
+
+    /**
+     * Sinkronkan data wilayah (provinsi/kab-kota/kecamatan) dari wilayah.id di background.
+     */
+    public function syncWilayah()
+    {
+        if ($this->wilayahSyncService->currentStatus()['status'] === 'running') {
+            return redirect()->back()->with('error', 'Sinkronisasi wilayah sedang berjalan. Silakan tunggu hingga selesai.');
+        }
+
+        SyncWilayahJob::dispatch();
+
+        return redirect()->back()->with('success', 'Sinkronisasi data wilayah dimulai di background. Muat ulang halaman ini beberapa saat lagi untuk melihat status.');
     }
 
     /**

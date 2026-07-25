@@ -8,9 +8,38 @@
         <h4 class="fw-bold mb-0">
             <span class="text-muted fw-light">Wilayah /</span> Daftar Instansi
         </h4>
-        <a href="{{ route('instansi.create') }}" class="btn btn-primary">
-            <i class="ri-add-line me-1"></i> Tambah Instansi
-        </a>
+        <div class="d-flex gap-2">
+            <form action="{{ route('instansi.wilayah-sync') }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-outline-secondary" {{ $wilayahSync['status'] === 'running' ? 'disabled' : '' }}>
+                    @if ($wilayahSync['status'] === 'running')
+                        <span class="spinner-border spinner-border-sm me-1"></span> Sedang Menyinkron...
+                    @else
+                        <i class="ri-refresh-line me-1"></i> Sinkronkan Data Wilayah
+                    @endif
+                </button>
+            </form>
+            <a href="{{ route('instansi.create') }}" class="btn btn-primary">
+                <i class="ri-add-line me-1"></i> Tambah Instansi
+            </a>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        @if ($wilayahSync['status'] === 'running')
+            <small class="text-muted">Sinkronisasi provinsi/kabupaten-kota/kecamatan dari wilayah.id sedang berjalan di background — bisa memakan waktu hingga sejam. Muat ulang halaman ini untuk memeriksa status.</small>
+        @elseif ($wilayahSync['status'] === 'failed')
+            <small class="text-danger">Sinkronisasi terakhir gagal dijalankan. Coba lagi, atau jalankan <code>php artisan wilayah:sync</code> lewat terminal.</small>
+        @elseif ($wilayahSync['last_synced_at'])
+            <small class="text-muted">
+                Data wilayah terakhir disinkron: {{ \Carbon\Carbon::parse($wilayahSync['last_synced_at'])->locale('id')->translatedFormat('d F Y H:i') }}
+                @if (! empty($wilayahSync['last_result']['failed']))
+                    &mdash; <span class="text-warning">{{ count($wilayahSync['last_result']['failed']) }} permintaan gagal, jalankan sinkron ulang untuk melengkapi.</span>
+                @endif
+            </small>
+        @else
+            <small class="text-muted">Data wilayah belum pernah disinkron lewat tombol ini. Jalankan sinkronisasi untuk mengaktifkan pencarian Provinsi/Kabupaten/Kecamatan di form Instansi.</small>
+        @endif
     </div>
 
     <div class="card">
