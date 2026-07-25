@@ -31,16 +31,27 @@ class SettingService
      */
     public function getAllCached()
     {
-        return Cache::rememberForever($this->cacheKey, function () {
-            try {
-                if (!\Illuminate\Support\Facades\Schema::hasTable('settings')) {
-                    return [];
-                }
-                return Setting::pluck('value', 'key')->toArray();
-            } catch (\Exception $e) {
+        try {
+            return Cache::rememberForever($this->cacheKey, fn () => $this->loadFromDatabase());
+        } catch (\Throwable $e) {
+            // Cache store unavailable (e.g. database cache before first migrate)
+            return $this->loadFromDatabase();
+        }
+    }
+
+    /**
+     * Load settings directly from DB, safe to call before migrations exist
+     */
+    protected function loadFromDatabase(): array
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('settings')) {
                 return [];
             }
-        });
+            return Setting::pluck('value', 'key')->toArray();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     /**
