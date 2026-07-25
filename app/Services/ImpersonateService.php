@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Interfaces\Repositories\UserRepositoryInterface;
+use App\Contracts\Repositories\UserRepository as UserRepositoryContract;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
@@ -14,7 +14,7 @@ class ImpersonateService
     protected const SESSION_KEY = 'impersonate_admin_id';
 
     public function __construct(
-        protected UserRepositoryInterface $userRepository
+        protected UserRepositoryContract $userRepository
     ) {}
 
     /**

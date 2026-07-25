@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use App\Helpers\ViewConfigHelper;
-use App\Interfaces\Repositories\UserRepositoryInterface;
-use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -15,18 +13,21 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        // Repository bindings
-        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        // Repository bindings (contract => concrete)
         $this->app->bind(
-            \App\Interfaces\Repositories\RoleRepositoryInterface::class,
+            \App\Contracts\Repositories\UserRepository::class,
+            \App\Repositories\UserRepository::class
+        );
+        $this->app->bind(
+            \App\Contracts\Repositories\RoleRepository::class,
             \App\Repositories\RoleRepository::class
         );
         $this->app->bind(
-            \App\Interfaces\Repositories\MenuRepositoryInterface::class,
+            \App\Contracts\Repositories\MenuRepository::class,
             \App\Repositories\MenuRepository::class
         );
         $this->app->bind(
-            \App\Interfaces\Repositories\ProductsRepositoryInterface::class,
+            \App\Contracts\Repositories\ProductsRepository::class,
             \App\Repositories\ProductsRepository::class
         );
     }

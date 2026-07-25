@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function __construct(
         protected UserService $service,
-        protected \App\Interfaces\Repositories\RoleRepositoryInterface $roleRepository,
+        protected \App\Contracts\Repositories\RoleRepository $roleRepository,
         protected FileUploadService $fileUploadService
     ) {}
 

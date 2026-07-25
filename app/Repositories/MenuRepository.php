@@ -2,10 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Interfaces\Repositories\MenuRepositoryInterface;
+use App\Contracts\Repositories\MenuRepository as MenuRepositoryContract;
 use App\Models\Menu;
 
-class MenuRepository extends BaseRepository implements MenuRepositoryInterface
+class MenuRepository extends BaseRepository implements MenuRepositoryContract
 {
     public function __construct(Menu $model)
     {

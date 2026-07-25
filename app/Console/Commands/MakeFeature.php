@@ -86,7 +86,7 @@ class MakeFeature extends Command
         $dirs = [
             app_path("Repositories{$this->pathSuffix}"),
             app_path("Services{$this->pathSuffix}"),
-            app_path("Interfaces/Repositories{$this->pathSuffix}"),
+            app_path("Contracts/Repositories{$this->pathSuffix}"),
             app_path("Http/Controllers{$this->pathSuffix}"),
             app_path("Http/Requests{$this->pathSuffix}"),
             resource_path("views/pages/{$viewSubPath}{$viewFolder}"),
@@ -101,23 +101,23 @@ class MakeFeature extends Command
 
     /**
      * ===============================
-     * REPOSITORY + INTERFACE
+     * REPOSITORY + CONTRACT
      * ===============================
      */
     protected function makeRepository(): void
     {
         $repositoryPath = app_path("Repositories{$this->pathSuffix}/{$this->feature}Repository.php");
-        $interfacePath = app_path("Interfaces/Repositories{$this->pathSuffix}/{$this->feature}RepositoryInterface.php");
+        $contractPath = app_path("Contracts/Repositories{$this->pathSuffix}/{$this->feature}Repository.php");
 
-        if (! $this->files->exists($interfacePath)) {
-            $this->files->put($interfacePath, <<<PHP
+        if (! $this->files->exists($contractPath)) {
+            $this->files->put($contractPath, <<<PHP
 <?php
 
-namespace App\Interfaces\Repositories{$this->namespaceSuffix};
+namespace App\Contracts\Repositories{$this->namespaceSuffix};
 
-use App\Interfaces\Repositories\BaseRepositoryInterface;
+use App\Contracts\Repositories\Repository;
 
-interface {$this->feature}RepositoryInterface extends BaseRepositoryInterface
+interface {$this->feature}Repository extends Repository
 {
 }
 PHP);
@@ -129,11 +129,11 @@ PHP);
 
 namespace App\Repositories{$this->namespaceSuffix};
 
+use App\Contracts\Repositories{$this->namespaceSuffix}\\{$this->feature}Repository as {$this->feature}RepositoryContract;
 use App\Models\\{$this->feature};
 use App\Repositories\BaseRepository;
-use App\Interfaces\Repositories{$this->namespaceSuffix}\\{$this->feature}RepositoryInterface;
 
-class {$this->feature}Repository extends BaseRepository implements {$this->feature}RepositoryInterface
+class {$this->feature}Repository extends BaseRepository implements {$this->feature}RepositoryContract
 {
     public function __construct({$this->feature} \$model)
     {
@@ -614,7 +614,7 @@ BLADE;
     protected function registerBinding(): void
     {
         $providerPath = app_path('Providers/AppServiceProvider.php');
-        $interfaceFqcn = "\\App\\Interfaces\\Repositories{$this->namespaceSuffix}\\{$this->feature}RepositoryInterface::class";
+        $interfaceFqcn = "\\App\\Contracts\\Repositories{$this->namespaceSuffix}\\{$this->feature}Repository::class";
         $repositoryFqcn = "\\App\\Repositories{$this->namespaceSuffix}\\{$this->feature}Repository::class";
 
         if (! $this->files->exists($providerPath)) {
@@ -625,8 +625,8 @@ BLADE;
 
         $contents = $this->files->get($providerPath);
 
-        if (str_contains($contents, "{$this->feature}RepositoryInterface::class") && str_contains($contents, $repositoryFqcn)) {
-            $this->line("ℹ️  Binding for {$this->feature}RepositoryInterface already present — skipped.");
+        if (str_contains($contents, $interfaceFqcn) && str_contains($contents, $repositoryFqcn)) {
+            $this->line("ℹ️  Binding for {$this->feature}Repository contract already present — skipped.");
 
             return;
         }

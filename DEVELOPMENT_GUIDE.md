@@ -19,7 +19,7 @@ php artisan make:feature SubFolder/FeatureName
 
 -   `app/Models/FeatureName.php`
 -   `database/migrations/xxxx_create_feature_name_table.php`
--   `app/Interfaces/Repositories/FeatureNameRepositoryInterface.php`
+-   `app/Contracts/Repositories/FeatureNameRepository.php` (contract/interface — Laravel-style, tanpa suffix `Interface`)
 -   `app/Repositories/FeatureNameRepository.php` (Auto-binding in AppServiceProvider)
 -   `app/Services/FeatureNameService.php`
 -   `app/Http/Controllers/FeatureNameController.php`
