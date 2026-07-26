@@ -68,6 +68,11 @@ jobs:
       # reset mid-handshake — provider-side IP filtering on the SSH port), so unlike a
       # typical rsync-over-SSH setup this can't run remote artisan commands directly.
       # The next step calls an HTTP webhook instead — see DEPLOYMENT.md.
+      # tests/Tests/docs/examples/*.md/phpunit.xml* below trim per-package bloat that
+      # `composer install --no-dev` doesn't strip (dev deps are excluded, but many prod
+      # packages still ship their own tests/docs dirs) — smaller/faster FTP transfer.
+      # The action also does an incremental diff against a state file on the server by
+      # default, so unchanged vendor/ files aren't re-uploaded on every deploy either.
       - name: Deploy files via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
@@ -81,6 +86,11 @@ jobs:
             **/.git*/**
             **/node_modules/**
             **/tests/**
+            **/Tests/**
+            **/docs/**
+            **/examples/**
+            **/*.md
+            **/phpunit.xml*
             .env
             .env.example
             storage/app/public/**
