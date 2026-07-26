@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Jobs\SyncWilayahJob;
 use App\Models\Wilayah;
+use Exception;
+use Throwable;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Cache;
@@ -21,7 +23,7 @@ class WilayahSyncService
 
     public function __construct()
     {
-        $this->baseUrl = rtrim(config('services.wilayah_id.base_url'), '/');
+        $this->baseUrl = rtrim(config('services.wilayah_id.base_url', 'https://wilayah.id/api'), '/');
     }
 
     public function syncProvinces(): int
@@ -40,6 +42,32 @@ class WilayahSyncService
     }
 
     /**
+     * Sinkronkan provinsi & seluruh kabupaten/kota secara cepat.
+     * Dipakai agar data dasar langsung masuk ke DB saat tombol sync diklik.
+     *
+     * @return array{provinces: int, regencies: int}
+     */
+    public function syncProvincesAndRegencies(): array
+    {
+        $provincesCount = $this->syncProvinces();
+
+        $regencyTotal = 0;
+        foreach (Wilayah::provinsi()->pluck('code') as $provinceCode) {
+            try {
+                $regencyTotal += $this->syncRegencies($provinceCode);
+            } catch (ConnectionException | RequestException $e) {
+                // Abaikan kesalahan koneksi sementara per provinsi
+            }
+            Sleep::for(50)->milliseconds();
+        }
+
+        return [
+            'provinces' => $provincesCount,
+            'regencies' => $regencyTotal,
+        ];
+    }
+
+    /**
      * Sinkronisasi penuh provinsi -> kabupaten/kota -> kecamatan, tanpa progress bar
      * (dipakai oleh SyncWilayahJob). Logikanya sama dengan yang dijalankan
      * `php artisan wilayah:sync`, hanya tanpa output console.
@@ -48,36 +76,45 @@ class WilayahSyncService
      */
     public function syncAll(): array
     {
-        $failed = [];
+        try {
+            $failed = [];
 
-        $provinces = $this->syncProvinces();
+            $provinces = $this->syncProvinces();
 
-        $regencyTotal = 0;
-        foreach (Wilayah::provinsi()->pluck('code') as $provinceCode) {
-            try {
-                $regencyTotal += $this->syncRegencies($provinceCode);
-            } catch (ConnectionException|RequestException $e) {
-                $failed[] = "regencies/{$provinceCode}";
+            $regencyTotal = 0;
+            foreach (Wilayah::provinsi()->pluck('code') as $provinceCode) {
+                try {
+                    $regencyTotal += $this->syncRegencies($provinceCode);
+                } catch (ConnectionException | RequestException $e) {
+                    $failed[] = "regencies/{$provinceCode}";
+                }
+                Sleep::for(50)->milliseconds();
             }
-            Sleep::for(100)->milliseconds();
-        }
 
-        $districtTotal = 0;
-        foreach (Wilayah::kabupatenKota()->pluck('code') as $regencyCode) {
-            try {
-                $districtTotal += $this->syncDistricts($regencyCode);
-            } catch (ConnectionException|RequestException $e) {
-                $failed[] = "districts/{$regencyCode}";
+            $districtTotal = 0;
+            foreach (Wilayah::kabupatenKota()->pluck('code') as $regencyCode) {
+                try {
+                    $districtTotal += $this->syncDistricts($regencyCode);
+                } catch (ConnectionException | RequestException $e) {
+                    $failed[] = "districts/{$regencyCode}";
+                }
+                Sleep::for(50)->milliseconds();
             }
-            Sleep::for(100)->milliseconds();
-        }
 
-        return [
-            'provinces' => $provinces,
-            'regencies' => $regencyTotal,
-            'districts' => $districtTotal,
-            'failed' => $failed,
-        ];
+            return [
+                'provinces' => $provinces,
+                'regencies' => $regencyTotal,
+                'districts' => $districtTotal,
+                'failed' => $failed,
+            ];
+        } catch (Throwable $e) {
+            return [
+                'provinces' => 0,
+                'regencies' => 0,
+                'districts' => 0,
+                'failed' => [$e->getMessage()],
+            ];
+        }
     }
 
     /**
@@ -112,8 +149,12 @@ class WilayahSyncService
      */
     protected function upsertLevel(array $items, ?string $parentCode, int $level): int
     {
+        if (empty($items)) {
+            return 0;
+        }
+
         Wilayah::upsert(
-            array_map(fn (array $item) => [
+            array_map(fn(array $item) => [
                 'code' => $item['code'],
                 'parent_code' => $parentCode,
                 'name' => $item['name'],

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\InstansiController;
 use App\Http\Controllers\JenisSuratController;
@@ -19,6 +20,10 @@ use App\Http\Controllers\TiketController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
+
+// Public Landing Home Route
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+
 
 // Auth Routes
 Route::get('login', [AuthController::class, 'showLogin'])->name('login');

@@ -8,6 +8,7 @@ use App\Jobs\SyncWilayahJob;
 use App\Models\Instansi;
 use App\Services\InstansiService;
 use App\Services\WilayahSyncService;
+use Throwable;
 
 class InstansiController extends Controller
 {
@@ -28,17 +29,25 @@ class InstansiController extends Controller
     }
 
     /**
-     * Sinkronkan data wilayah (provinsi/kab-kota/kecamatan) dari wilayah.id di background.
+     * Sinkronkan data wilayah (provinsi/kab-kota/kecamatan) dari wilayah.id.
      */
     public function syncWilayah()
     {
         if ($this->wilayahSyncService->currentStatus()['status'] === 'running') {
-            return redirect()->back()->with('error', 'Sinkronisasi wilayah sedang berjalan. Silakan tunggu hingga selesai.');
+            return redirect()->back()->with('error', 'Sinkronisasi wilayah sedang berjalan di background. Silakan tunggu hingga selesai.');
         }
 
-        SyncWilayahJob::dispatch();
+        try {
+            // Synchronously sync Provinces and Regencies so basic dropdown data is immediately stored in DB
+            $syncedCount = $this->wilayahSyncService->syncProvincesAndRegencies();
 
-        return redirect()->back()->with('success', 'Sinkronisasi data wilayah dimulai di background. Muat ulang halaman ini beberapa saat lagi untuk melihat status.');
+            // Dispatch background queue job for remaining district data sync
+            SyncWilayahJob::dispatch();
+
+            return redirect()->back()->with('success', "Sinkronisasi data wilayah berhasil diproses! {$syncedCount['provinces']} Provinsi & {$syncedCount['regencies']} Kabupaten/Kota telah tersimpan langsung ke database.");
+        } catch (Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal menyinkronkan data wilayah: ' . $e->getMessage());
+        }
     }
 
     /**
