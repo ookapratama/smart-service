@@ -22,7 +22,10 @@ Known tech debt in this base, recorded during the initial cleanup pass. HIGH-sev
 - **Commented-out stubs.** `prepareForValidation` body in `BaseRequest`; `defaultLanguage` config in `ViewConfigHelper`.
 - **Generator stub still assumes a single `name` column.** `make:feature` now marks this with TODO comments, but full DB-column introspection (generating views/migration from actual columns) is not implemented. Optional future enhancement.
 - **CLI emoji in `make:feature` output** (✅💡📌) can mojibake on legacy Windows `cmd`. Swap for plain `[OK]`/`[INFO]` tags if that matters.
-- **`PermissionPestTest > admin can view permission index` fails without built assets.** The test renders a full Blade page with `@vite`; in a checkout without `npm run build` it throws `ViteManifestNotFoundException`. Add `$this->withoutVite()` to that test (or build assets in CI).
+
+## Fixed (2026-07-26 — CI `ViteManifestNotFoundException`)
+
+- ✅ **Every full-page-render Feature test 500'd in GitHub Actions** (`PermissionPestTest`, `S3CrudSmokeTest`, `WilayahSyncButtonTest` — 7 tests total), passing only locally. Root cause: `deploy.yml`'s `test` job never runs `npm run build`, so `public/build/manifest.json` doesn't exist there (it's gitignored) — passed locally only because a stale manifest from a previous local build happened to be on disk. Fixed in `tests/Pest.php` by chaining `->beforeEach(fn () => $this->withoutVite())` onto the existing `uses(...)->in('Feature')` call, applying to every Feature test globally. Note: a separate top-level `beforeEach(...)->in('Feature')` call did **not** reliably apply — must be chained onto the same `uses()` builder. Verified by physically removing `public/build/` locally and confirming the full suite (35/35) still passes.
 
 ## Fixed (2026-07-25 batch)
 
