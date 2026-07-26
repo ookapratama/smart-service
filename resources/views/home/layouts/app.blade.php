@@ -43,6 +43,9 @@
   {{-- Footer --}}
   @include('home.partials.footer')
 
+  {{-- Mobile Bottom Navigation --}}
+  @include('home.partials.bottom-nav')
+
   <!-- Scroll Top -->
   <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -67,6 +70,26 @@
 
   <!-- Main JS File -->
   <script src="{{ asset('assets/home/js/main.js') }}"></script>
+
+  {{-- Bottom Nav Scroll Spy --}}
+  <script>
+    (function () {
+      var items = document.querySelectorAll('.bottom-nav-item[data-section]');
+      if (!items.length) return;
+      function update() {
+        var offset = window.scrollY + window.innerHeight / 3;
+        items.forEach(function (el) {
+          var sec = document.getElementById(el.dataset.section);
+          if (sec && offset >= sec.offsetTop && offset < sec.offsetTop + sec.offsetHeight) {
+            items.forEach(function (i) { i.classList.remove('active'); });
+            el.classList.add('active');
+          }
+        });
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('load', update);
+    })();
+  </script>
 
   @stack('scripts')
 </body>
