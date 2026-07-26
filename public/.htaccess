@@ -1,3 +1,13 @@
+# Overrides the deny-all in the parent .htaccess (repo root) — that one blocks
+# direct web access to the whole app since it's deployed inside the cPanel doc
+# root instead of a sibling folder; this re-opens just public/.
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Allow from all
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

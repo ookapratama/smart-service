@@ -61,42 +61,42 @@ jobs:
           npm run build
 
       # Uploads the already-built app (vendor/, public/build/, etc.) to the server via
-      # rsync over SSH. Composer/npm run here in CI, not on the shared host, since
-      # shared-hosting resource limits (memory/time) make `composer install` there
-      # unreliable. The server only needs to run lightweight artisan commands after.
-      - name: Deploy files via rsync over SSH
-        uses: easingthemes/ssh-deploy@v6
+      # FTP. Composer/npm run here in CI, not on the shared host, since shared-hosting
+      # resource limits (memory/time) make `composer install` there unreliable.
+      #
+      # SSH is not usable on this host (GitHub Actions runners get their connection
+      # reset mid-handshake — provider-side IP filtering on the SSH port), so unlike a
+      # typical rsync-over-SSH setup this can't run remote artisan commands directly.
+      # The next step calls an HTTP webhook instead — see DEPLOYMENT.md.
+      - name: Deploy files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
-          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
-          REMOTE_PORT: ${{ secrets.DEPLOY_PORT }}
-          TARGET: ${{ secrets.DEPLOY_PATH }}
-          ARGS: '-avzr --delete-after'
-          EXCLUDE: '/.git/, /.github/, /node_modules/, /tests/, /.env, /.env.example, /storage/app/public/, /storage/logs/, /storage/framework/cache/, /storage/framework/sessions/, /storage/framework/views/'
-
-      # .env lives only on the server and is never touched by this workflow.
-      # `source ~/.bash_profile` loads asdf's PHP/Composer shims into PATH — a plain
-      # non-interactive SSH command (which is all this action runs) does not source
-      # it automatically the way a normal `ssh` login does, so `php`/`composer` would
-      # otherwise resolve to nothing on hosts using asdf/rbenv-style version managers.
-      - name: Run post-deploy commands over SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
+          server: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          password: ${{ secrets.DEPLOY_FTP_PASSWORD }}
           port: ${{ secrets.DEPLOY_PORT }}
-          script: |
-            set -e
-            source ~/.bash_profile || true
-            cd ${{ secrets.DEPLOY_PATH }}
-            php artisan down || true
-            php artisan migrate --force
-            php artisan db:seed --force
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan storage:link || true
-            php artisan queue:restart || true
-            php artisan up
+          server-dir: ${{ secrets.DEPLOY_PATH }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tests/**
+            .env
+            .env.example
+            storage/app/public/**
+            storage/logs/**
+            storage/framework/cache/**
+            storage/framework/sessions/**
+            storage/framework/views/**
+
+      # .env lives only on the server and is never touched by this workflow. Since
+      # there's no SSH to run `php artisan migrate/db:seed/config:cache/...` remotely,
+      # a protected route on the app itself runs them instead — see
+      # app/Http/Controllers/DeployWebhookController.php + DEPLOYMENT.md. The token is
+      # compared with hash_equals() server-side, so it must match DEPLOY_WEBHOOK_TOKEN
+      # in the server's .env exactly.
+      - name: Trigger post-deploy commands via webhook
+        run: |
+          curl -sf -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}" \
+            -H "X-Deploy-Token: ${{ secrets.DEPLOY_WEBHOOK_TOKEN }}" \
+            --max-time 120
