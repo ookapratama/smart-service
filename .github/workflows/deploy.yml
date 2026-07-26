@@ -1,0 +1,113 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    name: Run Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, fileinfo, mysql, gd, zip, xml, curl, bcmath
+          coverage: none
+
+      - name: Copy .env for testing
+        run: cp .env.example .env
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run Pest test suite
+        run: vendor/bin/pest
+
+  deploy:
+    name: Build & Deploy to cPanel
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, fileinfo, mysql, gd, zip, xml, curl, bcmath
+          coverage: none
+
+      - name: Install Composer dependencies (production, no dev)
+        run: composer install --no-dev --optimize-autoloader --no-progress --prefer-dist
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install NPM dependencies & build frontend assets
+        run: |
+          npm ci
+          npm run build
+
+      # Uploads the already-built app (vendor/, public/build/, etc.) to the server via
+      # rsync over SSH. Composer/npm run here in CI, not on the shared host, since
+      # shared-hosting resource limits (memory/time) make `composer install` there
+      # unreliable. The server only needs to run lightweight artisan commands after.
+      - name: Deploy files via rsync over SSH
+        uses: easingthemes/ssh-deploy@v5
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
+          REMOTE_USER: ${{ secrets.DEPLOY_USER }}
+          REMOTE_PORT: ${{ secrets.DEPLOY_PORT }}
+          TARGET: ${{ secrets.DEPLOY_PATH }}
+          ARGS: '-avzr --delete-after'
+          EXCLUDE: |
+            /.git/
+            /.github/
+            /node_modules/
+            /tests/
+            /.env
+            /.env.example
+            /storage/app/public/
+            /storage/logs/
+            /storage/framework/cache/
+            /storage/framework/sessions/
+            /storage/framework/views/
+
+      # .env lives only on the server and is never touched by this workflow.
+      # `source ~/.bash_profile` loads asdf's PHP/Composer shims into PATH — a plain
+      # non-interactive SSH command (which is all this action runs) does not source
+      # it automatically the way a normal `ssh` login does, so `php`/`composer` would
+      # otherwise resolve to nothing on hosts using asdf/rbenv-style version managers.
+      - name: Run post-deploy commands over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          script: |
+            set -e
+            source ~/.bash_profile || true
+            cd ${{ secrets.DEPLOY_PATH }}
+            php artisan down || true
+            php artisan migrate --force
+            php artisan db:seed --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan storage:link || true
+            php artisan queue:restart || true
+            php artisan up
