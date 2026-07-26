@@ -65,7 +65,7 @@ jobs:
       # shared-hosting resource limits (memory/time) make `composer install` there
       # unreliable. The server only needs to run lightweight artisan commands after.
       - name: Deploy files via rsync over SSH
-        uses: easingthemes/ssh-deploy@v5
+        uses: easingthemes/ssh-deploy@v6
         with:
           SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           REMOTE_HOST: ${{ secrets.DEPLOY_HOST }}
