@@ -1,47 +1,50 @@
-# 🚀 Base Laravel - Enterprise Ready Template
+# 🏢 Soreang Smart Service (S3)
 
-A modern Laravel starter template designed with **Service Repository Pattern**, **Audit Trail**, and **Powerful File Management**. Optimized for enterprise scalability and developer productivity.
+Sistem pelayanan publik terintegrasi berbasis digital untuk tingkat kecamatan/kelurahan — persuratan online, pengaduan masyarakat, dan cek status permohonan, dirancang untuk bisa dipakai lebih dari satu instansi (multi-tenant).
 
----
-
-## 🌟 Key Features
-
--   🏗️ **Service Repository Pattern** - Clean, structured, and testable codebase.
--   🛡️ **Granular Role & Permission** - Robust RBAC (Role Based Access Control) down to per-menu actions (Create, Read, Update, Delete).
--   🕵️ **Activity Log (Audit Trail)** - Automatically track every data change with Before/After snapshots via Trait.
--   ⚙️ **Global Settings & Branding** - Manage App Name, Logo, Favicon, and System settings from the UI.
--   👤 **Personal Profile & Avatar** - Dedicated page for users to manage info, passwords, and profile pictures.
--   📊 **Role-Based Dashboards** - Specific views tailored for Administrators and regular Users.
--   �️‍♂️ **User Impersonation** - Super Admin can login as any user to troubleshoot issues without needing their password.
--   �📁 **File Upload Manager** - Centralized file handling with auto-resize and optimization.
--   🎨 **Premium Admin UI** - Powered by Sneat Bootstrap 5 with Dark/Light mode support.
--   🏥 **System Health Monitoring** - Built-in endpoints to monitor application and database status.
--   🤖 **Custom Code Generator** - Scaffold complete CRUD modules with a single command.
--   📖 **API Documentation** - Interactive Swagger (OpenAPI) docs out of the box.
--   🔔 **Global Alert System** - Pre-configured SweetAlert2 & Toastr integration.
+Dibangun di atas fondasi admin panel Laravel dengan **Service-Repository Pattern**, **Audit Trail**, dan **RBAC granular**.
 
 ---
 
-## 📁 Documentation Guide
+## 🌟 Fitur Utama
 
-For in-depth explanations of the features and how to use them, please refer to the following guides:
-
-| Guide                                                 | Description                                           |
-| ----------------------------------------------------- | ----------------------------------------------------- |
-| 📘 **[FEATURES_GUIDE.md](FEATURES_GUIDE.md)**         | **FULL OVERVIEW** of all available features.          |
-| 🛠 **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)**   | **CODING STANDARDS** and how to add new modules.      |
-| 🕵️ **[ACTIVITY_LOG_GUIDE.md](ACTIVITY_LOG_GUIDE.md)** | Detailed audit trail & user monitoring documentation. |
-| 🔔 **[ALERT_SYSTEM_GUIDE.md](ALERT_SYSTEM_GUIDE.md)** | How to use the global SweetAlert & Toastr system.     |
+-   🏛️ **Manajemen Instansi Multi-Tenant** — hierarki kabupaten/kecamatan/kelurahan, dengan pencarian data wilayah resmi (sinkron dari [wilayah.id](https://wilayah.id)).
+-   🎫 **Tiket sebagai Tulang Punggung** — setiap layanan (persuratan & pengaduan) menghasilkan nomor tiket yang bisa dipantau statusnya (baru → diproses → selesai/ditolak).
+-   📄 **Smart Digital Service** — pelayanan persuratan online (Surat Keterangan, Surat Pengantar).
+-   📢 **Smart Complaint** — pengaduan masyarakat per kategori.
+-   👥 **Data Pemohon** — pencatatan warga pemohon layanan, NIK unik per instansi.
+-   🏗️ **Service-Repository Pattern** — kodebase yang bersih, terstruktur, dan mudah diuji.
+-   🛡️ **RBAC Granular** — role & permission per menu per aksi (Create, Read, Update, Delete), termasuk role khusus **Petugas Instansi** yang terikat ke satu instansi.
+-   🕵️ **Activity Log (Audit Trail)** — mencatat setiap perubahan data secara otomatis (before/after snapshot).
+-   ⚙️ **Global Settings & Branding** — kelola nama aplikasi, logo, favicon dari UI.
+-   👤 **Profil & Impersonation** — kelola profil pengguna; Super Admin bisa login sebagai user lain untuk troubleshooting.
+-   📁 **File Upload Manager** — penanganan file terpusat dengan auto-resize.
+-   🎨 **Admin UI Premium** — Sneat Bootstrap 5, mode Dark/Light.
+-   🤖 **Custom Code Generator** — scaffold modul CRUD lengkap dengan satu perintah.
+-   📖 **Dokumentasi API** — Swagger (OpenAPI) siap pakai.
 
 ---
 
-## 🚀 Quick Start
+## 📁 Panduan Dokumentasi
+
+| Panduan | Deskripsi |
+| --- | --- |
+| 📘 **[FEATURES_GUIDE.md](FEATURES_GUIDE.md)** | Overview lengkap fitur admin panel dasar. |
+| 🛠 **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)** | Standar koding dan cara menambah modul baru. |
+| 🕵️ **[ACTIVITY_LOG_GUIDE.md](ACTIVITY_LOG_GUIDE.md)** | Dokumentasi audit trail & monitoring pengguna. |
+| 🔔 **[ALERT_SYSTEM_GUIDE.md](ALERT_SYSTEM_GUIDE.md)** | Cara pakai sistem SweetAlert & Toastr global. |
+| 🚀 **[DEPLOYMENT.md](DEPLOYMENT.md)** | Deploy otomatis via GitHub Actions ke hosting cPanel. |
+| 🧹 **[REFACTOR_BACKLOG.md](REFACTOR_BACKLOG.md)** | Utang teknis yang tercatat & yang sudah diperbaiki. |
+
+---
+
+## 🚀 Quick Start (Lokal)
 
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/ookapratama/base-laravel.git
-cd base-laravel
+git clone https://github.com/ookapratama/smart-service.git
+cd smart-service
 composer install && npm install
 ```
 
@@ -59,56 +62,65 @@ php artisan migrate:fresh --seed
 npm run build
 ```
 
-### 4. Run the Project
+### 4. Sinkronkan Data Wilayah (opsional, untuk pencarian Provinsi/Kabupaten/Kecamatan)
 
 ```bash
-# Using the built-in shortcut
+php artisan wilayah:sync
+```
+
+Perintah ini menarik data dari wilayah.id — bisa memakan waktu beberapa menit untuk sinkronisasi penuh (idempoten, aman diulang). Bisa juga dipicu lewat tombol **"Sinkronkan Data Wilayah"** di halaman Instansi setelah aplikasi jalan.
+
+### 5. Jalankan Project
+
+```bash
 composer dev
 ```
 
 ---
 
-## 💡 Pro Tip: Creating a New Feature
+## 🔑 Akun untuk Testing
 
-Want to create a new module (e.g., Product)? Use our custom generator:
+Setelah `migrate:fresh --seed`, akun berikut tersedia (password: `password` untuk semua):
+
+| Email | Role | Cakupan |
+| --- | --- | --- |
+| `superadmin@gmail.com` | Super Admin | Akses penuh platform |
+| `admin@gmail.com` | Admin | Manajemen user/menu/activity-log + modul S3 |
+| `petugas.soreang@gmail.com` | Petugas Instansi | Tiket + Pemohon, terikat Kecamatan Soreang |
+| `petugas.pamekaran@gmail.com` | Petugas Instansi | Tiket + Pemohon, terikat Desa Pamekaran |
+| `user@gmail.com` | User | Dashboard saja |
+
+---
+
+## 💡 Membuat Modul Baru
+
+Butuh modul CRUD baru (mis. Product)? Pakai generator bawaan:
 
 ```bash
 # Basic usage
 php artisan make:feature Product
 
-# With subdirectory support
+# Dengan subdirectory
 php artisan make:feature Admin/User
 ```
 
-This scaffolding includes Repository, Service, Controller, Request, and **full CRUD Blade views**. See **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)** for details.
+Scaffolding mencakup Repository, Service, Controller, Request, dan **CRUD Blade views lengkap**. Lihat **[DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md)** untuk detail.
 
 ---
 
 ## 📦 Tech Stack
 
 -   **Backend**: Laravel 12.x, PHP 8.2+
--   **Frontend**: Bootstrap 5, Vite, jQuery (Sneat Template)
--   **Database**: MySQL / PostgreSQL / SQLite
--   **API Docs**: Swagger (L5-Swagger)
--   **System**: PHP 8.2+ Type Safety & Modern Features
+-   **Frontend**: Bootstrap 5, Vite, jQuery (Sneat Template), Select2
+-   **Database**: MySQL
+-   **Data Wilayah**: Sinkron dari [wilayah.id](https://wilayah.id) API
+-   **CI/CD**: GitHub Actions → auto-deploy ke hosting cPanel (lihat [DEPLOYMENT.md](DEPLOYMENT.md))
+-   **Testing**: Pest PHP
 
 ---
 
-## 💖 Support & Sponsoring
+## 📄 Lisensi
 
-If you find this project useful, please consider supporting its development. Your support helps keep the project active and allows me to create more open-source tools.
+Proyek ini menggunakan lisensi [MIT](LICENSE).
 
--   **GitHub Sponsors**: [Sponsor @ookapratama](https://github.com/sponsors/ookapratama)
--   **Buy Me a Coffee**: [buymeacoffee.com/ookapratama](https://www.buymeacoffee.com/ookapratama)
-
-For Indonesian supporters:
-
--   **Trakteer**: [trakteer.id/ookapratama](https://trakteer.id/ftopxczkt5voq7rg0zyn/gift)
-
----
-
-## 📄 License
-
-This project is open-sourced software licensed under the [MIT license](LICENSE).
-
-_Developed with ❤️ by [Ooka Pratama](https://github.com/ookapratama)_
+_Dibangun di atas base admin panel oleh [Ooka Pratama](https://github.com/ookapratama)_

@@ -1,0 +1,118 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    name: Run Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, fileinfo, mysql, gd, zip, xml, curl, bcmath
+          coverage: none
+
+      - name: Copy .env for testing
+        run: cp .env.example .env
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run Pest test suite
+        run: vendor/bin/pest
+
+  deploy:
+    name: Build & Deploy to cPanel
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, dom, fileinfo, mysql, gd, zip, xml, curl, bcmath
+          coverage: none
+
+      - name: Install Composer dependencies (production, no dev)
+        run: composer install --no-dev --optimize-autoloader --no-progress --prefer-dist
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install NPM dependencies & build frontend assets
+        run: |
+          npm ci
+          npm run build
+
+      # Uploads the already-built app (vendor/, public/build/, etc.) to the server via
+      # FTP. Composer/npm run here in CI, not on the shared host, since shared-hosting
+      # resource limits (memory/time) make `composer install` there unreliable.
+      #
+      # SSH is not usable on this host (GitHub Actions runners get their connection
+      # reset mid-handshake — provider-side IP filtering on the SSH port), so unlike a
+      # typical rsync-over-SSH setup this can't run remote artisan commands directly.
+      # The next step calls an HTTP webhook instead — see DEPLOYMENT.md.
+      # tests/Tests/docs/examples/*.md/phpunit.xml* below trim per-package bloat that
+      # `composer install --no-dev` doesn't strip (dev deps are excluded, but many prod
+      # packages still ship their own tests/docs dirs) — smaller/faster FTP transfer.
+      # The action also does an incremental diff against a state file on the server by
+      # default, so unchanged vendor/ files aren't re-uploaded on every deploy either.
+      - name: Deploy files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          password: ${{ secrets.DEPLOY_FTP_PASSWORD }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          server-dir: ${{ secrets.DEPLOY_PATH }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/tests/**
+            **/Tests/**
+            **/docs/**
+            **/examples/**
+            **/*.md
+            **/phpunit.xml*
+            .env
+            .env.example
+            storage/app/public/**
+            storage/logs/**
+            storage/framework/cache/**
+            storage/framework/sessions/**
+            storage/framework/views/**
+
+      # .env lives only on the server and is never touched by this workflow. Since
+      # there's no SSH to run `php artisan migrate/db:seed/config:cache/...` remotely,
+      # a protected route on the app itself runs them instead — see
+      # app/Http/Controllers/DeployWebhookController.php + DEPLOYMENT.md. The token is
+      # compared with hash_equals() server-side, so it must match DEPLOY_WEBHOOK_TOKEN
+      # in the server's .env exactly.
+      - name: Trigger post-deploy commands via webhook
+        run: |
+          http_status=$(curl -s -o /tmp/webhook_response.json -w "%{http_code}" -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}" \
+            -H "X-Deploy-Token: ${{ secrets.DEPLOY_WEBHOOK_TOKEN }}" \
+            --max-time 120)
+          echo "HTTP status: $http_status"
+          cat /tmp/webhook_response.json
+          echo
+          if [ "$http_status" -lt 200 ] || [ "$http_status" -ge 300 ]; then
+            exit 1
+          fi
