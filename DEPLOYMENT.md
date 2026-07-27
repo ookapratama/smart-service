@@ -2,13 +2,13 @@
 
 Target environment (confirmed): cPanel account `simbbgps`, subdomain `soreang.simbbgtksulsel.com`, document root `/home/simbbgps/soreang` (already exists — cPanel put `.htaccess`, `php.ini`, `.user.ini`, and `.well-known/` there for the domain's SSL/PHP config; **never delete these**). The app deploys into `~/soreang/laravel_soreang` — a folder **nested inside** the document root, not a sibling of it. Because that puts the whole app (`.env`, `vendor/`, `app/`, `database/`, ...) inside the web-servable tree, a repo-root `.htaccess` (deployed automatically with every FTP upload) blocks direct HTTP access to everything except `public/` — see section 2.
 
-`.github/workflows/deploy.yml` runs on every push to `main`: it runs the Pest test suite first (deploy is blocked if tests fail), then builds the app (Composer + npm) on the GitHub Actions runner and uploads the built result to the server over **FTP**, then triggers a short list of `artisan` commands via an **HTTP webhook** on the app itself.
+`.github/workflows/deploy.yml` runs on every push to `main`: it runs the Pest test suite first (deploy is blocked if tests fail), then builds the app (Composer + npm) on the GitHub Actions runner and uploads the built result to the server over **FTP**. That's it — the pipeline no longer calls any command on the server automatically. `migrate`/`db:seed`/cache commands must be run **by hand** after any deploy that needs them — see "Post-deploy manual steps" at the end of section 4.
 
-**Why FTP + a webhook instead of rsync-over-SSH:** GitHub Actions' runner IPs get their SSH connection reset mid-handshake on this host (`kex_exchange_identification: read: Connection reset by peer`) — almost certainly provider-side IP filtering on the SSH port (Domainesia/CloudLinux shared hosting), not a config mistake. FTP (port 21) is unaffected. Since FTP can only move files, not run commands, a protected route — `POST /api/deploy/webhook`, `app/Http/Controllers/Api/DeployWebhookController.php` — runs `migrate`/`db:seed`/the cache commands/`queue:restart` instead, authenticated via a shared-secret token (`X-Deploy-Token` header, compared with `hash_equals()`) rather than a login session, since CI has no browser/cookies.
+**Why FTP instead of rsync-over-SSH:** GitHub Actions' runner IPs get their SSH connection reset mid-handshake on this host (`kex_exchange_identification: read: Connection reset by peer`) — almost certainly provider-side IP filtering on the SSH port (Domainesia/CloudLinux shared hosting), not a config mistake. FTP (port 21) is unaffected, but can only move files — it can't run commands, so there's no way for CI to trigger `artisan` commands on the server directly.
 
-Composer and `npm run build` run **on the CI runner, not on the shared host** — shared-hosting memory/time limits make `composer install` there unreliable. The server only ever runs lightweight commands via the webhook: `migrate`, `db:seed`, `config:cache`, `route:cache`, `view:cache`, `queue:restart`. (`storage:link` is no longer run on every deploy — see section 4, it's a one-time step now.)
+Composer and `npm run build` still run **on the CI runner, not on the shared host** — shared-hosting memory/time limits make `composer install` there unreliable. A protected route, `POST /api/deploy/webhook` (`app/Http/Controllers/Api/DeployWebhookController.php`, token-authenticated via `X-Deploy-Token` + `hash_equals()`), still exists and can run `migrate`/`db:seed`/the cache commands/`queue:restart` in one call if you want to trigger it yourself with `curl` — but nothing in `deploy.yml` calls it anymore, so it's optional, not part of the automated flow.
 
-`db:seed` runs on **every** deploy (not just the first). This is safe because every seeder in this app uses `updateOrCreate`/`updateOrInsert` — re-running them never duplicates rows, it just re-asserts the same baseline data (roles, menus, demo instansi, demo accounts, master data). Real data added through the app (tickets, pemohon, uploaded files) is untouched — seeders never write to those tables.
+**Don't leave `config`/`route`/`view` cached in production** now that nothing re-runs those commands automatically after each deploy: if you cache them once and then a later deploy changes `.env`-dependent config or routes without you manually re-running `config:cache`/`route:cache`, the app keeps silently serving the **stale** cached version. Simplest is to just leave them uncached (`php artisan config:clear && route:clear && view:clear`, don't re-cache) — slightly slower per request, but no risk of drifting out of sync with a deploy you didn't follow up on by hand.
 
 ## 1. One-time FTP credentials
 
@@ -67,25 +67,47 @@ Repo (`ookapratama/smart-service`) → **Settings** → **Secrets and variables*
 | `DEPLOY_FTP_PASSWORD`  | FTP password from step 1                                                                                                                                                               |
 | `DEPLOY_PORT`          | FTP port, usually `21`                                                                                                                                                                 |
 | `DEPLOY_PATH`          | `soreang/laravel_soreang/` — **must end with a trailing slash** (FTP-Deploy-Action requirement); path is relative to the FTP account's root (confirm with `ls`/an FTP client — if the account is chrooted straight into `~/soreang`, drop the `soreang/` prefix) |
-| `DEPLOY_WEBHOOK_URL`   | `https://soreang.simbbgtksulsel.com/api/deploy/webhook`                                                                                                                                |
-| `DEPLOY_WEBHOOK_TOKEN` | A random secret — generate with `php artisan tinker --execute="echo Str::random(40);"`, must match the server's `.env` `DEPLOY_WEBHOOK_TOKEN` exactly                                  |
+| `DEPLOY_WEBHOOK_URL`   | *(optional — not called by CI anymore)* `https://soreang.simbbgtksulsel.com/api/deploy/webhook`, only needed if you want to `curl` it yourself by hand                                 |
+| `DEPLOY_WEBHOOK_TOKEN` | *(optional, same reason)* A random secret — generate with `php artisan tinker --execute="echo Str::random(40);"`, must match the server's `.env` `DEPLOY_WEBHOOK_TOKEN` exactly if used |
 
 ## 4. One-time server-side setup
 
 Before the first deploy:
 
 1. Create the target directory (via cPanel Terminal or File Manager): `mkdir -p ~/soreang/laravel_soreang`
-2. Push to `main` (or trigger the workflow manually — see section 7) so the first FTP upload populates `~/soreang/laravel_soreang` with code. This run's webhook step will fail (expected — `.env` doesn't exist yet, so the app can't boot to respond) once files are up.
-3. Create the production `.env` **directly on the server** (cPanel Terminal or File Manager), in `~/soreang/laravel_soreang/.env` — copy from `.env.example`, fill in real DB credentials, `APP_KEY`, `APP_URL=https://soreang.simbbgtksulsel.com`, `APP_ENV=production`, `APP_DEBUG=false`, and the same `DEPLOY_WEBHOOK_TOKEN` value you put in the GitHub Secret. **Never commit `.env`** — `deploy.yml`'s `exclude` list keeps it out of the FTP upload, so it's untouched on every future deploy.
+2. Push to `main` (or trigger the workflow manually — see section 7) so the first FTP upload populates `~/soreang/laravel_soreang` with code.
+3. Create the production `.env` **directly on the server** (cPanel Terminal or File Manager), in `~/soreang/laravel_soreang/.env` — copy from `.env.example`, fill in real DB credentials, `APP_KEY`, `APP_URL=https://soreang.simbbgtksulsel.com`, `APP_ENV=production`, `APP_DEBUG=false`. **Never commit `.env`** — `deploy.yml`'s `exclude` list keeps it out of the FTP upload, so it's untouched on every future deploy.
 4. Create the MySQL database + user via cPanel → **MySQL Databases**, put those credentials in `.env`.
 5. Generate the app key: `cd ~/soreang/laravel_soreang && php artisan key:generate`.
 6. Do the one-time symlink setup from section 2, including `php artisan storage:link` (no longer run automatically on every deploy — see the note above the sections).
-7. Run `php artisan migrate --force && php artisan db:seed --force` once by hand the first time (subsequent deploys run both automatically via the webhook).
-8. After this, the app has demo login accounts ready — see **"Test accounts"** below. From the next push onward, the full pipeline (FTP upload → webhook → migrate/seed/cache/queue-restart) runs unattended.
+7. Run `php artisan migrate --force && php artisan db:seed --force` by hand.
+8. After this, the app has demo login accounts ready — see **"Test accounts"** below.
+
+### Post-deploy manual steps (every deploy, not just the first)
+
+Since `deploy.yml` only uploads files, run these yourself in cPanel Terminal after any push that needs them:
+
+```bash
+cd ~/soreang/laravel_soreang
+
+# only if this deploy added/changed migrations or seed data:
+php artisan migrate --force
+php artisan db:seed --force
+
+# recommended default — keep config/routes/views uncached rather than stale:
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+
+# only if a queue worker cron isn't already picking up new code (see section 6):
+php artisan queue:restart
+```
+
+`db:seed --force` is safe to re-run any time — every seeder in this app uses `updateOrCreate`/`updateOrInsert`, so re-running never duplicates rows, it just re-asserts the same baseline data (roles, menus, demo instansi, demo accounts, master data). Real data added through the app (tickets, pemohon, uploaded files) is untouched.
 
 ### Test accounts
 
-Seeded automatically on every deploy (`UserSeeder`), password `password` for all:
+Seeded whenever `db:seed` is run by hand (`UserSeeder`), password `password` for all:
 
 | Email                         | Role             | Scope                                                                 |
 | ----------------------------- | ---------------- | --------------------------------------------------------------------- |
@@ -99,7 +121,7 @@ Seeded automatically on every deploy (`UserSeeder`), password `password` for all
 
 ## 5. Known gotcha: asdf-managed PHP/Composer PATH
 
-This account uses **asdf** (`.tool-versions`/`.asdf` in the home directory) to manage PHP/Composer versions. A normal interactive login (including cPanel's Terminal) sources `.bash_profile`, which loads asdf's shims into `PATH` — this matters for the **manual one-time steps** in sections 2 and 4 (`php artisan key:generate`, `storage:link`, the first `migrate`/`db:seed`) and for the **queue cron job** in section 6, both of which run `php`/`artisan` directly. If `php: command not found` shows up in either context, confirm `cat ~/.bash_profile` actually initializes asdf (should source `~/.asdf/asdf.sh` or similar), or explicitly `source ~/.bash_profile` first. This does **not** affect `deploy.yml` itself anymore — the workflow no longer runs any command on the server directly; the webhook route runs inside the already-booted app, which doesn't need shell PATH resolution at all.
+This account uses **asdf** (`.tool-versions`/`.asdf` in the home directory) to manage PHP/Composer versions. A normal interactive login (including cPanel's Terminal) sources `.bash_profile`, which loads asdf's shims into `PATH` — this matters for **every manual step** that runs `php`/`artisan` directly: the one-time setup in sections 2 and 4, the **post-deploy manual steps** at the end of section 4 (now run after every deploy, not just the first), and the **queue cron job** in section 6. If `php: command not found` shows up in any of these, confirm `cat ~/.bash_profile` actually initializes asdf (should source `~/.asdf/asdf.sh` or similar), or explicitly `source ~/.bash_profile` first. This does **not** affect `deploy.yml` itself — the workflow only uploads files over FTP and never runs a command on the server, so it was never exposed to this PATH issue in the first place.
 
 ## 6. Important: queue jobs on shared hosting
 
