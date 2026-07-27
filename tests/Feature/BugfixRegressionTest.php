@@ -99,18 +99,6 @@ test('should reject non-image app logo upload when updating settings', function 
 |--------------------------------------------------------------------------
 */
 
-test('should deny products excel import when user has read-only permission', function () {
-    // Route suffix "excel" was unmapped and previously defaulted to "read",
-    // letting read-only users create data through the import endpoint.
-    $user = createReadOnlyUser(['products.index']);
-
-    $this->actingAs($user)
-        ->post(route('products.import.excel'), [
-            'file' => UploadedFile::fake()->create('products.xlsx', 10),
-        ])
-        ->assertStatus(403);
-});
-
 test('should deny settings cache clear when user has read-only permission', function () {
     // clear-cache mutates state and now requires "update" permission.
     $user = createReadOnlyUser(['settings.index']);
@@ -120,12 +108,3 @@ test('should deny settings cache clear when user has read-only permission', func
         ->assertStatus(403);
 });
 
-test('should allow products excel export when user has read permission', function () {
-    // Export is a read action and must remain accessible to read-only users.
-    $user = createReadOnlyUser(['products.index']);
-
-    $response = $this->actingAs($user)->get(route('products.export.excel'));
-
-    // The export returns a BinaryFileResponse; the middleware must not block it.
-    expect($response->baseResponse->getStatusCode())->not->toBe(403);
-});

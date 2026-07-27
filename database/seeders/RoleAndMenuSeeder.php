@@ -40,9 +40,7 @@ class RoleAndMenuSeeder extends Seeder
             ['parent' => 'User Management', 'name' => 'Roles', 'slug' => 'role.index', 'path' => '/role', 'icon' => 'ri-shield-user-line', 'order_no' => 2],
             ['parent' => 'User Management', 'name' => 'Menus', 'slug' => 'menu.index', 'path' => '/menu', 'icon' => 'ri-menu-search-line', 'order_no' => 3],
             ['parent' => 'User Management', 'name' => 'Permissions', 'slug' => 'permission.index', 'path' => '/permission', 'icon' => 'ri-lock-password-line', 'order_no' => 4],
-            ['name' => 'Katalog Produk', 'slug' => 'products.index', 'path' => '/products', 'icon' => 'ri-shopping-bag-3-line', 'order_no' => 3],
             ['name' => 'Activity Log', 'slug' => 'activity-log.index', 'path' => '/activity-log', 'icon' => 'ri-history-line', 'order_no' => 4],
-            ['name' => 'API Docs', 'slug' => 'api-docs', 'path' => '/api/documentation', 'icon' => 'ri-book-open-line', 'order_no' => 5],
         ];
 
         $menuIdMap = [];
@@ -125,7 +123,7 @@ class RoleAndMenuSeeder extends Seeder
             }
 
             // Assign some to Visitor (Full view of public features but Read Only)
-            if (in_array($m['slug'], ['dashboard', 'products.index'])) {
+            if (in_array($m['slug'], ['dashboard'])) {
                 DB::table('role_menu')->updateOrInsert(
                     ['role_id' => $roleIds['visitor'], 'menu_id' => $dbMenu->id],
                     [

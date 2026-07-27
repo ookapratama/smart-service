@@ -6,7 +6,6 @@ use App\Helpers\ViewConfigHelper;
 use App\Models\Pengaduan;
 use App\Models\PengajuanSurat;
 use App\Repositories\MenuRepository;
-use App\Repositories\ProductsRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
 use App\Services\SettingService;
@@ -64,10 +63,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             \App\Contracts\Repositories\MenuRepository::class,
             MenuRepository::class
-        );
-        $this->app->bind(
-            \App\Contracts\Repositories\ProductsRepository::class,
-            ProductsRepository::class
         );
     }
 

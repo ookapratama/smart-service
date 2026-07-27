@@ -14,7 +14,6 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PemohonController;
 use App\Http\Controllers\PengaduanPublicController;
 use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
@@ -53,12 +52,6 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('menu', MenuController::class)->middleware('check.permission:menu.index');
     Route::get('permission', [PermissionController::class, 'index'])->name('permission.index')->middleware('check.permission:permission.index');
     Route::put('permission', [PermissionController::class, 'update'])->name('permission.update')->middleware('check.permission:permission.index');
-
-    // Products CRUD routes
-    Route::get('products/export/excel', [ProductsController::class, 'exportExcel'])->name('products.export.excel')->middleware('check.permission:products.index');
-    Route::get('products/export/pdf', [ProductsController::class, 'exportPdf'])->name('products.export.pdf')->middleware('check.permission:products.index');
-    Route::post('products/import/excel', [ProductsController::class, 'importExcel'])->name('products.import.excel')->middleware('check.permission:products.index');
-    Route::resource('products', ProductsController::class)->middleware('check.permission:products.index');
 
     // Activity Log
     Route::get('activity-log', [ActivityLogController::class, 'index'])->name('activity-log.index');
