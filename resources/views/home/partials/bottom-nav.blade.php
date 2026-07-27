@@ -1,38 +1,75 @@
-{{-- Mobile & Tablet Bottom Navigation --}}
-<div id="mobile-bottom-nav" class="mobile-bottom-nav">
-  <div class="mobile-bottom-nav-inner">
+<style>
+  .bottom-nav {
+    border-top: 1px solid #cbd5e1 !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
+    background-color: #ffffff !important;
+    z-index: 1000 !important;
+    padding: 6px 0 8px 0 !important;
+  }
+  .bottom-nav-item {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+    color: #64748b !important;
+    padding-top: 6px !important;
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  /* Active indicator line placed at top boundary ABOVE the icon */
+  .bottom-nav-item.active::before {
+    content: "" !important;
+    position: absolute !important;
+    top: -6px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 28px !important;
+    height: 3px !important;
+    background-color: #106eea !important;
+    border-radius: 0 0 4px 4px !important;
+  }
+  .bottom-nav-item i {
+    font-size: 1.25rem !important;
+    line-height: 1 !important;
+    margin-bottom: 3px !important;
+  }
+  .bottom-nav-item span {
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+  }
+  .bottom-nav-item.active,
+  .bottom-nav-item.active i,
+  .bottom-nav-item.active span {
+    color: #106eea !important;
+  }
+</style>
 
-    <a href="#hero" class="bottom-nav-item active" data-section="hero">
-      <i class="bi bi-house-door"></i>
+<div class="bottom-nav d-lg-none fixed-bottom bg-white">
+  <div class="container d-flex justify-content-around align-items-center text-center">
+    <a href="{{ route('home') }}#hero" class="bottom-nav-item {{ request()->routeIs('home') ? 'active' : '' }}" data-section="hero">
+      <i class="bi bi-house-door d-block"></i>
       <span>Beranda</span>
     </a>
-
-    <a href="#about" class="bottom-nav-item" data-section="about">
-      <i class="bi bi-info-circle"></i>
-      <span>Tentang</span>
+    <a href="{{ route('pengaduan.index') }}" class="bottom-nav-item {{ request()->routeIs('pengaduan.*') ? 'active' : '' }}">
+      <i class="bi bi-megaphone d-block"></i>
+      <span>Pengaduan</span>
     </a>
-
-    <a href="#services" class="bottom-nav-item" data-section="services">
-      <i class="bi bi-grid"></i>
-      <span>Layanan</span>
+    <a href="{{ route('home') }}#cek-status" class="bottom-nav-item" data-section="cek-status">
+      <i class="bi bi-search d-block"></i>
+      <span>Cek Status</span>
     </a>
-
-    <a href="#contact" class="bottom-nav-item" data-section="contact">
-      <i class="bi bi-envelope"></i>
-      <span>Kontak</span>
+    <a href="{{ route('home') }}#faq" class="bottom-nav-item" data-section="faq">
+      <i class="bi bi-question-circle d-block"></i>
+      <span>FAQ</span>
     </a>
-
-    @auth
-      <a href="{{ route('dashboard') }}" class="bottom-nav-item">
-        <i class="bi bi-speedometer2"></i>
-        <span>Dashboard</span>
-      </a>
-    @else
-      <a href="{{ route('login') }}" class="bottom-nav-item">
-        <i class="bi bi-person-circle"></i>
-        <span>Masuk</span>
-      </a>
-    @endauth
-
+    <a href="{{ route('login') }}" class="bottom-nav-item">
+      <i class="bi bi-person-circle d-block"></i>
+      <span>Login</span>
+    </a>
   </div>
 </div>
