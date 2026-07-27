@@ -51,19 +51,19 @@
 
 <div class="bottom-nav d-lg-none fixed-bottom bg-white">
   <div class="container d-flex justify-content-around align-items-center text-center">
-    <a href="#hero" class="bottom-nav-item active" data-section="hero">
+    <a href="{{ route('home') }}#hero" class="bottom-nav-item {{ request()->routeIs('home') ? 'active' : '' }}" data-section="hero">
       <i class="bi bi-house-door d-block"></i>
       <span>Beranda</span>
     </a>
-    <a href="#fitur" class="bottom-nav-item" data-section="fitur">
-      <i class="bi bi-grid d-block"></i>
-      <span>Fitur 3S</span>
+    <a href="{{ route('pengaduan.index') }}" class="bottom-nav-item {{ request()->routeIs('pengaduan.*') ? 'active' : '' }}">
+      <i class="bi bi-megaphone d-block"></i>
+      <span>Pengaduan</span>
     </a>
-    <a href="#cek-status" class="bottom-nav-item" data-section="cek-status">
+    <a href="{{ route('home') }}#cek-status" class="bottom-nav-item" data-section="cek-status">
       <i class="bi bi-search d-block"></i>
       <span>Cek Status</span>
     </a>
-    <a href="#faq" class="bottom-nav-item" data-section="faq">
+    <a href="{{ route('home') }}#faq" class="bottom-nav-item" data-section="faq">
       <i class="bi bi-question-circle d-block"></i>
       <span>FAQ</span>
     </a>

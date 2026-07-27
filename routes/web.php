@@ -12,6 +12,7 @@ use App\Http\Controllers\JenisSuratController;
 use App\Http\Controllers\KategoriPengaduanController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PemohonController;
+use App\Http\Controllers\PengaduanPublicController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProfileController;
@@ -25,6 +26,12 @@ use Illuminate\Support\Facades\Route;
 
 // Public Landing Home Route
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+// Public Pengaduan Routes
+Route::get('/pengaduan', [PengaduanPublicController::class, 'index'])->name('pengaduan.index');
+Route::get('/pengaduan/create', [PengaduanPublicController::class, 'create'])->name('pengaduan.create');
+Route::post('/pengaduan', [PengaduanPublicController::class, 'store'])->name('pengaduan.store');
+Route::get('/pengaduan/sukses/{nomor_tiket}', [PengaduanPublicController::class, 'sukses'])->name('pengaduan.sukses');
 
 
 // Auth Routes

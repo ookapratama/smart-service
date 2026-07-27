@@ -267,7 +267,6 @@
                    Cek Status
                 </button>
               </form>
-              <div id="s3TicketResultBox" class="w-100 mt-3" style="display:none;"></div>
             </div>
           </div>
         </div>
@@ -449,6 +448,26 @@
             <button type="button" class="btn btn-sm btn-outline-primary" onclick="s3SimulateQrInput('SRG-2607-00123')">SRG-2607-00123</button>
             <button type="button" class="btn btn-sm btn-outline-success" onclick="s3SimulateQrInput('3204012345670001')">NIK 3204012345670001</button>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Pop Up Cek Status Result -->
+  <div class="modal fade" id="modalCekStatusResult" tabindex="-1" aria-labelledby="modalCekStatusResultLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="modal-header bg-primary text-white py-3">
+          <h5 class="modal-title fw-bold text-white mb-0" id="modalCekStatusResultLabel">
+            <i class="bi bi-ticket-perforated me-2 text-white"></i> Hasil Cek Status Permohonan
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-4" id="s3TicketModalBody">
+          <!-- Content will be injected dynamically via JS -->
+        </div>
+        <div class="modal-footer bg-light border-0 py-2">
+          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
         </div>
       </div>
     </div>

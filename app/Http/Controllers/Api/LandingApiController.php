@@ -67,18 +67,22 @@ class LandingApiController extends Controller
             ], 404);
         }
 
+        $latestLog = $tiket->statusLogs()->latest()->first();
+        $catatanRespon = $latestLog && !empty($latestLog->catatan) ? $latestLog->catatan : null;
+
         return response()->json([
             'status' => 'success',
             'data'   => [
-                'nomor_tiket'   => $tiket->nomor_tiket,
-                'judul'         => $tiket->judul,
-                'status'        => is_object($tiket->status) ? $tiket->status->value ?? $tiket->status : $tiket->status,
-                'status_label'  => is_object($tiket->status) && method_exists($tiket->status, 'label') ? $tiket->status->label() : strtoupper((string)$tiket->status),
-                'channel'       => is_object($tiket->channel) ? $tiket->channel->value ?? $tiket->channel : $tiket->channel,
-                'pemohon_nama'  => $tiket->pemohon ? $tiket->pemohon->nama : 'N/A',
-                'instansi_nama' => $tiket->instansi ? $tiket->instansi->nama : 'Kecamatan Sorean',
-                'created_at'    => $tiket->created_at ? $tiket->created_at->format('d M Y H:i') : '-',
-                'updated_at'    => $tiket->updated_at ? $tiket->updated_at->format('d M Y H:i') : '-',
+                'nomor_tiket'    => $tiket->nomor_tiket,
+                'judul'          => $tiket->judul,
+                'status'         => is_object($tiket->status) ? $tiket->status->value ?? $tiket->status : $tiket->status,
+                'status_label'   => is_object($tiket->status) && method_exists($tiket->status, 'label') ? $tiket->status->label() : strtoupper((string)$tiket->status),
+                'channel'        => is_object($tiket->channel) ? $tiket->channel->value ?? $tiket->channel : $tiket->channel,
+                'pemohon_nama'   => $tiket->pemohon ? ($tiket->pemohon->name ?? $tiket->pemohon->nama) : 'N/A',
+                'instansi_nama'  => $tiket->instansi ? ($tiket->instansi->name ?? $tiket->instansi->nama) : 'Kecamatan Sorean',
+                'created_at'     => $tiket->created_at ? $tiket->created_at->format('d M Y H:i') : '-',
+                'updated_at'     => $tiket->updated_at ? $tiket->updated_at->format('d M Y H:i') : '-',
+                'catatan_respon' => $catatanRespon,
             ],
         ]);
     }

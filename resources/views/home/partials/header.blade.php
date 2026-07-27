@@ -33,15 +33,12 @@
 
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="#hero" class="active">Beranda</a></li>
-          <li><a href="#masalah-solusi">Solusi</a></li>
-          <li><a href="#fitur">Fitur 3S</a></li>
-          <li><a href="#keunggulan">Keunggulan</a></li>
-          <li><a href="#indikator">Indikator</a></li>
-          <li><a href="#galeri">Galeri</a></li>
-          <li><a href="#berita">Berita</a></li>
-          <li><a href="#cek-status">Cek Status</a></li>
-          <li><a href="#faq">FAQ</a></li>
+          <li><a href="{{ route('home') }}#hero">Beranda</a></li>
+          <li><a href="{{ route('home') }}#fitur">Fitur 3S</a></li>
+          <li><a href="{{ route('pengaduan.index') }}" class="{{ request()->routeIs('pengaduan.*') ? 'active' : '' }}"><i class="bi bi-megaphone me-1"></i> Pengaduan</a></li>
+          <li><a href="{{ route('home') }}#berita">Berita</a></li>
+          <li><a href="{{ route('home') }}#cek-status">Cek Status</a></li>
+          <li><a href="{{ route('home') }}#faq">FAQ</a></li>
           <li><a href="{{ route('login') }}"><i class="bi bi-box-arrow-in-right me-1"></i> Login</a></li>
         </ul>
         <i class="mobile-nav-toggle d-none bi bi-list"></i>
