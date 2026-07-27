@@ -59,6 +59,7 @@ class S3MenuSeeder extends Seeder
 
         $superAdmin = Role::where('slug', 'super-admin')->first();
         $admin = Role::where('slug', 'admin')->first();
+        $petugasInstansi = Role::where('slug', 'petugas-instansi')->first();
 
         if ($superAdmin) {
             $superAdmin->menus()->syncWithoutDetaching([
@@ -82,6 +83,17 @@ class S3MenuSeeder extends Seeder
                 $kategoriPengaduanMenu->id => $noDelete,
                 $beritaMenu->id => $noDelete,
                 $jadwalPelayananMenu->id => $noDelete,
+                $pelayananMenu->id => $readOnly,
+                $tiketMenu->id => $readUpdateOnly,
+                $pemohonMenu->id => $noDelete,
+            ]);
+        }
+
+        // Petugas Instansi: only Tiket (process) + Pemohon (register/manage), scoped to
+        // their own instansi once tenant-resolution middleware exists — see REFACTOR_BACKLOG.md.
+        // No access to Instansi/Master Data management (platform-level concerns).
+        if ($petugasInstansi) {
+            $petugasInstansi->menus()->syncWithoutDetaching([
                 $pelayananMenu->id => $readOnly,
                 $tiketMenu->id => $readUpdateOnly,
                 $pemohonMenu->id => $noDelete,

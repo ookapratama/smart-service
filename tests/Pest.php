@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -11,7 +14,20 @@
 |
 */
 
-uses(Tests\TestCase::class, Illuminate\Foundation\Testing\RefreshDatabase::class)->in('Feature');
+// CI's `test` job only installs Composer deps, not npm/Vite (asset building happens
+// later, only in the `deploy` job) — so `public/build/manifest.json` never exists
+// when Pest runs there. Any Feature test that renders a full page via the shared
+// admin layout (or a page with its own @vite include, e.g. permission/index.blade.php's
+// select2 assets) would otherwise throw ViteManifestNotFoundException in CI even
+// though it passes locally (where a manifest from a previous `npm run build` sits
+// on disk). withoutVite() must be chained onto the same uses() call — a separate
+// top-level beforeEach()->in('Feature') call does not reliably apply before every
+// test in this Pest version.
+uses(TestCase::class, RefreshDatabase::class)
+    ->beforeEach(function () {
+        $this->withoutVite();
+    })
+    ->in('Feature');
 
 /*
 |--------------------------------------------------------------------------

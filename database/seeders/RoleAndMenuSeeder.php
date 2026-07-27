@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class RoleAndMenuSeeder extends Seeder
 {
@@ -14,6 +13,7 @@ class RoleAndMenuSeeder extends Seeder
         $roles = [
             ['name' => 'Super Admin', 'slug' => 'super-admin'],
             ['name' => 'Admin', 'slug' => 'admin'],
+            ['name' => 'Petugas Instansi', 'slug' => 'petugas-instansi'],
             ['name' => 'User', 'slug' => 'user'],
             ['name' => 'Visitor', 'slug' => 'visitor'],
         ];
@@ -48,7 +48,7 @@ class RoleAndMenuSeeder extends Seeder
         $menuIdMap = [];
         foreach ($menus as $m) {
             $parentId = isset($m['parent']) ? ($menuIdMap[$m['parent']] ?? null) : null;
-            
+
             DB::table('menus')->updateOrInsert(
                 ['slug' => $m['slug']],
                 [
@@ -62,7 +62,7 @@ class RoleAndMenuSeeder extends Seeder
                     'updated_at' => now(),
                 ]
             );
-            
+
             $dbMenu = DB::table('menus')->where('slug', $m['slug'])->first();
             $menuIdMap[$m['name']] = $dbMenu->id;
 
@@ -87,6 +87,21 @@ class RoleAndMenuSeeder extends Seeder
                         'can_create' => true,
                         'can_read' => true,
                         'can_update' => true,
+                        'can_delete' => false,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]
+                );
+            }
+
+            // Assign some to Petugas Instansi (dashboard only here — Tiket/Pemohon access is granted in S3MenuSeeder)
+            if (in_array($m['slug'], ['dashboard'])) {
+                DB::table('role_menu')->updateOrInsert(
+                    ['role_id' => $roleIds['petugas-instansi'], 'menu_id' => $dbMenu->id],
+                    [
+                        'can_create' => false,
+                        'can_read' => true,
+                        'can_update' => false,
                         'can_delete' => false,
                         'created_at' => now(),
                         'updated_at' => now(),

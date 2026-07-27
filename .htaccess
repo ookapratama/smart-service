@@ -1,0 +1,12 @@
+# Blocks direct web access to the whole app. This file only matters because the
+# app is deployed inside the cPanel document root (~/soreang/laravel_soreang/)
+# instead of a sibling folder outside it — without this, .env/vendor/app/database
+# would be directly requestable over HTTP. public/.htaccess overrides this to
+# re-allow just public/, which is what the docroot symlinks actually point at.
+# Ships automatically with every deploy since it lives at the repo root.
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Deny from all
+</IfModule>

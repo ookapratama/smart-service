@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+-   **Deploy webhook**: `POST /api/deploy/webhook` (`DeployWebhookController`) runs `migrate`/`db:seed`/cache/`queue:restart` on the production server, authenticated via a shared-secret token (`services.deploy.webhook_token`) instead of a login session.
+
+### Changed
+
+-   **CI/CD deploy pipeline**: switched from rsync-over-SSH to FTP (`SamKirkland/FTP-Deploy-Action`) for file upload, since GitHub Actions' runner IPs get their SSH connection reset on the target host. Post-deploy commands moved from SSH (`appleboy/ssh-action`) to the new HTTP deploy webhook. See `DEPLOYMENT.md` and `REFACTOR_BACKLOG.md` for details.
+
+### Security
+
+-   **Deny-all `.htaccess` at the repo root**: the production app is deployed inside the cPanel document root (`~/soreang/laravel_soreang`) rather than a sibling folder, so without this, `.env`/`vendor/`/`app/`/`database/` would be directly reachable over HTTP. `public/.htaccess` overrides the deny for that folder only. Ships automatically with every FTP deploy.
+
 ## [1.4.0] - 2026-02-23
 
 ### Added
