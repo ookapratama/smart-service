@@ -41,6 +41,14 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\JenisSuratRepository::class
         );
         $this->app->bind(
+            \App\Contracts\Repositories\BeritaRepository::class,
+            \App\Repositories\BeritaRepository::class
+        );
+        $this->app->bind(
+            \App\Contracts\Repositories\JadwalPelayananRepository::class,
+            \App\Repositories\JadwalPelayananRepository::class
+        );
+        $this->app->bind(
             \App\Contracts\Repositories\InstansiRepository::class,
             \App\Repositories\InstansiRepository::class
         );

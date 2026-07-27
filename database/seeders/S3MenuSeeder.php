@@ -34,6 +34,14 @@ class S3MenuSeeder extends Seeder
             ['slug' => 'kategori-pengaduan.index'],
             ['name' => 'Kategori Pengaduan', 'icon' => 'ri-price-tag-3-line', 'path' => 'kategori-pengaduan', 'parent_id' => $masterDataMenu->id, 'order_no' => 2]
         );
+        $beritaMenu = Menu::updateOrCreate(
+            ['slug' => 'berita.index'],
+            ['name' => 'Berita & Informasi', 'icon' => 'ri-newspaper-line', 'path' => 'berita', 'parent_id' => $masterDataMenu->id, 'order_no' => 3]
+        );
+        $jadwalPelayananMenu = Menu::updateOrCreate(
+            ['slug' => 'jadwal-pelayanan.index'],
+            ['name' => 'Jadwal Pelayanan', 'icon' => 'ri-calendar-event-line', 'path' => 'jadwal-pelayanan', 'parent_id' => $masterDataMenu->id, 'order_no' => 4]
+        );
 
         // Pelayanan group
         $pelayananMenu = Menu::updateOrCreate(
@@ -58,6 +66,8 @@ class S3MenuSeeder extends Seeder
                 $masterDataMenu->id => $readOnly,
                 $jenisSuratMenu->id => $fullCrud,
                 $kategoriPengaduanMenu->id => $fullCrud,
+                $beritaMenu->id => $fullCrud,
+                $jadwalPelayananMenu->id => $fullCrud,
                 $pelayananMenu->id => $readOnly,
                 $tiketMenu->id => $fullCrud,
                 $pemohonMenu->id => $fullCrud,
@@ -70,6 +80,8 @@ class S3MenuSeeder extends Seeder
                 $masterDataMenu->id => $readOnly,
                 $jenisSuratMenu->id => $noDelete,
                 $kategoriPengaduanMenu->id => $noDelete,
+                $beritaMenu->id => $noDelete,
+                $jadwalPelayananMenu->id => $noDelete,
                 $pelayananMenu->id => $readOnly,
                 $tiketMenu->id => $readUpdateOnly,
                 $pemohonMenu->id => $noDelete,

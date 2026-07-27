@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImpersonateController;
 use App\Http\Controllers\InstansiController;
+use App\Http\Controllers\JadwalPelayananController;
 use App\Http\Controllers\JenisSuratController;
 use App\Http\Controllers\KategoriPengaduanController;
 use App\Http\Controllers\MenuController;
@@ -76,6 +78,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('instansi', InstansiController::class)->middleware('check.permission:instansi.index');
     Route::post('instansi/wilayah/sync', [InstansiController::class, 'syncWilayah'])->name('instansi.wilayah-sync')->middleware('check.permission:instansi.index');
     Route::resource('jenis-surat', JenisSuratController::class)->middleware('check.permission:jenis-surat.index');
+    Route::resource('berita', BeritaController::class)->middleware('check.permission:berita.index');
+    Route::resource('jadwal-pelayanan', JadwalPelayananController::class)->middleware('check.permission:jadwal-pelayanan.index');
     Route::resource('kategori-pengaduan', KategoriPengaduanController::class)->middleware('check.permission:kategori-pengaduan.index');
     Route::resource('pemohon', PemohonController::class)->middleware('check.permission:pemohon.index');
 
