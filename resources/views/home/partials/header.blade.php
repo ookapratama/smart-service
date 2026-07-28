@@ -66,7 +66,7 @@
             </a>
           </li>
         </ul>
-        <i class="mobile-nav-toggle d-none bi bi-list fs-3"></i>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list fs-3"></i>
       </nav>
 
     </div>
