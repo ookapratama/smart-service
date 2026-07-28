@@ -53,7 +53,7 @@
           <li><a href="{{ route('home') }}#services">Fitur 3S</a></li>
           <li><a href="{{ route('pengaduan.index') }}" class="{{ request()->routeIs('pengaduan.*') ? 'active' : '' }}">Pengaduan</a></li>
           <li><a href="{{ route('berita.public.index') }}" class="{{ request()->routeIs('berita.public.*') ? 'active' : '' }}">Berita</a></li>
-          <li><a href="{{ route('home') }}#cek-status">Cek Status</a></li>
+          <li><a href="{{ route('cek-status.index') }}" class="{{ request()->routeIs('cek-status.*') ? 'active' : '' }}">Cek Status</a></li>
           <li><a href="{{ route('home') }}#faq">FAQ</a></li>
           <li>
             <a href="{{ route('login') }}" class="btn btn-sm btn-primary text-white rounded-pill px-3 py-1 ms-lg-2">

@@ -45,8 +45,8 @@
       <div class="row justify-content-center text-center">
         <div class="col-lg-8" data-aos="fade-up">
           <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3 bg-white bg-opacity-20 border border-white border-opacity-30 shadow-sm mx-auto">
-            <i class="bi bi-newspaper text-white"></i>
-            <span class="small fw-semibold text-white">Portal Berita & Publikasi Kecamatan Soreang</span>
+            <i class="bi bi-newspaper text-dark"></i>
+            <span class="small fw-semibold text-dark">Portal Berita & Publikasi Kecamatan Soreang</span>
           </div>
 
           <h1 class="display-5 fw-extrabold mb-3" style="color: #ffffff !important; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">Kabar Kecamatan Soreang</h1>
