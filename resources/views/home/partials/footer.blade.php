@@ -51,9 +51,11 @@
           <li class="mb-2"><i class="bi bi-chevron-right text-primary me-1"></i> <a href="{{ route('home') }}#profil" class="text-white-50 text-decoration-none hover-white">Profil Kecamatan</a></li>
           <li class="mb-2"><i class="bi bi-chevron-right text-primary me-1"></i> <a href="{{ route('home') }}#jelajahi" class="text-white-50 text-decoration-none hover-white">Jelajahi Services</a></li>
           <li class="mb-2"><i class="bi bi-chevron-right text-primary me-1"></i> <a href="{{ route('pengaduan.index') }}" class="text-white-50 text-decoration-none hover-white">Pengaduan Warga</a></li>
+          <li class="mb-2"><i class="bi bi-chevron-right text-primary me-1"></i> <a href="{{ route('surat.index') }}" class="text-white-50 text-decoration-none hover-white">Buat Surat</a></li>
           <li class="mb-2"><i class="bi bi-chevron-right text-primary me-1"></i> <a href="{{ route('berita.public.index') }}" class="text-white-50 text-decoration-none hover-white">Portal Berita</a></li>
           <li class="mb-2"><i class="bi bi-chevron-right text-primary me-1"></i> <a href="{{ route('home') }}#cek-status" class="text-white-50 text-decoration-none hover-white">Cek Status Tiket</a></li>
-          <li class="mb-0"><i class="bi bi-chevron-right text-primary me-1"></i> <a href="{{ route('home') }}#faq" class="text-white-50 text-decoration-none hover-white">FAQ & Bantuan</a></li>
+          <li class="mb-2"><i class="bi bi-chevron-right text-primary me-1"></i> <a href="{{ route('panduan') }}" class="text-white-50 text-decoration-none hover-white">Panduan Layanan</a></li>
+          <li class="mb-0"><i class="bi bi-chevron-right text-primary me-1"></i> <a href="{{ route('panduan') }}#panduan-faq" class="text-white-50 text-decoration-none hover-white">FAQ & Bantuan</a></li>
         </ul>
       </div>
 

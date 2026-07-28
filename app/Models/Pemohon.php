@@ -19,8 +19,13 @@ class Pemohon extends Model
         'nik',
         'name',
         'phone',
+        'phone_verified_at',
         'email',
         'alamat',
+    ];
+
+    protected $casts = [
+        'phone_verified_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

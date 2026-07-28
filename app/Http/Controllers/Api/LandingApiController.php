@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\TiketStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Berita;
 use App\Models\JadwalPelayanan;
 use App\Models\JenisSurat;
 use App\Models\Tiket;
+use App\Services\SuratService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -75,6 +77,17 @@ class LandingApiController extends Controller
         $latestLog = $tiket->statusLogs()->latest()->first();
         $catatanRespon = $latestLog && ! empty($latestLog->catatan) ? $latestLog->catatan : null;
 
+        // Surat jadi (persuratan selesai + PDF terbit): arahkan ke halaman
+        // pengajuan, tempat unduhan digerbangi nomor tiket + NIK (§3/§5.3).
+        $suratUrl = null;
+        if (
+            $tiket->detail_type === 'pengajuan_surat'
+            && $tiket->status === TiketStatus::Selesai
+            && $tiket->detail?->media()->where('collection', SuratService::PDF_COLLECTION)->exists()
+        ) {
+            $suratUrl = route('surat.sukses', $tiket->nomor_tiket);
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -88,6 +101,7 @@ class LandingApiController extends Controller
                 'created_at' => $tiket->created_at ? $tiket->created_at->format('d M Y H:i') : '-',
                 'updated_at' => $tiket->updated_at ? $tiket->updated_at->format('d M Y H:i') : '-',
                 'catatan_respon' => $catatanRespon,
+                'surat_url' => $suratUrl,
             ],
         ]);
     }

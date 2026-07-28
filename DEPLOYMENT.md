@@ -38,6 +38,11 @@ ln -s ~/soreang/laravel_soreang/public/index.php index.php
 ln -s ~/soreang/laravel_soreang/public/.htaccess .htaccess
 ln -s ~/soreang/laravel_soreang/public/build build
 
+# Sneat template's static assets (img/js/css/svg/json under public/assets) — referenced
+# directly as /assets/... in Blade views, not bundled through Vite, so they need their
+# own symlink too (easy to miss since they're not an "entry point" like the others).
+ln -s ~/soreang/laravel_soreang/public/assets assets
+
 # Only if these exist in public/ — check first with: ls ~/soreang/laravel_soreang/public
 ln -s ~/soreang/laravel_soreang/public/robots.txt robots.txt
 ln -s ~/soreang/laravel_soreang/public/favicon.ico favicon.ico

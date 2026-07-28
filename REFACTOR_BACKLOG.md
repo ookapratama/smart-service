@@ -2,6 +2,14 @@
 
 Known tech debt in this base, recorded during the initial cleanup pass. HIGH-severity bugs, the `make:feature` generator, and the 2026-07-25 bugfix batch (validation/permission/leak fixes — see CHANGELOG) have been resolved; the items below are the remaining MEDIUM/LOW work.
 
+## Deferred from Fase C/D persuratan (2026-07-28)
+
+- **WA send is synchronous in the request cycle.** `S3_MVP_DESIGN.md` §5.4 mandates a queued job dispatched `->afterCommit()` for every WA trigger (tiket creation + each status change); current code calls the notifier inline (blocking on gateway latency). Introduce a `KirimNotifikasiWaJob` + wire all call sites when the real HTTP gateway driver lands.
+- **Phone normalization 08xx vs +628xx.** The same physical number in two formats is treated as two different numbers (OTP target resolution, cooldown keys, pemohon dedupe). Normalize to one canonical form (e.g. `628…`) at the service boundary.
+- **Preview draft surat for warga (§5.3).** "Bisa lihat preview draft surat" after submit = on-demand render, never stored. Deferred to the warga-login phase; `SuratService::generatePdf()` template resolution is already reusable for it.
+- **OTP cooldown response returns the constant, not exact seconds.** On `reason: cooldown`, `retry_after` is always the full `RESEND_COOLDOWN` (60) instead of the actual remaining seconds of the cooldown cache entry. Store the expiry timestamp in the cooldown cache value and compute the remainder.
+- **Form re-verify UX after failed submit.** When submit fails validation after OTP passed, the session flag survives but the page reloads with the OTP UI in its initial state — the user can't tell whether they must re-verify. Surface the still-verified state (or remaining TTL) in the form on re-render.
+
 ## Medium
 
 - **`DeployWebhookController::run` executes migrate/seed/cache/queue-restart synchronously inside one HTTP request.** Shared-hosting PHP has a max execution time (often 30-60s). Fine at the current schema/data size (~11s locally including all six commands), but if the migration/seed set grows substantially this could start timing out mid-command, leaving `config:cache`/`route:cache` unrun after a successful `migrate`. If it ever becomes a problem, consider queuing the commands instead and having the webhook just dispatch + return 202, with a second webhook call (or the queue-worker cron already documented in `DEPLOYMENT.md` §6) to check completion.

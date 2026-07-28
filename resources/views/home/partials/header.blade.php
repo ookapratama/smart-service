@@ -48,13 +48,18 @@
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="{{ route('home') }}#hero" class="{{ request()->routeIs('home') ? 'active' : '' }}">Beranda</a></li>
-          <li><a href="{{ route('home') }}#profil">Profil</a></li>
-          <li><a href="{{ route('home') }}#jelajahi">Jelajahi</a></li>
-          <li><a href="{{ route('home') }}#services">Fitur 3S</a></li>
-          <li><a href="{{ route('pengaduan.index') }}" class="{{ request()->routeIs('pengaduan.*') ? 'active' : '' }}">Pengaduan</a></li>
+          <li class="dropdown">
+            <a href="#" class="{{ request()->routeIs(['pengaduan.*', 'surat.*', 'cek-status.*']) ? 'active' : '' }}">
+              <span>Layanan</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+            </a>
+            <ul>
+              <li><a href="{{ route('pengaduan.index') }}" class="{{ request()->routeIs('pengaduan.*') ? 'active' : '' }}">Pengaduan</a></li>
+              <li><a href="{{ route('surat.index') }}" class="{{ request()->routeIs('surat.*') ? 'active' : '' }}">Buat Surat</a></li>
+              <li><a href="{{ route('cek-status.index') }}" class="{{ request()->routeIs('cek-status.*') ? 'active' : '' }}">Cek Status</a></li>
+            </ul>
+          </li>
           <li><a href="{{ route('berita.public.index') }}" class="{{ request()->routeIs('berita.public.*') ? 'active' : '' }}">Berita</a></li>
-          <li><a href="{{ route('cek-status.index') }}" class="{{ request()->routeIs('cek-status.*') ? 'active' : '' }}">Cek Status</a></li>
-          <li><a href="{{ route('home') }}#faq">FAQ</a></li>
+          <li><a href="{{ route('panduan') }}" class="{{ request()->routeIs('panduan') ? 'active' : '' }}">Panduan</a></li>
           <li>
             <a href="{{ route('login') }}" class="btn btn-sm btn-primary text-white rounded-pill px-3 py-1 ms-lg-2">
               <i class="bi bi-box-arrow-in-right me-1"></i> Login Admin
