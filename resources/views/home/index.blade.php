@@ -556,39 +556,6 @@
 
 
 
-  <!-- 10. SECTION FAQ ACCORDION -->
-  <section id="faq" class="py-5">
-    
-    @include('home.components.section-title', [
-      'subtitle' => 'Faq',
-      'title' => 'Pertanyaan Yang Sering Diajukan',
-      'description' => 'Informasi jawaban atas pertanyaan seputar layanan Soreang Smart Service.'
-    ])
-
-    <div class="container mt-4">
-      <div class="row justify-content-center">
-        <div class="col-lg-10" data-aos="fade-up">
-          <div class="accordion accordion-flush" id="faqAccordion">
-            @foreach($faqs as $index => $faq)
-              <div class="accordion-item mb-3 border rounded-4 overflow-hidden shadow-sm">
-                <h2 class="accordion-header" id="faqHeading{{ $index }}">
-                  <button class="accordion-button fw-bold text-dark py-3 px-4 {{ $index > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ $index }}" aria-expanded="{{ $index === 0 ? 'true' : 'false' }}">
-                    <i class="bi bi-question-circle-fill text-primary me-3 fs-5"></i> {{ $faq['question'] }}
-                  </button>
-                </h2>
-                <div id="faqCollapse{{ $index }}" class="accordion-collapse collapse {{ $index === 0 ? 'show' : '' }}" data-bs-parent="#faqAccordion">
-                  <div class="accordion-body text-secondary px-4 pb-4 pt-0" style="line-height: 1.6; font-size: 0.95rem;">
-                    {{ $faq['answer'] }}
-                  </div>
-                </div>
-              </div>
-            @endforeach
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   {{-- Include All Interactive Modals --}}
   @include('home.partials.modals')
 

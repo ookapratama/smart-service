@@ -41,6 +41,10 @@
                     </tr>
                     @if ($data->detail)
                         @if (str_contains(get_class($data->detail), 'PengajuanSurat'))
+                            @php
+                                $fieldDefs = collect($data->detail->jenisSurat->fields ?? []);
+                                $fieldLabels = $fieldDefs->pluck('label', 'name');
+                            @endphp
                             <tr>
                                 <th class="text-muted">Jenis Layanan</th>
                                 <td>: Persuratan - {{ $data->detail->jenisSurat->nama ?? '-' }}</td>
@@ -48,6 +52,22 @@
                             <tr>
                                 <th class="text-muted">Keperluan</th>
                                 <td>: {{ $data->detail->keperluan }}</td>
+                            </tr>
+                            @foreach ($data->detail->data ?? [] as $fieldName => $fieldValue)
+                                <tr>
+                                    <th class="text-muted">{{ $fieldLabels[$fieldName] ?? \Illuminate\Support\Str::headline($fieldName) }}</th>
+                                    <td>: {{ is_array($fieldValue) ? implode(', ', $fieldValue) : $fieldValue }}</td>
+                                </tr>
+                            @endforeach
+                            <tr>
+                                <th class="text-muted">Nomor Surat</th>
+                                <td>:
+                                    @if ($data->detail->nomor_surat)
+                                        <code>{{ $data->detail->nomor_surat }}</code>
+                                    @else
+                                        <span class="text-muted">Belum terbit (terbit saat tiket selesai)</span>
+                                    @endif
+                                </td>
                             </tr>
                         @elseif (str_contains(get_class($data->detail), 'Pengaduan'))
                             <tr>
@@ -140,6 +160,56 @@
                     </form>
                 @endif
             </div>
+
+            @if ($data->detail && str_contains(get_class($data->detail), 'PengajuanSurat'))
+                @php
+                    $lampiranGrouped = $data->detail->media
+                        ->where('collection', '!=', \App\Services\SuratService::PDF_COLLECTION)
+                        ->groupBy('collection');
+                    $suratPdf = $data->detail->media
+                        ->where('collection', \App\Services\SuratService::PDF_COLLECTION)
+                        ->sortByDesc('id')
+                        ->first();
+                @endphp
+
+                <div class="card p-4 mt-4">
+                    <h6 class="fw-bold mb-3">Lampiran Syarat</h6>
+                    @forelse ($lampiranGrouped as $collection => $mediaList)
+                        <div class="mb-2">
+                            <small class="text-muted d-block mb-1">{{ $fieldLabels[$collection] ?? \Illuminate\Support\Str::headline($collection) }}</small>
+                            @foreach ($mediaList as $media)
+                                <a href="{{ route('tiket.lampiran', [$data->id, $media->id]) }}" class="d-flex align-items-center text-truncate mb-1">
+                                    <i class="ri-attachment-2 me-1"></i>
+                                    {{ $media->original_name }}
+                                    <span class="text-muted ms-1">({{ $media->size_formatted }})</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    @empty
+                        <p class="text-muted mb-0">Tidak ada lampiran.</p>
+                    @endforelse
+                </div>
+
+                <div class="card p-4 mt-4">
+                    <h6 class="fw-bold mb-3">Surat Resmi (PDF)</h6>
+                    @if ($suratPdf)
+                        <a href="{{ route('tiket.surat-pdf', $data->id) }}" class="btn btn-outline-primary w-100 mb-2">
+                            <i class="ri-file-download-line me-1"></i> Unduh PDF Surat
+                        </a>
+                    @endif
+
+                    @if ($data->status->value === 'selesai' && $data->detail->nomor_surat)
+                        <form action="{{ route('tiket.regenerate-surat-pdf', $data->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-secondary w-100">
+                                <i class="ri-refresh-line me-1"></i> {{ $suratPdf ? 'Generate Ulang PDF' : 'Generate PDF Surat' }}
+                            </button>
+                        </form>
+                    @elseif (! $suratPdf)
+                        <p class="text-muted mb-0">PDF dibuat otomatis saat tiket ditandai selesai.</p>
+                    @endif
+                </div>
+            @endif
         </div>
     </div>
 </div>

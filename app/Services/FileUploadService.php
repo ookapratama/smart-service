@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileUploadService
 {
@@ -57,6 +58,40 @@ class FileUploadService
             'collection' => $options['collection'] ?? $folder,
             'meta' => $meta,
         ]);
+    }
+
+    /**
+     * Persist raw generated contents (e.g. a rendered PDF) as a Media record.
+     * Counterpart of upload() for bytes produced by the app itself, where no
+     * UploadedFile exists.
+     *
+     * @param  array  $options  collection, mime_type, original_name, meta
+     */
+    public function uploadContents(string $contents, string $filename, string $folder = 'uploads', string $disk = 'public', array $options = []): Media
+    {
+        $path = "{$folder}/{$filename}";
+
+        Storage::disk($disk)->put($path, $contents);
+
+        return Media::create([
+            'user_id' => auth()->id(),
+            'filename' => $filename,
+            'original_name' => $options['original_name'] ?? $filename,
+            'mime_type' => $options['mime_type'] ?? 'application/octet-stream',
+            'size' => strlen($contents),
+            'disk' => $disk,
+            'path' => $path,
+            'collection' => $options['collection'] ?? $folder,
+            'meta' => $options['meta'] ?? [],
+        ]);
+    }
+
+    /**
+     * Stream a stored Media file as a download response.
+     */
+    public function download(Media $media): StreamedResponse
+    {
+        return Storage::disk($media->disk)->download($media->path, $media->original_name);
     }
 
     /**

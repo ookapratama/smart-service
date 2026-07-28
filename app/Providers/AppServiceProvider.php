@@ -2,9 +2,11 @@
 
 namespace App\Providers;
 
+use App\Contracts\Services\WhatsAppNotifier;
 use App\Helpers\ViewConfigHelper;
 use App\Models\Pengaduan;
 use App\Models\PengajuanSurat;
+use App\Models\Setting;
 use App\Repositories\BeritaRepository;
 use App\Repositories\JadwalPelayananRepository;
 use App\Repositories\JenisSuratRepository;
@@ -15,6 +17,7 @@ use App\Repositories\RoleRepository;
 use App\Repositories\TiketRepository;
 use App\Repositories\UserRepository;
 use App\Services\SettingService;
+use App\Services\Wa\LogWhatsAppNotifier;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
@@ -66,6 +69,22 @@ class AppServiceProvider extends ServiceProvider
             \App\Contracts\Repositories\MenuRepository::class,
             MenuRepository::class
         );
+
+        // WhatsApp notifier: driver dipilih dari setting `wa_driver` saat resolve.
+        // Driver HTTP gateway tinggal ditambahkan ke map ini tanpa mengubah call site.
+        $this->app->bind(WhatsAppNotifier::class, function () {
+            $drivers = [
+                'log' => LogWhatsAppNotifier::class,
+            ];
+
+            try {
+                $driver = Setting::getByKey('wa_driver') ?: 'log';
+            } catch (\Throwable) {
+                $driver = 'log'; // tabel settings belum tersedia (migrasi awal / bootstrap test)
+            }
+
+            return $this->app->make($drivers[$driver] ?? $drivers['log']);
+        });
     }
 
     /**

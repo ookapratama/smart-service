@@ -20,7 +20,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Landing\BeritaPublicController;
 use App\Http\Controllers\Landing\CekStatusPublicController;
 use App\Http\Controllers\Landing\HomeController;
+use App\Http\Controllers\Landing\OtpController;
 use App\Http\Controllers\Landing\PengaduanPublicController;
+use App\Http\Controllers\Landing\PengajuanSuratPublicController;
 use Illuminate\Support\Facades\Route;
 
 // Public Landing Home Route
@@ -38,6 +40,22 @@ Route::get('/pengaduan', [PengaduanPublicController::class, 'index'])->name('pen
 Route::get('/pengaduan/create', [PengaduanPublicController::class, 'create'])->name('pengaduan.create');
 Route::post('/pengaduan', [PengaduanPublicController::class, 'store'])->name('pengaduan.store');
 Route::get('/pengaduan/sukses/{nomor_tiket}', [PengaduanPublicController::class, 'sukses'])->name('pengaduan.sukses');
+
+// Public Persuratan Routes
+Route::get('/surat', [PengajuanSuratPublicController::class, 'index'])->name('surat.index');
+Route::post('/surat', [PengajuanSuratPublicController::class, 'store'])->name('surat.store');
+Route::get('/surat/sukses/{nomor_tiket}', [PengajuanSuratPublicController::class, 'sukses'])->name('surat.sukses');
+// Unduh PDF surat jadi: gerbang ganda nomor tiket + NIK (§3 — NIK bukan otentikasi tunggal).
+// Throttle per IP: tanpa ini NIK bisa di-brute-force terhadap nomor tiket yang diketahui.
+Route::get('/surat/unduh/{nomor_tiket}', [PengajuanSuratPublicController::class, 'unduh'])->name('surat.unduh')->middleware('throttle:10,1');
+Route::get('/surat/{jenisSurat}', [PengajuanSuratPublicController::class, 'create'])->name('surat.create');
+
+// Halaman panduan penggunaan layanan (bahasa awam)
+Route::get('/panduan', [HomeController::class, 'panduan'])->name('panduan');
+
+// OTP endpoints (AJAX dari halaman landing — session + CSRF)
+Route::post('/otp/request', [OtpController::class, 'request'])->name('otp.request');
+Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify');
 
 // Auth Routes
 Route::get('login', [AuthController::class, 'showLogin'])->name('login');
@@ -91,4 +109,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('tiket', [TiketController::class, 'index'])->name('tiket.index')->middleware('check.permission:tiket.index');
     Route::get('tiket/{id}', [TiketController::class, 'show'])->name('tiket.show')->middleware('check.permission:tiket.index');
     Route::post('tiket/{id}/status', [TiketController::class, 'updateStatus'])->name('tiket.update-status')->middleware('check.permission:tiket.index');
+    Route::get('tiket/{id}/lampiran/{mediaId}', [TiketController::class, 'downloadLampiran'])->name('tiket.lampiran')->middleware('check.permission:tiket.index');
+    Route::get('tiket/{id}/surat-pdf', [TiketController::class, 'downloadSuratPdf'])->name('tiket.surat-pdf')->middleware('check.permission:tiket.index');
+    Route::post('tiket/{id}/surat-pdf', [TiketController::class, 'regenerateSuratPdf'])->name('tiket.regenerate-surat-pdf')->middleware('check.permission:tiket.index');
 });

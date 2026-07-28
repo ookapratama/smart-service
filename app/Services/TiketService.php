@@ -12,7 +12,14 @@ use Illuminate\Support\Facades\DB;
 
 class TiketService extends BaseService
 {
-    public function __construct(TiketRepository $repository)
+    /**
+     * Pesan peringatan bila PDF surat gagal dibuat pada transisi selesai
+     * terakhir. Side-effect pasca-commit tidak boleh menggagalkan perubahan
+     * status (§7) — controller membaca properti ini untuk menampilkan warning.
+     */
+    public ?string $pdfWarning = null;
+
+    public function __construct(TiketRepository $repository, protected SuratService $suratService)
     {
         parent::__construct($repository);
     }
@@ -52,6 +59,8 @@ class TiketService extends BaseService
      */
     public function updateStatus(int $id, string $statusTo, ?string $catatan = null)
     {
+        $this->pdfWarning = null;
+
         $tiket = $this->find($id);
         $statusFrom = $tiket->status;
         $newStatus = TiketStatus::from($statusTo);
@@ -62,18 +71,41 @@ class TiketService extends BaseService
             );
         }
 
-        $tiket->status = $newStatus;
-        if ($newStatus === TiketStatus::Selesai) {
-            $tiket->selesai_at = now();
-        }
-        $tiket->save();
+        $terbitkanSurat = $newStatus === TiketStatus::Selesai
+            && $tiket->detail_type === 'pengajuan_surat';
 
-        $tiket->statusLogs()->create([
-            'status_from' => $statusFrom,
-            'status_to' => $newStatus,
-            'user_id' => Auth::id(),
-            'catatan' => $catatan,
-        ]);
+        // Status + status_log + nomor surat dalam SATU transaksi (§7 Atomicity):
+        // nomor surat resmi hanya terbit bersama status selesai yang ter-commit.
+        DB::transaction(function () use ($tiket, $statusFrom, $newStatus, $catatan, $terbitkanSurat) {
+            $tiket->status = $newStatus;
+            if ($newStatus === TiketStatus::Selesai) {
+                $tiket->selesai_at = now();
+            }
+            $tiket->save();
+
+            $tiket->statusLogs()->create([
+                'status_from' => $statusFrom,
+                'status_to' => $newStatus,
+                'user_id' => Auth::id(),
+                'catatan' => $catatan,
+            ]);
+
+            if ($terbitkanSurat) {
+                $this->suratService->assignNomorSurat($tiket->detail);
+            }
+        });
+
+        // Tulis file PDF ketat SETELAH commit (§7 Durability). Gagal PDF tidak
+        // membatalkan status — dicatat + petugas bisa generate ulang dari detail tiket.
+        if ($terbitkanSurat) {
+            try {
+                $this->suratService->generatePdf($tiket->detail);
+            } catch (\Throwable $e) {
+                report($e);
+                $this->pdfWarning = 'Status tersimpan dan nomor surat terbit, tetapi PDF surat gagal dibuat. '
+                    .'Gunakan tombol "Generate Ulang PDF" pada detail tiket.';
+            }
+        }
 
         return $tiket;
     }
