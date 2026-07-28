@@ -32,16 +32,16 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label" for="instansi_id">Instansi</label>
-                                <select class="select2 form-select @error('instansi_id') is-invalid @enderror" id="instansi_id" name="instansi_id" required>
-                                    <option value="">-- Pilih Instansi --</option>
-                                    @foreach ($instansiList as $instansi)
-                                        <option value="{{ $instansi->id }}" {{ old('instansi_id') == $instansi->id ? 'selected' : '' }}>
-                                            {{ $instansi->name }} ({{ $instansi->level->label() }})
+                                <label class="form-label" for="kelurahan_id">Kelurahan</label>
+                                <select class="select2 form-select @error('kelurahan_id') is-invalid @enderror" id="kelurahan_id" name="kelurahan_id">
+                                    <option value="">-- Pilih Kelurahan --</option>
+                                    @foreach ($kelurahanList as $kelurahan)
+                                        <option value="{{ $kelurahan->id }}" {{ old('kelurahan_id') == $kelurahan->id ? 'selected' : '' }}>
+                                            {{ $kelurahan->nama }}
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('instansi_id')
+                                @error('kelurahan_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

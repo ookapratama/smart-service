@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('jenis_surat_id')->constrained('jenis_surat')->restrictOnDelete();
             $table->string('keperluan');
             $table->json('data')->nullable();
+            $table->string('nomor_surat', 100)->nullable()->unique();
             $table->timestamps();
         });
     }

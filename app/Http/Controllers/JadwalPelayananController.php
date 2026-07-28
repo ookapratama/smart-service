@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\JadwalPelayananRequest;
+use App\Models\Kelurahan;
 use App\Services\JadwalPelayananService;
 
 class JadwalPelayananController extends Controller
@@ -17,7 +18,7 @@ class JadwalPelayananController extends Controller
      */
     public function index()
     {
-        $data = $this->service->all();
+        $data = $this->service->all()->load('kelurahan');
 
         return view('pages.jadwal-pelayanan.index', compact('data'));
     }
@@ -27,7 +28,9 @@ class JadwalPelayananController extends Controller
      */
     public function create()
     {
-        return view('pages.jadwal-pelayanan.create');
+        $kelurahanList = Kelurahan::orderBy('nama')->get();
+
+        return view('pages.jadwal-pelayanan.create', compact('kelurahanList'));
     }
 
     /**
@@ -49,7 +52,7 @@ class JadwalPelayananController extends Controller
      */
     public function show(int $id)
     {
-        $data = $this->service->find($id);
+        $data = $this->service->find($id)->load('kelurahan');
 
         return view('pages.jadwal-pelayanan.show', compact('data'));
     }
@@ -60,8 +63,9 @@ class JadwalPelayananController extends Controller
     public function edit(int $id)
     {
         $data = $this->service->find($id);
+        $kelurahanList = Kelurahan::orderBy('nama')->get();
 
-        return view('pages.jadwal-pelayanan.edit', compact('data'));
+        return view('pages.jadwal-pelayanan.edit', compact('data', 'kelurahanList'));
     }
 
     /**

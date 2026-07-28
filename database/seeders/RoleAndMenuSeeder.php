@@ -13,7 +13,8 @@ class RoleAndMenuSeeder extends Seeder
         $roles = [
             ['name' => 'Super Admin', 'slug' => 'super-admin'],
             ['name' => 'Admin', 'slug' => 'admin'],
-            ['name' => 'Petugas Instansi', 'slug' => 'petugas-instansi'],
+            ['name' => 'Petugas', 'slug' => 'petugas'],
+            ['name' => 'Warga', 'slug' => 'warga'],
             ['name' => 'User', 'slug' => 'user'],
             ['name' => 'Visitor', 'slug' => 'visitor'],
         ];
@@ -34,15 +35,13 @@ class RoleAndMenuSeeder extends Seeder
 
         // 2. Menus
         $menus = [
-            ['name' => 'Dashboard', 'slug' => 'dashboard', 'path' => '/', 'icon' => 'ri-home-smile-line', 'order_no' => 1],
+            ['name' => 'Dashboard', 'slug' => 'dashboard', 'path' => '/dashboard', 'icon' => 'ri-home-smile-line', 'order_no' => 1],
             ['name' => 'User Management', 'slug' => 'user-management', 'path' => null, 'icon' => 'ri-user-settings-line', 'order_no' => 2],
             ['parent' => 'User Management', 'name' => 'Users', 'slug' => 'user.index', 'path' => '/user', 'icon' => 'ri-user-line', 'order_no' => 1],
             ['parent' => 'User Management', 'name' => 'Roles', 'slug' => 'role.index', 'path' => '/role', 'icon' => 'ri-shield-user-line', 'order_no' => 2],
             ['parent' => 'User Management', 'name' => 'Menus', 'slug' => 'menu.index', 'path' => '/menu', 'icon' => 'ri-menu-search-line', 'order_no' => 3],
             ['parent' => 'User Management', 'name' => 'Permissions', 'slug' => 'permission.index', 'path' => '/permission', 'icon' => 'ri-lock-password-line', 'order_no' => 4],
-            ['name' => 'Katalog Produk', 'slug' => 'products.index', 'path' => '/products', 'icon' => 'ri-shopping-bag-3-line', 'order_no' => 3],
             ['name' => 'Activity Log', 'slug' => 'activity-log.index', 'path' => '/activity-log', 'icon' => 'ri-history-line', 'order_no' => 4],
-            ['name' => 'API Docs', 'slug' => 'api-docs', 'path' => '/api/documentation', 'icon' => 'ri-book-open-line', 'order_no' => 5],
         ];
 
         $menuIdMap = [];
@@ -94,10 +93,10 @@ class RoleAndMenuSeeder extends Seeder
                 );
             }
 
-            // Assign some to Petugas Instansi (dashboard only here — Tiket/Pemohon access is granted in S3MenuSeeder)
+            // Assign some to Petugas (dashboard only here — Tiket/Pemohon access is granted in S3MenuSeeder)
             if (in_array($m['slug'], ['dashboard'])) {
                 DB::table('role_menu')->updateOrInsert(
-                    ['role_id' => $roleIds['petugas-instansi'], 'menu_id' => $dbMenu->id],
+                    ['role_id' => $roleIds['petugas'], 'menu_id' => $dbMenu->id],
                     [
                         'can_create' => false,
                         'can_read' => true,
@@ -108,6 +107,9 @@ class RoleAndMenuSeeder extends Seeder
                     ]
                 );
             }
+
+            // Warga: no admin menus at all — the public landing has its own auth flow
+            // (OTP by NIK, later phase), not the admin sidebar.
 
             // Assign some to User
             if (in_array($m['slug'], ['dashboard'])) {
@@ -125,7 +127,7 @@ class RoleAndMenuSeeder extends Seeder
             }
 
             // Assign some to Visitor (Full view of public features but Read Only)
-            if (in_array($m['slug'], ['dashboard', 'products.index'])) {
+            if (in_array($m['slug'], ['dashboard'])) {
                 DB::table('role_menu')->updateOrInsert(
                     ['role_id' => $roleIds['visitor'], 'menu_id' => $dbMenu->id],
                     [

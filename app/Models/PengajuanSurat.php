@@ -18,6 +18,7 @@ class PengajuanSurat extends Model
         'jenis_surat_id',
         'keperluan',
         'data',
+        'nomor_surat',
     ];
 
     protected $casts = [

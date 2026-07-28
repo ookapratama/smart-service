@@ -1,7 +1,7 @@
 @extends('home.layouts.app')
 
-@section('title', 'Layanan Pengaduan Masyarakat - Sorean Smart Service (3S)')
-@section('meta_description', 'Portal Pengaduan, Aspirasi, dan Saran Masyarakat Kecamatan Sorean. Cepat, Terintegrasi, dan Terjamin Kerahasiaannya.')
+@section('title', 'Layanan Pengaduan Masyarakat - Soreang Smart Service (3S)')
+@section('meta_description', 'Portal Pengaduan, Aspirasi, dan Saran Masyarakat Kecamatan Soreang. Cepat, Terintegrasi, dan Terjamin Kerahasiaannya.')
 
 @section('content')
 
@@ -17,7 +17,7 @@
             Sampaikan Keluhan & Aspirasi Anda Secara Digital
           </h1>
           <p class="lead text-muted mb-4">
-            Pemerintah Kecamatan Sorean menyediakan sarana pengaduan publik yang transparan, cepat ditindaklanjuti, dan terjamin kerahasiaan pelapor.
+            Pemerintah Kecamatan Soreang menyediakan sarana pengaduan publik yang transparan, cepat ditindaklanjuti, dan terjamin kerahasiaan pelapor.
           </p>
           <div class="d-flex flex-wrap gap-3">
             <a href="{{ route('pengaduan.create') }}" class="btn btn-primary btn-md px-4 py-3 shadow-sm rounded-3 fw-bold">
@@ -160,7 +160,7 @@
     <div class="container text-center" data-aos="fade-up">
       <h2 class="fw-bold mb-3 text-white">Siap Menyampaikan Laporan Atau Aspirasi Anda?</h2>
       <p class="lead mb-4 text-white-50 mx-auto" style="max-width: 700px;">
-        Klik tombol di bawah ini untuk masuk ke Formulir Pengaduan Digital Kecamatan Sorean.
+        Klik tombol di bawah ini untuk masuk ke Formulir Pengaduan Digital Kecamatan Soreang.
       </p>
       <a href="{{ route('pengaduan.create') }}" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold text-primary shadow">
         <i class="bi bi-file-earmark-plus me-2"></i> Masuk Ke Form Pengaduan

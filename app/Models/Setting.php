@@ -10,7 +10,6 @@ class Setting extends Model
     use LogsActivity;
 
     protected $fillable = [
-        'instansi_id',
         'key',
         'value',
         'group',

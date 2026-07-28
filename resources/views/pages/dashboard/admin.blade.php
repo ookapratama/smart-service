@@ -120,10 +120,10 @@
                            </div>
                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
                               <div class="me-2">
-                                 <h6 class="mb-0">Tambah Produk Baru</h6>
-                                 <small class="text-muted">Katalog Master</small>
+                                 <h6 class="mb-0">Antrian Tiket</h6>
+                                 <small class="text-muted">Layanan Warga</small>
                               </div>
-                              <a href="{{ route('products.create') }}"
+                              <a href="{{ route('tiket.index') }}"
                                  class="btn btn-sm btn-icon btn-text-secondary rounded-pill"><i
                                     class="ri-arrow-right-s-line"></i></a>
                            </div>

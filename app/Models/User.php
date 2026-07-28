@@ -26,17 +26,11 @@ class User extends Authenticatable
         'password',
         'role_id',
         'avatar',
-        'instansi_id',
     ];
 
     public function role()
     {
         return $this->belongsTo(Role::class);
-    }
-
-    public function instansi()
-    {
-        return $this->belongsTo(Instansi::class);
     }
 
     /**

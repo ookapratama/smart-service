@@ -20,18 +20,29 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label" for="kelurahan">Nama Kelurahan</label>
-                                <input type="text" class="form-control @error('kelurahan') is-invalid @enderror" id="kelurahan" name="kelurahan" value="{{ old('kelurahan') }}" placeholder="Contoh: Kelurahan Mekarjaya" required>
-                                @error('kelurahan')
+                                <label class="form-label" for="kelurahan_id">Kelurahan</label>
+                                <select class="form-select @error('kelurahan_id') is-invalid @enderror" id="kelurahan_id" name="kelurahan_id" required>
+                                    <option value="">-- Pilih Kelurahan --</option>
+                                    @foreach ($kelurahanList as $kelurahan)
+                                        <option value="{{ $kelurahan->id }}" {{ old('kelurahan_id') == $kelurahan->id ? 'selected' : '' }}>{{ $kelurahan->nama }}</option>
+                                    @endforeach
+                                </select>
+                                @error('kelurahan_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label class="form-label" for="hari_operasional">Hari Operasional</label>
-                                <input type="text" class="form-control @error('hari_operasional') is-invalid @enderror" id="hari_operasional" name="hari_operasional" value="{{ old('hari_operasional', 'Senin - Jumat') }}" placeholder="Contoh: Senin - Jumat">
-                                @error('hari_operasional')
-                                    <div class="invalid-feedback">{{ $message }}</div>
+                                <label class="form-label d-block">Hari Operasional</label>
+                                @php $hariOptions = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']; $selectedHari = old('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat']); @endphp
+                                @foreach ($hariOptions as $hari)
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" name="hari[]" id="hari_{{ $hari }}" value="{{ $hari }}" {{ in_array($hari, $selectedHari) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="hari_{{ $hari }}">{{ $hari }}</label>
+                                    </div>
+                                @endforeach
+                                @error('hari')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
                             </div>
 
@@ -76,9 +87,9 @@
                             </div>
 
                             <div class="col-md-12 mb-3">
-                                <label class="form-label" for="catatan">Catatan / Keterangan Khusus</label>
-                                <textarea class="form-control @error('catatan') is-invalid @enderror" id="catatan" name="catatan" rows="2" placeholder="Informasi pelayanan khusus atau persyaratan kelurahan...">{{ old('catatan') }}</textarea>
-                                @error('catatan')
+                                <label class="form-label" for="keterangan">Catatan / Keterangan Khusus</label>
+                                <textarea class="form-control @error('keterangan') is-invalid @enderror" id="keterangan" name="keterangan" rows="2" placeholder="Informasi pelayanan khusus atau persyaratan kelurahan...">{{ old('keterangan') }}</textarea>
+                                @error('keterangan')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

@@ -1,5 +1,5 @@
 /**
- * 3S (Sorean Smart Service) Interactive Landing JS
+ * 3S (Soreang Smart Service) Interactive Landing JS
  */
 document.addEventListener('DOMContentLoaded', function () {
   'use strict';
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <h5 class="fw-bold text-dark mb-3">${d.judul}</h5>
                     <div class="row g-3 p-3 bg-light rounded-3 mb-3 border">
                       <div class="col-sm-6"><span class="text-muted small">Nama Pemohon:</span><br><strong class="text-dark">${d.pemohon_nama}</strong></div>
-                      <div class="col-sm-6"><span class="text-muted small">Instansi Tujuan:</span><br><strong class="text-dark">${d.instansi_nama}</strong></div>
+                      <div class="col-sm-6"><span class="text-muted small">Unit Layanan:</span><br><strong class="text-dark">${d.instansi_nama}</strong></div>
                       <div class="col-sm-6"><span class="text-muted small">Tanggal Dibuat:</span><br><strong>${d.created_at}</strong></div>
                       <div class="col-sm-6"><span class="text-muted small">Update Terakhir:</span><br><strong>${d.updated_at}</strong></div>
                     </div>

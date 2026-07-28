@@ -35,10 +35,10 @@
                     @forelse($data as $index => $item)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td><span class="fw-bold text-primary">{{ $item->kelurahan }}</span></td>
+                            <td><span class="fw-bold text-primary">{{ $item->kelurahan->nama ?? '-' }}</span></td>
                             <td><span class="badge bg-label-success fs-6">{{ $item->jam_buka }} - {{ $item->jam_tutup }}</span></td>
                             <td><small class="text-muted">{{ $item->istirahat ?? '-' }}</small></td>
-                            <td><small class="fw-semibold">{{ $item->hari_operasional ?? 'Senin - Jumat' }}</small></td>
+                            <td><small class="fw-semibold">{{ implode(', ', $item->hari ?? []) }}</small></td>
                             <td><small>{{ $item->petugas ?? '-' }}</small></td>
                             <td>
                                 @if ($item->is_active)
@@ -57,7 +57,7 @@
                                     </a>
                                     <button type="button" class="btn btn-sm btn-outline-danger delete-record"
                                             data-id="{{ $item->id }}"
-                                            data-name="{{ $item->kelurahan }}">
+                                            data-name="{{ $item->kelurahan->nama ?? '' }}">
                                         <i class="ri-delete-bin-line"></i>
                                     </button>
                                 </div>

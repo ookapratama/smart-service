@@ -24,7 +24,7 @@
                         <th style="width: 50px">#</th>
                         <th>NIK</th>
                         <th>Nama</th>
-                        <th>Instansi</th>
+                        <th>Kelurahan</th>
                         <th>Kontak</th>
                         <th class="text-center">Aksi</th>
                     </tr>
@@ -35,7 +35,7 @@
                             <td>{{ $index + 1 }}</td>
                             <td><code>{{ $item->nik }}</code></td>
                             <td><span class="fw-bold">{{ $item->name }}</span></td>
-                            <td>{{ $item->instansi->name ?? '-' }}</td>
+                            <td>{{ $item->kelurahan->nama ?? '-' }}</td>
                             <td>
                                 {{ $item->phone ?? '-' }}
                                 @if ($item->email)

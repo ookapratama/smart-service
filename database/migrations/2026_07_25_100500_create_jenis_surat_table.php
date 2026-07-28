@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('nama');
             $table->text('deskripsi')->nullable();
             $table->json('fields')->nullable();
+            $table->string('template_view')->nullable();
             $table->boolean('wajib_pengantar_rt_rw')->default(true);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

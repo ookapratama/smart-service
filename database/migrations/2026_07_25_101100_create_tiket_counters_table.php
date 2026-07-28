@@ -10,12 +10,9 @@ return new class extends Migration
     {
         Schema::create('tiket_counters', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('instansi_id')->constrained('instansi')->cascadeOnDelete();
-            $table->char('periode', 4);
+            $table->char('periode', 4)->unique();
             $table->unsignedInteger('last_seq')->default(0);
             $table->timestamps();
-
-            $table->unique(['instansi_id', 'periode']);
         });
     }
 

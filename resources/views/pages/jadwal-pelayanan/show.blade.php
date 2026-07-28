@@ -13,8 +13,8 @@
             <div class="card p-4">
                 <div class="d-flex justify-content-between align-items-start border-bottom pb-3 mb-3">
                     <div>
-                        <h3 class="mb-1 text-primary">{{ $data->kelurahan }}</h3>
-                        <p class="text-muted mb-0"><i class="ri-calendar-line me-1"></i> Hari Operasional: <strong>{{ $data->hari_operasional ?? 'Senin - Jumat' }}</strong></p>
+                        <h3 class="mb-1 text-primary">{{ $data->kelurahan->nama ?? '-' }}</h3>
+                        <p class="text-muted mb-0"><i class="ri-calendar-line me-1"></i> Hari Operasional: <strong>{{ implode(', ', $data->hari ?? []) }}</strong></p>
                     </div>
                     <div class="d-flex gap-2">
                         <a href="{{ route('jadwal-pelayanan.edit', $data->id) }}" class="btn btn-primary"><i class="ri-pencil-line me-1"></i> Edit</a>
@@ -53,7 +53,7 @@
                             </tr>
                             <tr>
                                 <th class="text-muted">Catatan Khusus</th>
-                                <td>: {{ $data->catatan ?? '-' }}</td>
+                                <td>: {{ $data->keterangan ?? '-' }}</td>
                             </tr>
                         </table>
                     </div>

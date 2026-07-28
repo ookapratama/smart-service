@@ -10,16 +10,14 @@ return new class extends Migration
     {
         Schema::create('pemohon', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('instansi_id')->constrained('instansi')->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('nik', 16);
+            $table->foreignId('kelurahan_id')->nullable()->constrained('kelurahan')->nullOnDelete();
+            $table->string('nik', 16)->unique();
             $table->string('name');
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->text('alamat')->nullable();
             $table->timestamps();
-
-            $table->unique(['instansi_id', 'nik']);
         });
     }
 

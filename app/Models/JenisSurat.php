@@ -17,6 +17,7 @@ class JenisSurat extends Model
         'nama',
         'deskripsi',
         'fields',
+        'template_view',
         'wajib_pengantar_rt_rw',
         'is_active',
     ];

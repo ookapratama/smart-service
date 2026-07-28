@@ -43,7 +43,7 @@
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="penulis">Penulis / Sumber</label>
-                                <input type="text" class="form-control @error('penulis') is-invalid @enderror" id="penulis" name="penulis" value="{{ old('penulis', 'Tim Humas Kecamatan Sorean') }}" placeholder="Contoh: Admin S3">
+                                <input type="text" class="form-control @error('penulis') is-invalid @enderror" id="penulis" name="penulis" value="{{ old('penulis', 'Tim Humas Kecamatan Soreang') }}" placeholder="Contoh: Admin S3">
                                 @error('penulis')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

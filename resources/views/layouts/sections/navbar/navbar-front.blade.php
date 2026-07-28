@@ -213,7 +213,7 @@ $activeClass = in_array($currentRouteName, $activeRoutes) ? 'active' : '';
           </div>
         </li>
         <li class="nav-item">
-          <a class="nav-link fw-medium" href="{{url('/')}}" target="_blank">Admin</a>
+          <a class="nav-link fw-medium" href="{{ route('dashboard') }}" target="_blank">Admin</a>
         </li>
       </ul>
     </div>

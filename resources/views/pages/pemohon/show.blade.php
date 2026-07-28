@@ -25,8 +25,8 @@
                     <div class="col-md-6">
                         <table class="table table-borderless">
                             <tr>
-                                <th width="150" class="text-muted">Instansi</th>
-                                <td>: {{ $data->instansi->name ?? '-' }}</td>
+                                <th width="150" class="text-muted">Kelurahan</th>
+                                <td>: {{ $data->kelurahan->nama ?? '-' }}</td>
                             </tr>
                             <tr>
                                 <th class="text-muted">No. HP</th>

@@ -1,6 +1,6 @@
 @extends('home.layouts.app')
 
-@section('title', 'Laporan Berhasil Dikirim - Sorean Smart Service (3S)')
+@section('title', 'Laporan Berhasil Dikirim - Soreang Smart Service (3S)')
 
 @section('content')
 
@@ -15,7 +15,7 @@
             <i class="bi bi-check-lg display-4 fw-bold"></i>
           </div>
           <h2 class="fw-bold text-white mb-2">Laporan Pengaduan Berhasil Dikirim!</h2>
-          <p class="text-white-50 mb-0">Terima kasih. Pengaduan Anda telah tercatat dan diteruskan ke tim penanganan 3S Sorean.</p>
+          <p class="text-white-50 mb-0">Terima kasih. Pengaduan Anda telah tercatat dan diteruskan ke tim penanganan 3S Soreang.</p>
         </div>
 
         <div class="card-body p-4 p-md-5">

@@ -15,12 +15,6 @@ class S3MenuSeeder extends Seeder
         $readUpdateOnly = ['can_create' => false, 'can_read' => true, 'can_update' => true, 'can_delete' => false];
         $readOnly = ['can_create' => false, 'can_read' => true, 'can_update' => false, 'can_delete' => false];
 
-        // Top-level: Manajemen Instansi
-        $instansiMenu = Menu::updateOrCreate(
-            ['slug' => 'instansi.index'],
-            ['name' => 'Manajemen Instansi', 'icon' => 'ri-building-4-line', 'path' => 'instansi', 'parent_id' => null, 'order_no' => 10]
-        );
-
         // Master Data group
         $masterDataMenu = Menu::updateOrCreate(
             ['slug' => 'master-data'],
@@ -28,19 +22,19 @@ class S3MenuSeeder extends Seeder
         );
         $jenisSuratMenu = Menu::updateOrCreate(
             ['slug' => 'jenis-surat.index'],
-            ['name' => 'Jenis Surat', 'icon' => 'ri-file-text-line', 'path' => 'jenis-surat', 'parent_id' => $masterDataMenu->id, 'order_no' => 1]
+            ['name' => 'Jenis Surat', 'icon' => 'ri-file-text-line', 'path' => 'admin/jenis-surat', 'parent_id' => $masterDataMenu->id, 'order_no' => 1]
         );
         $kategoriPengaduanMenu = Menu::updateOrCreate(
             ['slug' => 'kategori-pengaduan.index'],
-            ['name' => 'Kategori Pengaduan', 'icon' => 'ri-price-tag-3-line', 'path' => 'kategori-pengaduan', 'parent_id' => $masterDataMenu->id, 'order_no' => 2]
+            ['name' => 'Kategori Pengaduan', 'icon' => 'ri-price-tag-3-line', 'path' => 'admin/kategori-pengaduan', 'parent_id' => $masterDataMenu->id, 'order_no' => 2]
         );
         $beritaMenu = Menu::updateOrCreate(
             ['slug' => 'berita.index'],
-            ['name' => 'Berita & Informasi', 'icon' => 'ri-newspaper-line', 'path' => 'berita', 'parent_id' => $masterDataMenu->id, 'order_no' => 3]
+            ['name' => 'Berita & Informasi', 'icon' => 'ri-newspaper-line', 'path' => 'admin/berita', 'parent_id' => $masterDataMenu->id, 'order_no' => 3]
         );
         $jadwalPelayananMenu = Menu::updateOrCreate(
             ['slug' => 'jadwal-pelayanan.index'],
-            ['name' => 'Jadwal Pelayanan', 'icon' => 'ri-calendar-event-line', 'path' => 'jadwal-pelayanan', 'parent_id' => $masterDataMenu->id, 'order_no' => 4]
+            ['name' => 'Jadwal Pelayanan', 'icon' => 'ri-calendar-event-line', 'path' => 'admin/jadwal-pelayanan', 'parent_id' => $masterDataMenu->id, 'order_no' => 4]
         );
 
         // Pelayanan group
@@ -50,20 +44,19 @@ class S3MenuSeeder extends Seeder
         );
         $tiketMenu = Menu::updateOrCreate(
             ['slug' => 'tiket.index'],
-            ['name' => 'Tiket', 'icon' => 'ri-ticket-2-line', 'path' => 'tiket', 'parent_id' => $pelayananMenu->id, 'order_no' => 1]
+            ['name' => 'Tiket', 'icon' => 'ri-ticket-2-line', 'path' => 'admin/tiket', 'parent_id' => $pelayananMenu->id, 'order_no' => 1]
         );
         $pemohonMenu = Menu::updateOrCreate(
             ['slug' => 'pemohon.index'],
-            ['name' => 'Data Pemohon', 'icon' => 'ri-user-follow-line', 'path' => 'pemohon', 'parent_id' => $pelayananMenu->id, 'order_no' => 2]
+            ['name' => 'Data Pemohon', 'icon' => 'ri-user-follow-line', 'path' => 'admin/pemohon', 'parent_id' => $pelayananMenu->id, 'order_no' => 2]
         );
 
         $superAdmin = Role::where('slug', 'super-admin')->first();
         $admin = Role::where('slug', 'admin')->first();
-        $petugasInstansi = Role::where('slug', 'petugas-instansi')->first();
+        $petugas = Role::where('slug', 'petugas')->first();
 
         if ($superAdmin) {
             $superAdmin->menus()->syncWithoutDetaching([
-                $instansiMenu->id => $fullCrud,
                 $masterDataMenu->id => $readOnly,
                 $jenisSuratMenu->id => $fullCrud,
                 $kategoriPengaduanMenu->id => $fullCrud,
@@ -77,7 +70,6 @@ class S3MenuSeeder extends Seeder
 
         if ($admin) {
             $admin->menus()->syncWithoutDetaching([
-                $instansiMenu->id => $noDelete,
                 $masterDataMenu->id => $readOnly,
                 $jenisSuratMenu->id => $noDelete,
                 $kategoriPengaduanMenu->id => $noDelete,
@@ -89,11 +81,10 @@ class S3MenuSeeder extends Seeder
             ]);
         }
 
-        // Petugas Instansi: only Tiket (process) + Pemohon (register/manage), scoped to
-        // their own instansi once tenant-resolution middleware exists — see REFACTOR_BACKLOG.md.
-        // No access to Instansi/Master Data management (platform-level concerns).
-        if ($petugasInstansi) {
-            $petugasInstansi->menus()->syncWithoutDetaching([
+        // Petugas: only Tiket (process) + Pemohon (register/manage). No access to
+        // Master Data management (admin-level concern).
+        if ($petugas) {
+            $petugas->menus()->syncWithoutDetaching([
                 $pelayananMenu->id => $readOnly,
                 $tiketMenu->id => $readUpdateOnly,
                 $pemohonMenu->id => $noDelete,

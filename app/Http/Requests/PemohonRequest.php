@@ -11,14 +11,11 @@ class PemohonRequest extends BaseRequest
         $pemohonId = $this->route('pemohon');
 
         return [
-            'instansi_id' => 'required|exists:instansi,id',
+            'kelurahan_id' => 'nullable|exists:kelurahan,id',
             'nik' => [
                 'required',
-                'string',
-                'size:16',
-                Rule::unique('pemohon', 'nik')
-                    ->where('instansi_id', $this->input('instansi_id'))
-                    ->ignore($pemohonId),
+                'digits:16',
+                Rule::unique('pemohon', 'nik')->ignore($pemohonId),
             ],
             'name' => 'required|string|max:255',
             'phone' => 'nullable|string|max:20',
@@ -30,10 +27,9 @@ class PemohonRequest extends BaseRequest
     public function messages(): array
     {
         return [
-            'instansi_id.required' => 'Instansi wajib dipilih',
             'nik.required' => 'NIK wajib diisi',
-            'nik.size' => 'NIK harus 16 digit',
-            'nik.unique' => 'NIK sudah terdaftar pada instansi ini',
+            'nik.digits' => 'NIK harus 16 digit angka',
+            'nik.unique' => 'NIK sudah terdaftar',
             'name.required' => 'Nama pemohon wajib diisi',
         ];
     }

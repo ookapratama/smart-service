@@ -19,7 +19,7 @@
 <!--  Brand demo (display only for navbar-full and hide on below xl) -->
 @if (isset($navbarFull))
    <div class="navbar-brand app-brand demo d-none d-xl-flex py-0 me-6">
-      <a href="{{ url('/') }}" class="app-brand-link gap-2">
+      <a href="{{ route('dashboard') }}" class="app-brand-link gap-2">
          <span class="app-brand-logo demo">
             @if (config('variables.templateLogo'))
                <img src="{{ asset('storage/' . config('variables.templateLogo')) }}" alt="Logo" height="30">
@@ -190,7 +190,7 @@
                      <span class="dropdown-shortcuts-icon rounded-circle mb-3">
                         <i class="ri-pie-chart-2-line ri-26px text-heading"></i>
                      </span>
-                     <a href="{{ url('/') }}" class="stretched-link">Dashboard</a>
+                     <a href="{{ route('dashboard') }}" class="stretched-link">Dashboard</a>
                      <small class="mb-0">Analytics</small>
                   </div>
                   <div class="dropdown-shortcuts-item col">

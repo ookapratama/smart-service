@@ -29,12 +29,8 @@ class CheckPermission
 
         // Full route-name map, checked before the suffix map
         $routeNameMap = [
-            'products.export.excel' => 'read',
-            'products.export.pdf' => 'read',
-            'products.import.excel' => 'create',
             'settings.clear-cache' => 'update',
             'tiket.update-status' => 'update',
-            'instansi.wilayah-sync' => 'update',
         ];
 
         $routeName = $request->route()->getName();

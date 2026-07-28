@@ -7,9 +7,9 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'SOREAN SMART SERVICE (3S) - Pelayanan Publik Terintegrasi')</title>
   <meta name="description"
-    content="@yield('meta_description', 'Sorean Smart Service (3S) - Cepat, Mudah, Transparan, dan Melayani dengan Hati.')">
+    content="@yield('meta_description', 'Soreang Smart Service (3S) - Cepat, Mudah, Transparan, dan Melayani dengan Hati.')">
   <meta name="keywords"
-    content="@yield('meta_keywords', 'Sorean Smart Service, 3S, Pelayanan Publik, Surat Online, Kecamatan Sorean')">
+    content="@yield('meta_keywords', 'Soreang Smart Service, 3S, Pelayanan Publik, Surat Online, Kecamatan Soreang')">
 
   <!-- Favicons -->
   <link href="{{ asset('assets/home/img/favicon.png') }}" rel="icon">

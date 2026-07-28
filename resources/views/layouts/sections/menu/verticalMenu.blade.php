@@ -69,7 +69,7 @@
    <!-- ! Hide app brand if navbar-full -->
    @if (!isset($navbarFull))
       <div class="app-brand demo">
-         <a href="{{ url('/') }}" class="app-brand-link">
+         <a href="{{ route('dashboard') }}" class="app-brand-link">
             <span class="app-brand-logo demo">
                @if (config('variables.templateLogo'))
                   <img src="{{ asset('storage/' . config('variables.templateLogo')) }}" alt="Logo" height="30">
