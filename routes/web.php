@@ -1,28 +1,37 @@
 <?php
 
-use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\BeritaController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ImpersonateController;
+use App\Http\Controllers\Admin\JadwalPelayananController;
+use App\Http\Controllers\Admin\JenisSuratController;
+use App\Http\Controllers\Admin\KategoriPengaduanController;
+use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\PemohonController;
+use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SystemController;
+use App\Http\Controllers\Admin\TiketController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\BeritaController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ImpersonateController;
-use App\Http\Controllers\JadwalPelayananController;
-use App\Http\Controllers\JenisSuratController;
-use App\Http\Controllers\KategoriPengaduanController;
-use App\Http\Controllers\MenuController;
-use App\Http\Controllers\PemohonController;
-use App\Http\Controllers\PengaduanPublicController;
-use App\Http\Controllers\PermissionController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SettingController;
-use App\Http\Controllers\SystemController;
-use App\Http\Controllers\TiketController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Landing\BeritaPublicController;
+use App\Http\Controllers\Landing\CekStatusPublicController;
+use App\Http\Controllers\Landing\HomeController;
+use App\Http\Controllers\Landing\PengaduanPublicController;
 use Illuminate\Support\Facades\Route;
 
 // Public Landing Home Route
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Public Berita Routes (Landing Page Template)
+Route::get('/berita', [BeritaPublicController::class, 'index'])->name('berita.public.index');
+Route::get('/berita/{slug}', [BeritaPublicController::class, 'show'])->name('berita.public.show');
+
+// Public Cek Status Route
+Route::get('/cek-status', [CekStatusPublicController::class, 'index'])->name('cek-status.index');
 
 // Public Pengaduan Routes
 Route::get('/pengaduan', [PengaduanPublicController::class, 'index'])->name('pengaduan.index');
@@ -37,7 +46,7 @@ Route::get('register', [AuthController::class, 'showRegister'])->name('register'
 Route::post('register', [AuthController::class, 'register']);
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Dashboard (admin landing after login)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

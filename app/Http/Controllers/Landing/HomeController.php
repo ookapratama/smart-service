@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Landing;
 
+use App\Http\Controllers\Controller;
 use App\Models\Berita;
 use App\Models\JadwalPelayanan;
 use App\Models\JenisSurat;
@@ -85,7 +86,7 @@ class HomeController extends Controller
                 'icon' => '💬',
                 'bs_icon' => 'bi-whatsapp',
                 'description' => 'Pengaduan publik multi-channel terpadu via WhatsApp, Portal Web, dan QR Code terintegrasi.',
-                'link' => '#cek-status',
+                'link' => route('pengaduan.index'),
                 'link_text' => 'Buat Pengaduan',
                 'badge' => 'Responsif'
             ],
@@ -135,7 +136,7 @@ class HomeController extends Controller
                 'icon' => '🏪',
                 'bs_icon' => 'bi-shop',
                 'description' => 'Dukungan pengurusan izin usaha mikro, promosi produk digital, dan pemberdayaan pelaku ekonomi lokal.',
-                'link' => '#berita',
+                'link' => route('berita.public.index'),
                 'link_text' => 'Info Program UMKM',
                 'badge' => 'Ekonomi'
             ],
@@ -301,7 +302,7 @@ class HomeController extends Controller
             ],
             [
                 'question' => 'Bagaimana cara mengecek status permohonan surat saya?',
-                'answer'   => 'Masuk ke section "Cek Status Permohonan" di halaman ini, masukkan Nomor Tiket (contoh: SRG-2607-00123) atau NIK Anda, lalu klik "Cek Status". Hasil progres akan ditampilkan seketika.'
+                'answer'   => 'Masuk ke halaman "Cek Status" di menu navigasi, masukkan Nomor Tiket (contoh: SRG-2607-00123) atau NIK Anda, lalu klik "Cari Tiket". Hasil progres akan ditampilkan seketika.'
             ],
             [
                 'question' => 'Apakah pengaduan lewat WhatsApp dan Website ditindaklanjuti?',
