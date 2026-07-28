@@ -22,19 +22,19 @@ class S3MenuSeeder extends Seeder
         );
         $jenisSuratMenu = Menu::updateOrCreate(
             ['slug' => 'jenis-surat.index'],
-            ['name' => 'Jenis Surat', 'icon' => 'ri-file-text-line', 'path' => 'jenis-surat', 'parent_id' => $masterDataMenu->id, 'order_no' => 1]
+            ['name' => 'Jenis Surat', 'icon' => 'ri-file-text-line', 'path' => 'admin/jenis-surat', 'parent_id' => $masterDataMenu->id, 'order_no' => 1]
         );
         $kategoriPengaduanMenu = Menu::updateOrCreate(
             ['slug' => 'kategori-pengaduan.index'],
-            ['name' => 'Kategori Pengaduan', 'icon' => 'ri-price-tag-3-line', 'path' => 'kategori-pengaduan', 'parent_id' => $masterDataMenu->id, 'order_no' => 2]
+            ['name' => 'Kategori Pengaduan', 'icon' => 'ri-price-tag-3-line', 'path' => 'admin/kategori-pengaduan', 'parent_id' => $masterDataMenu->id, 'order_no' => 2]
         );
         $beritaMenu = Menu::updateOrCreate(
             ['slug' => 'berita.index'],
-            ['name' => 'Berita & Informasi', 'icon' => 'ri-newspaper-line', 'path' => 'berita', 'parent_id' => $masterDataMenu->id, 'order_no' => 3]
+            ['name' => 'Berita & Informasi', 'icon' => 'ri-newspaper-line', 'path' => 'admin/berita', 'parent_id' => $masterDataMenu->id, 'order_no' => 3]
         );
         $jadwalPelayananMenu = Menu::updateOrCreate(
             ['slug' => 'jadwal-pelayanan.index'],
-            ['name' => 'Jadwal Pelayanan', 'icon' => 'ri-calendar-event-line', 'path' => 'jadwal-pelayanan', 'parent_id' => $masterDataMenu->id, 'order_no' => 4]
+            ['name' => 'Jadwal Pelayanan', 'icon' => 'ri-calendar-event-line', 'path' => 'admin/jadwal-pelayanan', 'parent_id' => $masterDataMenu->id, 'order_no' => 4]
         );
 
         // Pelayanan group
@@ -44,11 +44,11 @@ class S3MenuSeeder extends Seeder
         );
         $tiketMenu = Menu::updateOrCreate(
             ['slug' => 'tiket.index'],
-            ['name' => 'Tiket', 'icon' => 'ri-ticket-2-line', 'path' => 'tiket', 'parent_id' => $pelayananMenu->id, 'order_no' => 1]
+            ['name' => 'Tiket', 'icon' => 'ri-ticket-2-line', 'path' => 'admin/tiket', 'parent_id' => $pelayananMenu->id, 'order_no' => 1]
         );
         $pemohonMenu = Menu::updateOrCreate(
             ['slug' => 'pemohon.index'],
-            ['name' => 'Data Pemohon', 'icon' => 'ri-user-follow-line', 'path' => 'pemohon', 'parent_id' => $pelayananMenu->id, 'order_no' => 2]
+            ['name' => 'Data Pemohon', 'icon' => 'ri-user-follow-line', 'path' => 'admin/pemohon', 'parent_id' => $pelayananMenu->id, 'order_no' => 2]
         );
 
         $superAdmin = Role::where('slug', 'super-admin')->first();

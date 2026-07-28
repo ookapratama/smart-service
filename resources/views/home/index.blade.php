@@ -1,10 +1,45 @@
 @extends('home.layouts.app')
 
-@section('title', 'SOREAN SMART SERVICE (3S) - Pelayanan Publik Terintegrasi')
-@section('meta_description', 'Sistem Pelayanan Publik Terintegrasi Berbasis Digital Kecamatan Soreang. Cepat, Mudah, Transparan, dan Melayani dengan Hati.')
+@section('title', 'Kecamatan Soreang Kota Parepare - Soreang Smart Service (3S)')
+@section('meta_description', 'Portal Resmi Pemerintah Kecamatan Soreang Kota Parepare. Informasi Profil Wilayah, Visi Misi, Pelayanan Publik Digital, Peta Wilayah Leaflet, dan Pengaduan Terpadu.')
 
 @push('styles')
+<!-- Leaflet CSS for Map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
 <style>
+  .hover-lift {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  .hero-badge {
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .visi-misi-card {
+    border-radius: 1.25rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+  }
+  .visi-misi-card:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 10px 25px rgba(13, 110, 253, 0.1);
+  }
+  #soreangMap {
+    height: 490px;
+    width: 100%;
+    border-radius: 1.25rem;
+    z-index: 1;
+  }
   #s3TicketResultBox i,
   #s3TicketResultBox span.bi {
     background: none !important;
@@ -13,186 +48,505 @@
     border-radius: 0 !important;
     display: inline-block !important;
   }
-  .modal-header .modal-title,
-  .modal-header .modal-title i,
-  .modal-header .modal-title span {
-    color: #ffffff !important;
-    background: none !important;
-    width: auto !important;
-    height: auto !important;
+
+  /* Override Template CSS White Pseudo-Overlay on Hero */
+  #hero::before {
+    display: none !important;
   }
 </style>
 @endpush
 
 @section('content')
 
-  <!-- 1. HERO SECTION (BANNER UTAMA) -->
-  <section id="hero" class="hero section light-background">
-    <div class="container">
-      <div class="row gy-4">
-        <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center" data-aos="zoom-out">
-          <h1>Soreang Smart Service <span>(3S)</span></h1>
-          <p>{{ $siteInfo['tagline'] ?? 'Cepat, Mudah, Transparan, dan Melayani dengan Hati.' }}</p>
-          <div class="d-flex">
-            <a href="{{ route('login') }}" class="btn-get-started">Mulai Sekarang</a>
-            <a href="#services" class="btn-watch-video d-flex align-items-center">
-              <i class="bi bi-info-circle"></i><span>Pelajari Lebih Lanjut</span>
+  <!-- 1. HERO BANNER SECTION (Rich Dark Blue Overlay with Soreang Background Photo & High Contrast Text) -->
+  <section id="hero" class="hero section position-relative py-5 overflow-hidden" style="background: linear-gradient(135deg, rgba(8, 35, 95, 0.88) 0%, rgba(4, 18, 55, 0.92) 100%), url('{{ asset('assets/home/img/soreang-hero.png') }}') center/cover no-repeat !important; min-height: 80vh; display: flex; align-items: center;">
+    
+    <div class="container position-relative z-2 text-white py-4">
+      <div class="row align-items-center gy-5">
+        
+        <!-- Left Content -->
+        <div class="col-lg-7 order-2 order-lg-1" data-aos="fade-right">
+          <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3 bg-white bg-opacity-20 border border-white border-opacity-30 shadow-sm">
+            <span class="small fw-semibold text-dark">Portal Resmi Kecamatan Soreang • Kota Parepare</span>
+          </div>
+
+          <h1 class="display-4 fw-extrabold mb-3" style="color: #ffffff !important; line-height: 1.15; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
+            Soreang Smart Service (3S)
+          </h1>
+          
+          <p class="fs-5 mb-4 me-lg-4" style="color: #f1f5f9 !important; line-height: 1.65; font-weight: 400; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);">
+            Pelayanan kependudukan digital terpadu, pengaduan publik, dan portal informasi resmi Kecamatan Soreang Kota Parepare secara cepat, mudah, dan transparan.
+          </p>
+
+          <div class="d-flex flex-wrap gap-3 align-items-center">
+            <a href="#jenis-surat-modal" data-bs-toggle="modal" class="btn btn-light btn-lg rounded-pill px-4 py-3 fw-bold text-primary shadow-lg d-inline-flex align-items-center gap-2 hover-lift">
+              <i class="bi bi-file-earmark-plus-fill fs-5"></i>
+              <span>Pengajuan Surat Online</span>
+            </a>
+            <a href="#profil" class="btn btn-outline-light btn-lg rounded-pill px-4 py-3 fw-semibold shadow-sm d-inline-flex align-items-center gap-2 hover-lift">
+              <i class="bi bi-info-circle fs-5"></i>
+              <span>Profil Kecamatan</span>
             </a>
           </div>
         </div>
-        <div class="col-lg-6 order-1 order-lg-2 hero-img d-flex justify-content-center" data-aos="zoom-out" data-aos-delay="200">
-          <img src="{{ asset('assets/home/img/hero-img.png') }}" class="img-fluid animated" alt="Soreang Smart Service Illustration" style="max-height: 380px;">
+
+        <!-- Right Graphic Photo of Soreang -->
+        <div class="col-lg-5 order-1 order-lg-2 text-center" data-aos="zoom-in" data-aos-delay="200">
+          <div class="position-relative d-inline-block w-100">
+            <div class="p-2 bg-white bg-opacity-15 rounded-4 border border-white border-opacity-30 shadow-2xl backdrop-blur">
+              <img src="{{ asset('assets/home/img/soreang-hero.png') }}" class="img-fluid rounded-4 shadow-lg w-100 object-fit-cover" alt="Kantor Kecamatan Soreang Kota Parepare" style="max-height: 360px;">
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- 2. SECTION MASALAH & SOLUSI (WHY 3S NEEDED?) -->
-  <section id="masalah-solusi" class="about section light-background">
+  <!-- 2. SECTION PROFIL & VISI MISI KECAMATAN SOREANG -->
+  <section id="profil" class="py-5 bg-white">
+    <div class="container py-3">
+      
+      @include('home.components.section-title', [
+        'subtitle' => 'Profil & Arah Kebijakan',
+        'title' => 'Profil & Visi Misi Kecamatan Soreang',
+        'description' => 'Mengenal profil wilayah Kecamatan Soreang Kota Parepare serta arah komitmen pelayanan publik.'
+      ])
+
+      <div class="row gy-4 align-items-stretch mt-3">
+        
+        <!-- Left: Profil Ringkas -->
+        <div class="col-lg-5" data-aos="fade-up" data-aos-delay="100">
+          <div class="p-4 p-lg-5 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="bg-primary text-white rounded-4 d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 58px; height: 58px; font-size: 1.75rem;">
+                  <i class="bi bi-building-check"></i>
+                </div>
+                <div>
+                  <h4 class="fw-bold text-dark m-0">Kecamatan Soreang</h4>
+                  <span class="text-primary fw-semibold small">Kota Parepare • Sulawesi Selatan</span>
+                </div>
+              </div>
+
+              <p class="text-secondary leading-relaxed mb-4" style="font-size: 0.96rem; line-height: 1.7;">
+                Kecamatan Soreang merupakan salah satu kawasan pusat pemerintahan dan aktivitas ekonomi masyarakat di Kota Parepare. Terdiri dari <strong>7 Kelurahan</strong>, Kecamatan Soreang mengusung inovasi pelayanan digital <strong>Soreang Smart Service (3S)</strong> untuk memudahkan pengurusan surat, pengaduan publik, serta transparansi data kependudukan.
+              </p>
+            </div>
+
+            <div class="row g-3 pt-3 border-top">
+              <div class="col-6">
+                <div class="p-3 bg-white rounded-4 border shadow-sm text-center">
+                  <span class="d-block text-muted small fw-semibold mb-1">Kode Wilayah</span>
+                  <h4 class="fw-bold text-primary m-0">73.72.03</h4>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-3 bg-white rounded-4 border shadow-sm text-center">
+                  <span class="d-block text-muted small fw-semibold mb-1">Kelurahan</span>
+                  <h4 class="fw-bold text-success m-0">7 Wilayah</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Cards Visi & Misi -->
+        <div class="col-lg-7" data-aos="fade-up" data-aos-delay="200">
+          <div class="d-flex flex-column gap-4 h-100">
+            
+            <!-- Visi Card -->
+            <div class="p-4 p-lg-4 bg-white rounded-4 border border-primary-subtle shadow-sm">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 fw-bold">VISI UTAMA</span>
+                <span class="small text-muted">Kecamatan Soreang</span>
+              </div>
+              <h4 class="fw-bold text-dark mb-2">"Parepare Terkemuka & Soreang Smart Sejahtera"</h4>
+              <p class="text-secondary m-0 small" style="line-height: 1.6;">
+                Mewujudkan tata kelola pemerintahan Kecamatan Soreang yang responsif, berbasis data digital, transparan, dan melayani masyarakat dengan integritas serta akuntabilitas tinggi.
+              </p>
+            </div>
+
+            <!-- Misi Grid Cards -->
+            <div class="row g-3 flex-grow-1">
+              
+              <div class="col-md-6">
+                <div class="visi-misi-card p-4 bg-white shadow-sm h-100">
+                  <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 fw-semibold">Misi 01</span>
+                  <h6 class="fw-bold text-dark mb-2">Pelayanan Publik Digital</h6>
+                  <p class="text-muted small m-0" style="line-height: 1.6;">
+                    Memberikan kepastian layanan administrasi surat online secara cepat, efisien, dan transparan bagi seluruh warga.
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="visi-misi-card p-4 bg-white shadow-sm h-100">
+                  <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 fw-semibold">Misi 02</span>
+                  <h6 class="fw-bold text-dark mb-2">Pengaduan Responsif 24 Jam</h6>
+                  <p class="text-muted small m-0" style="line-height: 1.6;">
+                    Mewadahi aspirasi dan laporan keluhan warga se-Kecamatan Soreang dengan target penyelesaian terukur.
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="visi-misi-card p-4 bg-white shadow-sm h-100">
+                  <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 fw-semibold">Misi 03</span>
+                  <h6 class="fw-bold text-dark mb-2">Integrasi 7 Kelurahan</h6>
+                  <p class="text-muted small m-0" style="line-height: 1.6;">
+                    Satu pangkalan data terpadu untuk mempermudah koordinasi administrasi lintas kelurahan Kecamatan Soreang.
+                  </p>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="visi-misi-card p-4 bg-white shadow-sm h-100">
+                  <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 mb-2 fw-semibold">Misi 04</span>
+                  <h6 class="fw-bold text-dark mb-2">Pemberdayaan Ekonomi UMKM</h6>
+                  <p class="text-muted small m-0" style="line-height: 1.6;">
+                    Mendorong potensi ekonomi kemasyarakatan dan kemudahan perizinan bagi pelaku UMKM lokal Soreang.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. SECTION JELAJAHI KECAMATAN SOREANG -->
+  <section id="jelajahi" class="py-5 bg-light border-top border-bottom">
+    <div class="container">
+      
+      @include('home.components.section-title', [
+        'subtitle' => 'Jelajahi Services',
+        'title' => 'Layanan & Portal Digital Kecamatan Soreang',
+        'description' => 'Akses cepat modul pelayanan administrasi, pengaduan, dan portal publik se-Kecamatan Soreang.'
+      ])
+
+      <div class="row g-3 g-md-4 justify-content-center mt-2">
+        
+        {{-- Item 1: Smart Surat --}}
+        @include('home.components.quick-grid-item', [
+          'title' => 'Smart Digital Service',
+          'description' => 'Pengurusan 12 jenis surat keterangan online',
+          'icon' => 'bi-file-earmark-text-fill',
+          'badge' => 'Terpopuler',
+          'isModal' => true,
+          'modalTarget' => '#jenis-surat-modal',
+          'delay' => 100,
+          'color' => 'primary'
+        ])
+
+        {{-- Item 2: Smart Complaint --}}
+        @include('home.components.quick-grid-item', [
+          'title' => 'Smart Complaint',
+          'description' => 'Layanan pengaduan warga multi-channel',
+          'icon' => 'bi-megaphone-fill',
+          'badge' => 'Responsif',
+          'link' => route('pengaduan.index'),
+          'delay' => 150,
+          'color' => 'danger'
+        ])
+
+        {{-- Item 3: Live Cek Status --}}
+        @include('home.components.quick-grid-item', [
+          'title' => 'Cek Status Tiket',
+          'description' => 'Lacak progres permohonan via NIK/Tiket',
+          'icon' => 'bi-search',
+          'badge' => 'Real-Time',
+          'link' => '#cek-status',
+          'delay' => 200,
+          'color' => 'success'
+        ])
+
+        {{-- Item 4: Jadwal Kelurahan --}}
+        @include('home.components.quick-grid-item', [
+          'title' => 'Jadwal Kelurahan',
+          'description' => 'Jam operasional & kontak 7 kelurahan',
+          'icon' => 'bi-clock-history',
+          'badge' => '7 Kelurahan',
+          'isModal' => true,
+          'modalTarget' => '#jadwal-pelayanan-modal',
+          'delay' => 250,
+          'color' => 'info'
+        ])
+
+        {{-- Item 5: QR Scanner --}}
+        @include('home.components.quick-grid-item', [
+          'title' => 'Scan QR Code',
+          'description' => 'Verifikasi keaslian resi & surat tiket',
+          'icon' => 'bi-qr-code-scan',
+          'badge' => 'Verifikasi',
+          'isModal' => true,
+          'modalTarget' => '#s3QrScannerModal',
+          'delay' => 300,
+          'color' => 'dark'
+        ])
+
+        {{-- Item 6: Peta Wilayah --}}
+        @include('home.components.quick-grid-item', [
+          'title' => 'Peta Wilayah',
+          'description' => 'Peta digital 7 kelurahan Soreang',
+          'icon' => 'bi-map-fill',
+          'badge' => 'Peta Leaflet',
+          'link' => '#peta-soreang',
+          'delay' => 350,
+          'color' => 'warning'
+        ])
+
+        {{-- Item 7: Portal Berita --}}
+        @include('home.components.quick-grid-item', [
+          'title' => 'Portal Berita',
+          'description' => 'Informasi & agenda resmi kecamatan',
+          'icon' => 'bi-newspaper',
+          'badge' => 'Halaman Berita',
+          'link' => route('berita.public.index'),
+          'delay' => 400,
+          'color' => 'primary'
+        ])
+
+        {{-- Item 8: Emergency 24/7 --}}
+        @include('home.components.quick-grid-item', [
+          'title' => 'Kontak Darurat',
+          'description' => 'Tanggap darurat siaga 24/7',
+          'icon' => 'bi-shield-exclamation',
+          'badge' => 'Siaga 24/7',
+          'link' => 'tel:112',
+          'delay' => 450,
+          'color' => 'danger'
+        ])
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. SECTION TANTANGAN & SOLUSI DIGITAL -->
+  <section id="masalah-solusi" class="py-5 bg-white">
+    
     @include('home.components.section-title', [
       'subtitle' => 'Tantangan & Solusi',
-      'title' => 'Mengapa Soreang Smart Service Dihadirkan?',
-      'description' => 'Transformasi digital pelayanan publik Kecamatan Soreang untuk mengatasi kendala pelayanan kependudukan konvensional.'
+      'title' => 'Transformasi Digital Pelayanan Kecamatan',
+      'description' => 'Menjawab tantangan administrasi kependudukan konvensional melalui platform 3S Soreang.'
     ])
 
-    <div class="container">
-      <div class="row gy-4">
+    <div class="container mt-4">
+      <div class="row gy-4 align-items-center">
+        
+        <!-- Left Column: Tantangan -->
         <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-          <div class="about-content">
-            <h3>Solusi Terintegrasi Pelayanan Publik Digital</h3>
-            <p class="fst-italic">
-              Sistem Pelayanan Publik Terintegrasi Berbasis Digital dan Kolaboratif Kecamatan Soreang menghadirkan kemudahan pengurusan administrasi warga.
-            </p>
-            <ul>
-              @foreach($challenges as $c)
-                <li>
-                  <i class="bi {{ $c['icon'] }}"></i>
-                  <div>
-                    <h4>{{ $c['title'] }}</h4>
-                    <p>{{ $c['description'] }}</p>
+          <div class="p-4 p-lg-5 bg-light rounded-4 border">
+            <span class="badge bg-primary text-white px-3 py-1 rounded-pill fw-bold mb-3">Tantangan Birokrasi</span>
+            <h4 class="fw-bold text-dark mb-4">Mengapa Diperlukan Soreang Smart Service?</h4>
+            
+            <div class="d-flex flex-column gap-3">
+              @foreach($challenges as $index => $c)
+                <div class="p-3 bg-white rounded-3 border shadow-sm">
+                  <div class="d-flex align-items-center justify-content-between mb-1">
+                    <h6 class="fw-bold text-dark m-0" style="font-size: 0.95rem;">
+                      <span class="text-primary me-2 font-monospace">0{{ $index + 1 }}.</span> {{ $c['title'] }}
+                    </h6>
                   </div>
-                </li>
+                  <p class="text-muted small m-0 ps-4" style="line-height: 1.5;">{{ $c['description'] }}</p>
+                </div>
               @endforeach
-            </ul>
-          </div>
-        </div>
-        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-          <div class="content ps-0 ps-lg-4">
-            <div class="p-4 bg-white rounded-3 shadow-sm border mb-4">
-              <h4 class="fw-bold text-primary mb-2"> 3S Menghadirkan Solusi Digital</h4>
-              <p class="text-muted small mb-0">Menghubungkan seluruh kelurahan, mempersingkat alur birokrasi, dan memberikan kepastian status permohonan secara real-time.</p>
             </div>
-            <img src="{{ asset('assets/home/img/about.jpg') }}" class="img-fluid rounded-4 shadow-sm" alt="Solusi 3S">
           </div>
         </div>
+
+        <!-- Right Column: Gambar Pelayanan Soreang -->
+        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="ps-lg-3">
+            
+            <div class="position-relative mb-4">
+              <div class="p-2 bg-white rounded-4 border shadow-sm">
+                <img src="{{ asset('assets/home/img/soreang-service.png') }}" class="img-fluid rounded-4 w-100 object-fit-cover shadow-sm" alt="Pusat Pelayanan Publik Kecamatan Soreang Parepare" style="max-height: 280px;">
+              </div>
+            </div>
+
+            <div class="p-4 bg-white rounded-4 border shadow-sm position-relative overflow-hidden">
+              <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill fw-bold mb-2">Solusi Terintegrasi</span>
+              <h4 class="fw-bold text-dark mb-2">Pelayanan Cepat, Transparan, & Tanpa Antri</h4>
+              <p class="text-muted small leading-relaxed mb-3">
+                Warga Kecamatan Soreang kini dapat mengajukan surat keterangan online, melacak tiket status permohonan secara real-time, dan menyampaikan aspirasi tanpa harus datang mengantri di kantor kelurahan.
+              </p>
+              <a href="#jenis-surat-modal" data-bs-toggle="modal" class="btn btn-primary text-white font-semibold rounded-pill px-4 py-2 hover-lift btn-sm">
+                Pengajuan Online Now <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- 3. SECTION FITUR UTAMA (8 SMART COMPONENTS) -->
-  <section id="services" class="services section">
+  <!-- 5. SECTION FITUR UTAMA (8 SMART COMPONENTS) -->
+  <section id="services" class="py-5 bg-light border-top border-bottom">
+    
     @include('home.components.section-title', [
       'subtitle' => '8 Komponen Smart',
       'title' => 'Fitur Utama Soreang Smart Service',
       'description' => 'Modularitas layanan publik berbasis digital yang memudahkan warga dan aparatur kelurahan.'
     ])
 
-    <div class="container">
+    <div class="container mt-4">
       <div class="row gy-4">
         @foreach($smartComponents as $index => $comp)
-          <div class="col-lg-6 col-md-6" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
-            <div class="service-item position-relative text-start p-4 h-100">
-              <div class="d-flex align-items-center mb-3">
-                <div class="icon me-3 m-0">
-                  <i class="bi {{ $comp['bs_icon'] }}"></i>
+          @include('home.components.service-card', [
+            'title' => $comp['title'],
+            'description' => $comp['description'],
+            'icon' => $comp['bs_icon'],
+            'badge' => $comp['badge'],
+            'link' => $comp['link'],
+            'linkText' => $comp['link_text'],
+            'delay' => ($index + 1) * 100
+          ])
+        @endforeach
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. SECTION PETA KECAMATAN SOREANG LEAFLET (DENGAN UPDATE POLIGON GARIS PER KELURAHAN) -->
+  <section id="peta-soreang" class="py-5 bg-white">
+    <div class="container" data-aos="fade-up">
+      
+      @include('home.components.section-title', [
+        'subtitle' => 'Peta Digital Wilayah',
+        'title' => 'Peta Administrasi Kecamatan Soreang',
+        'description' => 'Visualisasi interaktif batas wilayah polygon & lokasi 7 Kelurahan se-Kecamatan Soreang Kota Parepare.'
+      ])
+
+      <div class="row gy-4 mt-2">
+        
+        <!-- Sidebar Filter & Detail Wilayah -->
+        <div class="col-lg-4">
+          <div class="p-4 bg-light rounded-4 border h-100 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <span id="s3KodeWilayahBadge" class="font-monospace small text-primary fw-bold bg-primary-subtle px-3 py-1 rounded-pill">Kode: 73.72.03</span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle">Online Map</span>
+              </div>
+
+              <h5 id="s3SelectedKelurahanTitle" class="fw-bold text-dark mb-1">Kecamatan Soreang</h5>
+              <p id="s3SelectedKelurahanDesc" class="text-muted small mb-4">Sesuai Kepmendagri No 300.2.2-2430 Tahun 2025</p>
+
+              <!-- Dropdown Selector Kelurahan -->
+              <div class="mb-4">
+                <label class="form-label fw-bold small text-secondary">PILIH DESA / KELURAHAN:</label>
+                <select id="soreangKelurahanSelect" class="form-select form-select-lg rounded-pill fs-6 border-primary shadow-sm fw-semibold">
+                  <option value="all">-- Semua Kelurahan (Soreang) --</option>
+                  <option value="bukit_harapan">Kelurahan Bukit Harapan</option>
+                  <option value="bukit_indah">Kelurahan Bukit Indah</option>
+                  <option value="kampung_pisang">Kelurahan Kampung Pisang</option>
+                  <option value="lakessi">Kelurahan Lakessi</option>
+                  <option value="ujung_baru">Kelurahan Ujung Baru</option>
+                  <option value="ujung_lare">Kelurahan Ujung Lare</option>
+                  <option value="watang_soreang">Kelurahan Watang Soreang</option>
+                </select>
+              </div>
+
+              <!-- Dynamic Information Grid -->
+              <div class="p-3 bg-white rounded-4 border shadow-sm mb-3">
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted small">PROVINSI</span>
+                  <span class="fw-bold small text-dark">Sulawesi Selatan</span>
                 </div>
-                <div>
-                  <h3 class="m-0 fs-5">{{ $comp['title'] }}</h3>
-                  <span class="badge bg-light text-primary border me-1">{{ $comp['badge'] }}</span>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted small">KOTA / KABUPATEN</span>
+                  <span class="fw-bold small text-dark">Kota Parepare</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted small">KECAMATAN</span>
+                  <span class="fw-bold small text-primary">Soreang</span>
+                </div>
+                <div class="d-flex justify-content-between py-2 border-bottom">
+                  <span class="text-muted small">DESA / KELURAHAN</span>
+                  <span id="s3SelectedKelurahanDetail" class="fw-bold small text-primary">Semua Kelurahan</span>
+                </div>
+                <div class="d-flex justify-content-between py-2">
+                  <span class="text-muted small">KOORDINAT PUSAT</span>
+                  <span id="s3SelectedKoordinat" class="font-monospace small text-dark fw-semibold">-3.98924, 119.64297</span>
                 </div>
               </div>
-              <p class="mb-3">{{ $comp['description'] }}</p>
-              @if($comp['link'] === '#jenis-surat-modal')
-                <a href="#jenis-surat-modal" data-bs-toggle="modal" class="fw-bold text-primary text-decoration-none">
-                  {{ $comp['link_text'] }} <i class="bi bi-arrow-right"></i>
-                </a>
-              @elseif($comp['link'] === '#cek-status')
-                <a href="#cek-status" class="fw-bold text-primary text-decoration-none">
-                  {{ $comp['link_text'] }} <i class="bi bi-arrow-right"></i>
-                </a>
-              @else
-                <a href="{{ $comp['link'] }}" class="fw-bold text-primary text-decoration-none">
-                  {{ $comp['link_text'] }} <i class="bi bi-arrow-right"></i>
-                </a>
-              @endif
             </div>
-          </div>
-        @endforeach
-      </div>
-    </div>
-  </section>
 
-  <!-- 4. SECTION KEUNGGULAN (ADVANTAGES) -->
-  <section id="keunggulan" class="featured-services section light-background">
-    @include('home.components.section-title', [
-      'subtitle' => 'Keunggulan',
-      'title' => 'Keunggulan System 3S',
-      'description' => 'Standar pelayanan publik transparan, akuntabel, dan berbasis data real-time.'
-    ])
-
-    <div class="container">
-      <div class="row gy-4">
-        @foreach($advantages as $index => $adv)
-          <div class="col-lg-4 col-md-6 d-flex" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
-            <div class="service-item position-relative w-100">
-              <div class="icon"><i class="bi {{ $adv['icon'] }}"></i></div>
-              <h4><a href="#" class="stretched-link">{{ $adv['title'] }}</a></h4>
-              <p>{{ $adv['description'] }}</p>
+            <div class="pt-2">
+              <a href="{{ route('berita.public.index') }}" class="btn btn-outline-primary rounded-pill w-100 fw-semibold btn-sm">
+                <i class="bi bi-newspaper me-1"></i> Lihat Portal Berita & Agenda
+              </a>
             </div>
-          </div>
-        @endforeach
-      </div>
-    </div>
-  </section>
 
-  <!-- 5. SECTION INDIKATOR KEBERHASILAN -->
-  <section id="indikator" class="stats section">
-    <div class="container" data-aos="fade-up" data-aos-delay="100">
-      <div class="row gy-4">
-        @foreach($metrics as $m)
-          <div class="col-lg-4 col-md-6">
-            <div class="stats-item d-flex align-items-center w-100 h-100">
-              <i class="bi {{ $m['icon'] }} color-blue flex-shrink-0"></i>
-              <div>
-                <span data-purecounter-start="0" data-purecounter-end="{{ (float)$m['count'] }}" data-purecounter-duration="1" class="purecounter"></span>
-                <p><strong>{{ $m['label'] }}</strong><br><small class="text-muted">{{ $m['description'] }}</small></p>
+          </div>
+        </div>
+
+        <!-- Leaflet Map Container -->
+        <div class="col-lg-8">
+          <div class="p-2 bg-white rounded-4 border shadow-sm position-relative">
+            <div id="soreangMap" class="rounded-4"></div>
+            
+            <!-- Floating Map Footer Bar (Matches Wilayah ID Screenshot) -->
+            <div class="position-absolute bottom-0 start-50 translate-middle-x mb-3 z-3 shadow-lg rounded-pill overflow-hidden">
+              <div id="s3MapFooterKode" class="bg-dark bg-opacity-90 text-white font-monospace rounded-pill px-4 py-2 small border border-secondary shadow backdrop-blur" style="font-size: 0.82rem;">
+                KODE <strong>73.72.03</strong> &nbsp; LAT <strong>-3.98924</strong> &nbsp; LNG <strong>119.64297</strong>
               </div>
             </div>
           </div>
+
+          <div class="d-flex align-items-center justify-content-between mt-2 px-2">
+            <small class="text-muted"><i class="bi bi-info-circle me-1"></i> Pilih kelurahan di dropdown untuk memperbarui garis batas polygon & lokasi kantor.</small>
+            <span class="badge bg-light text-secondary border font-monospace" style="font-size: 0.75rem;">Leaflet.js + OpenStreetMap</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. SECTION INDIKATOR KEBERHASILAN (STATS COUNTER) -->
+  <section id="indikator" class="py-5 bg-primary text-white position-relative">
+    <div class="container" data-aos="fade-up">
+      <div class="row gy-4">
+        @foreach($metrics as $index => $m)
+          @include('home.components.stat-card', [
+            'count' => $m['count'],
+            'suffix' => $m['suffix'],
+            'label' => $m['label'],
+            'description' => $m['description'],
+            'icon' => $m['icon'],
+            'delay' => ($index + 1) * 100
+          ])
         @endforeach
       </div>
     </div>
   </section>
 
-  <!-- 6. SECTION GALERI / SCREENSHOT SISTEM -->
-  <section id="galeri" class="services section light-background">
+  <!-- 8. SECTION GALERI / SCREENSHOT SISTEM -->
+  <section id="galeri" class="py-5 bg-light border-bottom">
+    
     @include('home.components.section-title', [
       'subtitle' => 'Antarmuka',
       'title' => 'Galeri & Screenshot Fitur 3S',
       'description' => 'Tampilan antarmuka sistem yang bersih, cepat, dan mudah digunakan.'
     ])
 
-    <div class="container">
+    <div class="container mt-4">
       <div class="row gy-4">
         @foreach($screenshots as $index => $shot)
           <div class="col-lg-6 col-md-6" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
-            <div class="service-item text-start p-4 bg-white border rounded-3 h-100">
+            <div class="p-4 bg-white border rounded-4 shadow-sm h-100 hover-lift transition-all">
               <div class="d-flex align-items-center justify-content-between mb-3">
-                <span class="badge bg-primary">{{ $shot['tag'] }}</span>
+                <span class="badge bg-primary rounded-pill px-3 py-2">{{ $shot['tag'] }}</span>
                 <small class="text-muted font-monospace">Modul {{ $index + 1 }}</small>
               </div>
-              <h3 class="fs-5 fw-bold mb-2">{{ $shot['title'] }}</h3>
-              <p class="text-muted mb-0">{{ $shot['description'] }}</p>
+              <h5 class="fw-bold text-dark fs-6 mb-2">{{ $shot['title'] }}</h5>
+              <p class="text-muted small mb-0">{{ $shot['description'] }}</p>
             </div>
           </div>
         @endforeach
@@ -200,106 +554,75 @@
     </div>
   </section>
 
-  <!-- 7. SECTION BERITA & KEGIATAN -->
-  <section id="berita" class="services section">
-    @include('home.components.section-title', [
-      'subtitle' => 'Publikasi',
-      'title' => 'Berita & Kegiatan Terbaru',
-      'description' => 'Pembaruan informasi dan sosialisasi pelayanan publik Kecamatan Soreang.'
-    ])
-
-    <div class="container">
-      <div class="row gy-4">
-        @foreach($beritaList as $index => $b)
-          <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ ($index + 1) * 100 }}">
-            <div class="card border shadow-sm h-100">
-              @php
-                $imgPath = $b->thumbnail ?? $b->gambar;
-                if ($imgPath && !Str::startsWith($imgPath, 'http')) {
-                    $imgPath = Str::startsWith($imgPath, 'storage/') ? asset($imgPath) : asset('storage/' . ltrim($imgPath, '/'));
-                }
-              @endphp
-              @if(!empty($imgPath))
-                <img src="{{ $imgPath }}" class="card-img-top" alt="{{ $b->judul }}" style="height: 180px; object-fit: cover;">
-              @endif
-              <div class="card-body p-4 d-flex flex-column">
-                <span class="badge bg-light text-primary border align-self-start mb-2">{{ $b->kategori ?? 'Umum' }}</span>
-                <h5 class="card-title fw-bold fs-6 mb-2">{{ $b->judul }}</h5>
-                <p class="card-text text-muted small flex-grow-1">{{ Str::limit(strip_tags($b->ringkasan ?? $b->konten ?? ''), 120) }}</p>
-                <div class="pt-3 border-top mt-auto text-muted small d-flex justify-content-between">
-                  <span><i class="bi bi-calendar-event me-1"></i> {{ is_object($b->created_at) ? $b->created_at->format('d M Y') : date('d M Y') }}</span>
-                  <span><i class="bi bi-person me-1"></i> {{ $b->penulis ?? 'Admin' }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        @endforeach
-      </div>
-    </div>
-  </section>
-
-  <!-- 8. SECTION QUICK ACCESS / CTA UTAMA -->
-  <section id="cek-status" class="contact section light-background">
+  <!-- 9. SECTION QUICK ACCESS / CTA WIDGET UTAMA -->
+  <section id="cek-status" class="py-5 bg-light border-top border-bottom">
+    
     @include('home.components.section-title', [
       'subtitle' => 'Layanan Mandiri',
-      'title' => 'Cek Status & Akses Cepat',
+      'title' => 'Cek Status & Akses Cepat Tiket',
       'description' => 'Periksa progres surat permohonan Anda, jadwal pelayanan, atau scan QR code tiket secara langsung.'
     ])
 
-    <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="container mt-4" data-aos="fade-up">
       <div class="row gy-4 align-items-stretch">
 
-        <!-- Box 1: Cek Status -->
+        <!-- Box 1: Form AJAX Cek Status -->
         <div class="col-lg-4 col-md-6">
-          <div class="info-item d-flex flex-column justify-content-between h-100 p-4 bg-white rounded-3 shadow-sm border" data-aos="fade-up" data-aos-delay="200">
-            <div class="text-center">
-              <i class="bi bi-search d-flex align-items-center justify-content-center mx-auto mb-3"></i>
-              <h3>Cek Status Permohonan</h3>
-              <p class="text-muted small mb-0">Masukkan NIK atau Nomor Tiket permohonan Anda untuk mengecek progres live.</p>
+          <div class="p-4 p-lg-5 bg-white rounded-4 shadow-sm border h-100 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
+                <i class="bi bi-search"></i>
+              </div>
+              <h5 class="fw-bold text-dark text-center mb-2">Cek Status Permohonan</h5>
+              <p class="text-muted small text-center mb-0">Masukkan NIK atau Nomor Tiket permohonan Anda untuk mengecek progres live.</p>
             </div>
 
             <div class="w-100 mt-4">
               <form id="s3FormCekStatus" class="w-100">
                 <div class="mb-3">
-                  <input type="text" id="s3InputKeyword" class="form-control" placeholder="SRG-2607-00123 atau NIK" required>
+                  <input type="text" id="s3InputKeyword" class="form-control form-control-lg rounded-pill fs-6 px-3" placeholder="SRG-2607-00123 atau NIK" required>
                 </div>
-                <button type="submit" id="s3BtnCekStatus" class="btn btn-primary w-100">
-                   Cek Status
+                <button type="submit" id="s3BtnCekStatus" class="btn btn-primary btn-lg rounded-pill w-100 fw-bold fs-6 hover-lift">
+                  <i class="bi bi-search me-1"></i> Cek Status Now
                 </button>
               </form>
             </div>
           </div>
         </div>
 
-        <!-- Box 2: Jadwal Pelayanan -->
+        <!-- Box 2: Modal Jadwal Kelurahan Trigger -->
         <div class="col-lg-4 col-md-6">
-          <div class="info-item d-flex flex-column justify-content-between h-100 p-4 bg-white rounded-3 shadow-sm border" data-aos="fade-up" data-aos-delay="300">
-            <div class="text-center">
-              <i class="bi bi-clock d-flex align-items-center justify-content-center mx-auto mb-3"></i>
-              <h3>Jadwal Pelayanan</h3>
-              <p class="text-muted small mb-0">Jadwal operasional kantor kelurahan & jam kerja pelayanan publik se-Kecamatan Soreang.</p>
+          <div class="p-4 p-lg-5 bg-white rounded-4 shadow-sm border h-100 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
+                <i class="bi bi-clock-history"></i>
+              </div>
+              <h5 class="fw-bold text-dark text-center mb-2">Jadwal Pelayanan</h5>
+              <p class="text-muted small text-center mb-0">Jadwal operasional kantor kelurahan & jam kerja pelayanan publik se-Kecamatan Soreang.</p>
             </div>
 
             <div class="w-100 mt-4">
-              <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#jadwal-pelayanan-modal">
-                Lihat Jadwal Kelurahan
+              <button type="button" class="btn btn-outline-success btn-lg rounded-pill w-100 fw-bold fs-6 hover-lift" data-bs-toggle="modal" data-bs-target="#jadwal-pelayanan-modal">
+                <i class="bi bi-calendar-event me-1"></i> Lihat Jadwal Kelurahan
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Box 3: Scan QR Code -->
+        <!-- Box 3: Scan QR Code Trigger -->
         <div class="col-lg-4 col-md-12">
-          <div class="info-item d-flex flex-column justify-content-between h-100 p-4 bg-white rounded-3 shadow-sm border" data-aos="fade-up" data-aos-delay="400">
-            <div class="text-center">
-              <i class="bi bi-qr-code-scan d-flex align-items-center justify-content-center mx-auto mb-3"></i>
-              <h3>Scan QR Code Tiket</h3>
-              <p class="text-muted small mb-0">Pindai QR Code yang tercetak pada resi tiket permohonan untuk verifikasi instan.</p>
+          <div class="p-4 p-lg-5 bg-white rounded-4 shadow-sm border h-100 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex align-items-center justify-content-center rounded-circle bg-dark-subtle text-dark mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
+                <i class="bi bi-qr-code-scan"></i>
+              </div>
+              <h5 class="fw-bold text-dark text-center mb-2">Scan QR Code Tiket</h5>
+              <p class="text-muted small text-center mb-0">Pindai QR Code yang tercetak pada resi tiket permohonan untuk verifikasi instan.</p>
             </div>
 
             <div class="w-100 mt-4">
-              <button type="button" class="btn btn-primary w-100" onclick="s3TriggerQrScan()">
-                Buka QR Scanner
+              <button type="button" class="btn btn-dark btn-lg rounded-pill w-100 fw-bold fs-6 hover-lift" onclick="s3TriggerQrScan()">
+                <i class="bi bi-camera me-1"></i> Buka QR Scanner
               </button>
             </div>
           </div>
@@ -309,27 +632,28 @@
     </div>
   </section>
 
-  <!-- 9. SECTION FAQ ACCORDION -->
-  <section id="faq" class="faq section">
+  <!-- 10. SECTION FAQ ACCORDION -->
+  <section id="faq" class="py-5">
+    
     @include('home.components.section-title', [
       'subtitle' => 'Faq',
       'title' => 'Pertanyaan Yang Sering Diajukan',
       'description' => 'Informasi jawaban atas pertanyaan seputar layanan Soreang Smart Service.'
     ])
 
-    <div class="container">
+    <div class="container mt-4">
       <div class="row justify-content-center">
-        <div class="col-lg-10" data-aos="fade-up" data-aos-delay="100">
-          <div class="accordion" id="faqAccordion">
+        <div class="col-lg-10" data-aos="fade-up">
+          <div class="accordion accordion-flush" id="faqAccordion">
             @foreach($faqs as $index => $faq)
-              <div class="accordion-item mb-3 border rounded-3 overflow-hidden">
+              <div class="accordion-item mb-3 border rounded-4 overflow-hidden shadow-sm">
                 <h2 class="accordion-header" id="faqHeading{{ $index }}">
-                  <button class="accordion-button {{ $index > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ $index }}" aria-expanded="{{ $index === 0 ? 'true' : 'false' }}">
-                    <i class="bi bi-question-circle me-2 text-primary"></i> {{ $faq['question'] }}
+                  <button class="accordion-button fw-bold text-dark py-3 px-4 {{ $index > 0 ? 'collapsed' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse{{ $index }}" aria-expanded="{{ $index === 0 ? 'true' : 'false' }}">
+                    <i class="bi bi-question-circle-fill text-primary me-3 fs-5"></i> {{ $faq['question'] }}
                   </button>
                 </h2>
                 <div id="faqCollapse{{ $index }}" class="accordion-collapse collapse {{ $index === 0 ? 'show' : '' }}" data-bs-parent="#faqAccordion">
-                  <div class="accordion-body">
+                  <div class="accordion-body text-secondary px-4 pb-4 pt-0" style="line-height: 1.6; font-size: 0.95rem;">
                     {{ $faq['answer'] }}
                   </div>
                 </div>
@@ -341,136 +665,233 @@
     </div>
   </section>
 
-  <!-- MODALS -->
-
-  <!-- Modal 1: Jenis Surat List -->
-  <div class="modal fade" id="jenis-surat-modal" tabindex="-1" aria-labelledby="jenisSuratModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title fw-bold text-white" id="jenisSuratModalLabel">
-            <i class="bi bi-file-earmark-text me-2 text-white"></i> Daftar Jenis Surat Keterangan Online 3S
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-4">
-          <p class="text-muted small mb-3">Berikut 12 jenis surat administrasi kependudukan yang dapat diajukan secara digital via 3S:</p>
-          <div class="row g-3">
-            @foreach($jenisSuratList as $js)
-              <div class="col-md-6">
-                <div class="p-3 border rounded-3 bg-light h-100">
-                  <div class="d-flex align-items-center justify-content-between mb-1">
-                    <span class="badge bg-primary">{{ $js->kode }}</span>
-                    @if($js->wajib_pengantar_rt_rw)
-                      <small class="text-warning fw-bold"><i class="bi bi-exclamation-circle me-1"></i> Wajib RT/RW</small>
-                    @else
-                      <small class="text-success fw-bold"><i class="bi bi-check-circle me-1"></i> Langsung Proses</small>
-                    @endif
-                  </div>
-                  <h6 class="fw-bold text-dark mb-1">{{ $js->nama }}</h6>
-                  <p class="text-muted small mb-0">{{ $js->deskripsi }}</p>
-                </div>
-              </div>
-            @endforeach
-          </div>
-        </div>
-        <div class="modal-footer bg-light">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-          <a href="{{ route('login') }}" class="btn btn-primary">Pengajuan Sekarang <i class="bi bi-arrow-right"></i></a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 2: Jadwal Pelayanan per Kelurahan -->
-  <div class="modal fade" id="jadwal-pelayanan-modal" tabindex="-1" aria-labelledby="jadwalModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title fw-bold text-white" id="jadwalModalLabel">
-            <i class="bi bi-clock-history me-2 text-white"></i> Jadwal Pelayanan Kelurahan Se-Kecamatan Soreang
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-4">
-          <div class="mb-3">
-            <input type="text" id="s3SearchJadwal" class="form-control" placeholder="Cari nama kelurahan (contoh: Lakessi)...">
-          </div>
-          <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead class="table-light">
-                <tr>
-                  <th>Kelurahan</th>
-                  <th>Jam Operasional</th>
-                  <th>Istirahat</th>
-                  <th>Petugas Penanggung Jawab</th>
-                  <th>Telepon</th>
-                </tr>
-              </thead>
-              <tbody id="s3JadwalTableBody">
-                @foreach($jadwalList as $j)
-                  <tr>
-                    <td class="fw-bold text-primary">{{ $j->kelurahan->nama ?? '-' }}</td>
-                    <td><span class="badge bg-success">{{ $j->jam_buka }} - {{ $j->jam_tutup }}</span></td>
-                    <td><small class="text-muted">{{ $j->istirahat ?? '-' }}</small></td>
-                    <td><small class="fw-semibold">{{ $j->petugas ?? '-' }}</small></td>
-                    <td><small class="text-muted">{{ $j->telepon ?? '-' }}</small></td>
-                  </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="modal-footer bg-light">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 3: QR Scanner Simulator -->
-  <div class="modal fade" id="s3QrScannerModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content text-center">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title fw-bold text-white" id="qrModalLabel">
-            <i class="bi bi-qr-code-scan me-2 text-white"></i> QR Code Scanner 3S
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-4">
-          <div class="p-4 bg-light border border-2 border-dashed rounded-3 mb-3 position-relative">
-            <i class="bi bi-camera fs-1 text-muted d-block mb-2"></i>
-            <p class="text-muted small mb-0">Arahkan kamera ke QR Code Tiket 3S</p>
-          </div>
-          <p class="small text-muted mb-2">Atau gunakan sampel tiket berikut untuk pengujian:</p>
-          <div class="d-flex justify-content-center gap-2">
-            <button type="button" class="btn btn-sm btn-outline-primary" onclick="s3SimulateQrInput('SRG-2607-00123')">SRG-2607-00123</button>
-            <button type="button" class="btn btn-sm btn-outline-success" onclick="s3SimulateQrInput('3204012345670001')">NIK 3204012345670001</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal 4: Pop Up Cek Status Result -->
-  <div class="modal fade" id="modalCekStatusResult" tabindex="-1" aria-labelledby="modalCekStatusResultLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-      <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-        <div class="modal-header bg-primary text-white py-3">
-          <h5 class="modal-title fw-bold text-white mb-0" id="modalCekStatusResultLabel">
-            <i class="bi bi-ticket-perforated me-2 text-white"></i> Hasil Cek Status Permohonan
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body p-4" id="s3TicketModalBody">
-          <!-- Content will be injected dynamically via JS -->
-        </div>
-        <div class="modal-footer bg-light border-0 py-2">
-          <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Tutup</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  {{-- Include All Interactive Modals --}}
+  @include('home.partials.modals')
 
 @endsection
+
+@push('scripts')
+<!-- Leaflet JS for Map -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+  (function () {
+    'use strict';
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const mapContainer = document.getElementById('soreangMap');
+      if (!mapContainer) return;
+
+      // Map initialization
+      const soreangCenter = [-3.98924, 119.64297];
+      const map = L.map('soreangMap').setView(soreangCenter, 13);
+
+      // OpenStreetMap Tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Wilayah ID 73.72.03'
+      }).addTo(map);
+
+      // Data 7 Kelurahan + Data Kecamatan Soreang (Lengkap Kode Wilayah & Polygon Bounds)
+      const kelurahanData = {
+        all: {
+          name: "Kecamatan Soreang",
+          kode: "73.72.03",
+          lat: "-3.98924",
+          lng: "119.64297",
+          coords: [-3.98924, 119.64297],
+          desc: "Batas Wilayah Administrasi Kecamatan Soreang, Kota Parepare",
+          polygon: [
+            [-3.9700, 119.6480],
+            [-3.9740, 119.6590],
+            [-3.9880, 119.6540],
+            [-4.0080, 119.6380],
+            [-4.0040, 119.6220],
+            [-3.9850, 119.6250]
+          ]
+        },
+        bukit_harapan: {
+          name: "Kelurahan Bukit Harapan",
+          kode: "73.72.03.1007",
+          lat: "-3.98226",
+          lng: "119.64753",
+          coords: [-3.98226, 119.64753],
+          desc: "Kantor Kelurahan Bukit Harapan, Kecamatan Soreang, Kota Parepare",
+          polygon: [
+            [-3.9700, 119.6480],
+            [-3.9740, 119.6590],
+            [-3.9850, 119.6540],
+            [-3.9890, 119.6450],
+            [-3.9830, 119.6380],
+            [-3.9750, 119.6420]
+          ]
+        },
+        bukit_indah: {
+          name: "Kelurahan Bukit Indah",
+          kode: "73.72.03.1006",
+          lat: "-3.99000",
+          lng: "119.63800",
+          coords: [-3.99000, 119.63800],
+          desc: "Kantor Kelurahan Bukit Indah, Kecamatan Soreang, Kota Parepare",
+          polygon: [
+            [-3.9850, 119.6380],
+            [-3.9890, 119.6450],
+            [-3.9950, 119.6420],
+            [-3.9940, 119.6340],
+            [-3.9870, 119.6330]
+          ]
+        },
+        kampung_pisang: {
+          name: "Kelurahan Kampung Pisang",
+          kode: "73.72.03.1002",
+          lat: "-4.00100",
+          lng: "119.62800",
+          coords: [-4.00100, 119.62800],
+          desc: "Kantor Kelurahan Kampung Pisang, Kecamatan Soreang, Kota Parepare",
+          polygon: [
+            [-3.9980, 119.6250],
+            [-3.9970, 119.6310],
+            [-4.0040, 119.6330],
+            [-4.0050, 119.6240]
+          ]
+        },
+        lakessi: {
+          name: "Kelurahan Lakessi",
+          kode: "73.72.03.1001",
+          lat: "-3.99350",
+          lng: "119.62650",
+          coords: [-3.99350, 119.62650],
+          desc: "Kantor Kelurahan Lakessi, Kecamatan Soreang, Kota Parepare",
+          polygon: [
+            [-3.9890, 119.6230],
+            [-3.9880, 119.6300],
+            [-3.9970, 119.6310],
+            [-3.9980, 119.6240]
+          ]
+        },
+        ujung_baru: {
+          name: "Kelurahan Ujung Baru",
+          kode: "73.72.03.1003",
+          lat: "-4.00400",
+          lng: "119.63200",
+          coords: [-4.00400, 119.63200],
+          desc: "Kantor Kelurahan Ujung Baru, Kecamatan Soreang, Kota Parepare",
+          polygon: [
+            [-4.0010, 119.6300],
+            [-4.0000, 119.6360],
+            [-4.0080, 119.6380],
+            [-4.0070, 119.6290]
+          ]
+        },
+        ujung_lare: {
+          name: "Kelurahan Ujung Lare",
+          kode: "73.72.03.1004",
+          lat: "-3.99600",
+          lng: "119.63600",
+          coords: [-3.99600, 119.63600],
+          desc: "Kantor Kelurahan Ujung Lare, Kecamatan Soreang, Kota Parepare",
+          polygon: [
+            [-3.9930, 119.6330],
+            [-3.9920, 119.6400],
+            [-4.0000, 119.6410],
+            [-4.0010, 119.6330]
+          ]
+        },
+        watang_soreang: {
+          name: "Kelurahan Watang Soreang",
+          kode: "73.72.03.1005",
+          lat: "-3.98500",
+          lng: "119.63200",
+          coords: [-3.98500, 119.63200],
+          desc: "Kantor Kelurahan Watang Soreang, Kecamatan Soreang, Kota Parepare",
+          polygon: [
+            [-3.9800, 119.6270],
+            [-3.9790, 119.6360],
+            [-3.9880, 119.6370],
+            [-3.9890, 119.6280]
+          ]
+        }
+      };
+
+      const markers = {};
+      let currentActivePolygon = null;
+
+      // Add Markers to map for all 7 kelurahan
+      Object.keys(kelurahanData).forEach(key => {
+        if (key === 'all') return;
+        const item = kelurahanData[key];
+        const marker = L.marker(item.coords).addTo(map);
+        marker.bindPopup(`<b>${item.name}</b><br>${item.desc}<br><small class="text-primary font-monospace">Kode: ${item.kode} | Lat: ${item.lat}, Lng: ${item.lng}</small>`);
+        
+        // Clicking marker updates dropdown & polygon
+        marker.on('click', function () {
+          const selectEl = document.getElementById('soreangKelurahanSelect');
+          if (selectEl) selectEl.value = key;
+          renderSelectedWilayah(key);
+        });
+
+        markers[key] = marker;
+      });
+
+      // Function to render selected Wilayah (Update Polygon Line, Info Cards, & Map Focus)
+      function renderSelectedWilayah(key) {
+        const item = kelurahanData[key] || kelurahanData.all;
+
+        // 1. Update Badge & Text Elements
+        const elBadge = document.getElementById('s3KodeWilayahBadge');
+        const elTitle = document.getElementById('s3SelectedKelurahanTitle');
+        const elDesc = document.getElementById('s3SelectedKelurahanDesc');
+        const elDetail = document.getElementById('s3SelectedKelurahanDetail');
+        const elCoord = document.getElementById('s3SelectedKoordinat');
+        const elFooter = document.getElementById('s3MapFooterKode');
+
+        if (elBadge) elBadge.textContent = 'Kode: ' + item.kode;
+        if (elTitle) elTitle.textContent = item.name;
+        if (elDesc) elDesc.textContent = key === 'all' ? 'Sesuai Kepmendagri No 300.2.2-2430 Tahun 2025' : 'Kelurahan Terintegrasi Kecamatan Soreang Parepare';
+        if (elDetail) elDetail.textContent = item.name;
+        if (elCoord) elCoord.textContent = item.lat + ', ' + item.lng;
+        if (elFooter) {
+          elFooter.innerHTML = `KODE <strong>${item.kode}</strong> &nbsp; LAT <strong>${item.lat}</strong> &nbsp; LNG <strong>${item.lng}</strong>`;
+        }
+
+        // 2. Remove previous polygon line
+        if (currentActivePolygon) {
+          map.removeLayer(currentActivePolygon);
+        }
+
+        // 3. Draw updated polygon boundary line (Blue outline with translucent fill as in screenshot)
+        currentActivePolygon = L.polygon(item.polygon, {
+          color: '#0d6efd',
+          weight: 4,
+          opacity: 0.9,
+          fillColor: '#0d6efd',
+          fillOpacity: 0.2,
+          lineJoin: 'round'
+        }).addTo(map);
+
+        currentActivePolygon.bindPopup(`<b>${item.name}</b><br>Kode Wilayah: ${item.kode}<br><small class="text-primary font-monospace">Lat: ${item.lat}, Lng: ${item.lng}</small>`);
+
+        // 4. Fit map to polygon bounds smoothly
+        map.fitBounds(currentActivePolygon.getBounds(), { padding: [35, 35] });
+
+        // 5. Open marker popup if specific kelurahan selected
+        if (key !== 'all' && markers[key]) {
+          markers[key].openPopup();
+        }
+      }
+
+      // Initial Render (All Soreang)
+      renderSelectedWilayah('all');
+
+      // Dropdown Select Event
+      const selectEl = document.getElementById('soreangKelurahanSelect');
+      if (selectEl) {
+        selectEl.addEventListener('change', function () {
+          renderSelectedWilayah(this.value);
+        });
+      }
+
+    });
+  })();
+</script>
+@endpush

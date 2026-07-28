@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaController;
+use App\Http\Controllers\BeritaPublicController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImpersonateController;
@@ -24,6 +25,10 @@ use Illuminate\Support\Facades\Route;
 // Public Landing Home Route
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
+// Public Berita Routes (Landing Page Template)
+Route::get('/berita', [BeritaPublicController::class, 'index'])->name('berita.public.index');
+Route::get('/berita/{slug}', [BeritaPublicController::class, 'show'])->name('berita.public.show');
+
 // Public Pengaduan Routes
 Route::get('/pengaduan', [PengaduanPublicController::class, 'index'])->name('pengaduan.index');
 Route::get('/pengaduan/create', [PengaduanPublicController::class, 'create'])->name('pengaduan.create');
@@ -37,7 +42,7 @@ Route::get('register', [AuthController::class, 'showRegister'])->name('register'
 Route::post('register', [AuthController::class, 'register']);
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Dashboard (admin landing after login)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
