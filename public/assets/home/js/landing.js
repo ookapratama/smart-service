@@ -101,6 +101,18 @@ document.addEventListener('DOMContentLoaded', function () {
             if (d.status === 'selesai' || d.status === 'APPROVED') badgeClass = 'bg-success text-white';
             if (d.status === 'ditolak' || d.status === 'REJECTED') badgeClass = 'bg-danger text-white';
 
+            let suratHtml = '';
+            if (d.surat_url) {
+              suratHtml = `
+                <div class="mt-3 p-3 bg-success bg-opacity-10 rounded-3 border border-success-subtle text-start">
+                  <small class="text-success fw-bold d-block mb-1"><i class="bi bi-file-earmark-check me-1"></i> Surat Anda Sudah Terbit!</small>
+                  <a href="${d.surat_url}" class="btn btn-success btn-sm fw-bold px-3 mt-1">
+                    <i class="bi bi-download me-1"></i> Unduh Surat (verifikasi NIK)
+                  </a>
+                </div>
+              `;
+            }
+
             let responHtml = '';
             if (d.catatan_respon) {
               responHtml = `
@@ -127,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
                       <div class="col-sm-6"><span class="text-muted small">Update Terakhir:</span><br><strong>${d.updated_at}</strong></div>
                     </div>
                     ${responHtml}
+                    ${suratHtml}
                     <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
                       <span class="text-success small fw-semibold"><i class="bi bi-shield-check me-1"></i> Terverifikasi Resmi Sistem 3S</span>
                       <a href="/login" class="btn btn-outline-primary btn-sm fw-bold px-3">

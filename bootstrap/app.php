@@ -8,6 +8,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -34,6 +35,13 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (Throwable $e, $request) {
+            // ValidationException punya renderer bawaan yang benar untuk kedua
+            // dunia (redirect + errors bag untuk web, 422 JSON untuk AJAX) —
+            // jangan diubah jadi 500 oleh renderer generik di bawah.
+            if ($e instanceof ValidationException) {
+                return null;
+            }
+
             // Jika request meminta JSON (API), berikan response JSON
             if ($request->is('api/*') || $request->expectsJson()) {
                 Log::error($e);

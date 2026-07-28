@@ -59,17 +59,17 @@
       <i class="bi bi-megaphone d-block"></i>
       <span>Pengaduan</span>
     </a>
+    <a href="{{ route('surat.index') }}" class="bottom-nav-item {{ request()->routeIs('surat.*') ? 'active' : '' }}">
+      <i class="bi bi-file-earmark-text d-block"></i>
+      <span>Surat</span>
+    </a>
     <a href="{{ route('home') }}#cek-status" class="bottom-nav-item" data-section="cek-status">
       <i class="bi bi-search d-block"></i>
       <span>Cek Status</span>
     </a>
-    <a href="{{ route('home') }}#faq" class="bottom-nav-item" data-section="faq">
-      <i class="bi bi-question-circle d-block"></i>
-      <span>FAQ</span>
-    </a>
-    <a href="{{ route('login') }}" class="bottom-nav-item">
-      <i class="bi bi-person-circle d-block"></i>
-      <span>Login</span>
+    <a href="{{ route('panduan') }}" class="bottom-nav-item {{ request()->routeIs('panduan') ? 'active' : '' }}">
+      <i class="bi bi-book d-block"></i>
+      <span>Panduan</span>
     </a>
   </div>
 </div>

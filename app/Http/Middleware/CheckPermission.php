@@ -31,6 +31,9 @@ class CheckPermission
         $routeNameMap = [
             'settings.clear-cache' => 'update',
             'tiket.update-status' => 'update',
+            'tiket.lampiran' => 'read',
+            'tiket.surat-pdf' => 'read',
+            'tiket.regenerate-surat-pdf' => 'update',
         ];
 
         $routeName = $request->route()->getName();
