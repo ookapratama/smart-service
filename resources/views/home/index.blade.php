@@ -1,7 +1,7 @@
 @extends('home.layouts.app')
 
 @section('title', 'SOREAN SMART SERVICE (3S) - Pelayanan Publik Terintegrasi')
-@section('meta_description', 'Sistem Pelayanan Publik Terintegrasi Berbasis Digital Kecamatan Sorean. Cepat, Mudah, Transparan, dan Melayani dengan Hati.')
+@section('meta_description', 'Sistem Pelayanan Publik Terintegrasi Berbasis Digital Kecamatan Soreang. Cepat, Mudah, Transparan, dan Melayani dengan Hati.')
 
 @push('styles')
 <style>
@@ -31,7 +31,7 @@
     <div class="container">
       <div class="row gy-4">
         <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center" data-aos="zoom-out">
-          <h1>Sorean Smart Service <span>(3S)</span></h1>
+          <h1>Soreang Smart Service <span>(3S)</span></h1>
           <p>{{ $siteInfo['tagline'] ?? 'Cepat, Mudah, Transparan, dan Melayani dengan Hati.' }}</p>
           <div class="d-flex">
             <a href="{{ route('login') }}" class="btn-get-started">Mulai Sekarang</a>
@@ -41,7 +41,7 @@
           </div>
         </div>
         <div class="col-lg-6 order-1 order-lg-2 hero-img d-flex justify-content-center" data-aos="zoom-out" data-aos-delay="200">
-          <img src="{{ asset('assets/home/img/hero-img.png') }}" class="img-fluid animated" alt="Sorean Smart Service Illustration" style="max-height: 380px;">
+          <img src="{{ asset('assets/home/img/hero-img.png') }}" class="img-fluid animated" alt="Soreang Smart Service Illustration" style="max-height: 380px;">
         </div>
       </div>
     </div>
@@ -51,8 +51,8 @@
   <section id="masalah-solusi" class="about section light-background">
     @include('home.components.section-title', [
       'subtitle' => 'Tantangan & Solusi',
-      'title' => 'Mengapa Sorean Smart Service Dihadirkan?',
-      'description' => 'Transformasi digital pelayanan publik Kecamatan Sorean untuk mengatasi kendala pelayanan kependudukan konvensional.'
+      'title' => 'Mengapa Soreang Smart Service Dihadirkan?',
+      'description' => 'Transformasi digital pelayanan publik Kecamatan Soreang untuk mengatasi kendala pelayanan kependudukan konvensional.'
     ])
 
     <div class="container">
@@ -61,7 +61,7 @@
           <div class="about-content">
             <h3>Solusi Terintegrasi Pelayanan Publik Digital</h3>
             <p class="fst-italic">
-              Sistem Pelayanan Publik Terintegrasi Berbasis Digital dan Kolaboratif Kecamatan Sorean menghadirkan kemudahan pengurusan administrasi warga.
+              Sistem Pelayanan Publik Terintegrasi Berbasis Digital dan Kolaboratif Kecamatan Soreang menghadirkan kemudahan pengurusan administrasi warga.
             </p>
             <ul>
               @foreach($challenges as $c)
@@ -93,7 +93,7 @@
   <section id="services" class="services section">
     @include('home.components.section-title', [
       'subtitle' => '8 Komponen Smart',
-      'title' => 'Fitur Utama Sorean Smart Service',
+      'title' => 'Fitur Utama Soreang Smart Service',
       'description' => 'Modularitas layanan publik berbasis digital yang memudahkan warga dan aparatur kelurahan.'
     ])
 
@@ -205,7 +205,7 @@
     @include('home.components.section-title', [
       'subtitle' => 'Publikasi',
       'title' => 'Berita & Kegiatan Terbaru',
-      'description' => 'Pembaruan informasi dan sosialisasi pelayanan publik Kecamatan Sorean.'
+      'description' => 'Pembaruan informasi dan sosialisasi pelayanan publik Kecamatan Soreang.'
     ])
 
     <div class="container">
@@ -277,7 +277,7 @@
             <div class="text-center">
               <i class="bi bi-clock d-flex align-items-center justify-content-center mx-auto mb-3"></i>
               <h3>Jadwal Pelayanan</h3>
-              <p class="text-muted small mb-0">Jadwal operasional kantor kelurahan & jam kerja pelayanan publik se-Kecamatan Sorean.</p>
+              <p class="text-muted small mb-0">Jadwal operasional kantor kelurahan & jam kerja pelayanan publik se-Kecamatan Soreang.</p>
             </div>
 
             <div class="w-100 mt-4">
@@ -314,7 +314,7 @@
     @include('home.components.section-title', [
       'subtitle' => 'Faq',
       'title' => 'Pertanyaan Yang Sering Diajukan',
-      'description' => 'Informasi jawaban atas pertanyaan seputar layanan Sorean Smart Service.'
+      'description' => 'Informasi jawaban atas pertanyaan seputar layanan Soreang Smart Service.'
     ])
 
     <div class="container">
@@ -388,13 +388,13 @@
       <div class="modal-content">
         <div class="modal-header bg-primary text-white">
           <h5 class="modal-title fw-bold text-white" id="jadwalModalLabel">
-            <i class="bi bi-clock-history me-2 text-white"></i> Jadwal Pelayanan Kelurahan Se-Kecamatan Sorean
+            <i class="bi bi-clock-history me-2 text-white"></i> Jadwal Pelayanan Kelurahan Se-Kecamatan Soreang
           </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body p-4">
           <div class="mb-3">
-            <input type="text" id="s3SearchJadwal" class="form-control" placeholder="Cari nama kelurahan (contoh: Mekarjaya)...">
+            <input type="text" id="s3SearchJadwal" class="form-control" placeholder="Cari nama kelurahan (contoh: Lakessi)...">
           </div>
           <div class="table-responsive">
             <table class="table table-hover align-middle">
@@ -410,7 +410,7 @@
               <tbody id="s3JadwalTableBody">
                 @foreach($jadwalList as $j)
                   <tr>
-                    <td class="fw-bold text-primary">{{ $j->kelurahan }}</td>
+                    <td class="fw-bold text-primary">{{ $j->kelurahan->nama ?? '-' }}</td>
                     <td><span class="badge bg-success">{{ $j->jam_buka }} - {{ $j->jam_tutup }}</span></td>
                     <td><small class="text-muted">{{ $j->istirahat ?? '-' }}</small></td>
                     <td><small class="fw-semibold">{{ $j->petugas ?? '-' }}</small></td>

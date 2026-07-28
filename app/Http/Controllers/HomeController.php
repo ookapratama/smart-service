@@ -11,7 +11,7 @@ use Illuminate\View\View;
 class HomeController extends Controller
 {
     /**
-     * Display the 3S (Sorean Smart Service) landing home page.
+     * Display the 3S (Soreang Smart Service) landing home page.
      *
      * @return View
      */
@@ -19,22 +19,22 @@ class HomeController extends Controller
     {
         // 1. Informasi Produk
         $siteInfo = [
-            'name'          => 'SOREAN SMART SERVICE',
+            'name'          => 'SOREANG SMART SERVICE',
             'code'          => '3S',
             'tagline'       => 'Cepat, Mudah, Transparan, dan Melayani dengan Hati.',
-            'description'   => 'Sistem Pelayanan Publik Terintegrasi Berbasis Digital dan Kolaboratif Kecamatan Sorean',
-            'email'         => 'layanan@sorean.go.id',
-            'phone'         => '(0251) 833-3373',
+            'description'   => 'Sistem Pelayanan Publik Terintegrasi Berbasis Digital dan Kolaboratif Kecamatan Soreang',
+            'email'         => 'layanan@soreang.parepare.go.id',
+            'phone'         => '(0421) 21055',
             'whatsapp'      => '+6281234567890',
-            'address_line1' => 'Jl. Raya Sorean No. 45, Kecamatan Sorean',
-            'address_line2' => 'Kabupaten Bandung, Jawa Barat 40911',
+            'address_line1' => 'Jl. Jenderal Sudirman No. 45, Kecamatan Soreang',
+            'address_line2' => 'Kota Parepare, Sulawesi Selatan 91131',
             'about_short'   => 'Platform digital terpadu untuk pengurusan surat online, pengaduan masyarakat, monitoring real-time, dan kolaborasi antarkelurahan.',
             'video_url'     => 'https://www.youtube.com/watch?v=Y7f98aduVJ8',
             'social_links'  => [
-                'twitter'   => 'https://twitter.com/sorean_smart',
-                'facebook'  => 'https://facebook.com/soreansmartservice',
-                'instagram' => 'https://instagram.com/sorean.smartservice',
-                'youtube'   => 'https://youtube.com/c/SoreanSmartService',
+                'twitter'   => 'https://twitter.com/soreang_smart',
+                'facebook'  => 'https://facebook.com/soreangsmartservice',
+                'instagram' => 'https://instagram.com/soreang.smartservice',
+                'youtube'   => 'https://youtube.com/c/SoreangSmartService',
             ],
         ];
 
@@ -104,7 +104,7 @@ class HomeController extends Controller
                 'title' => 'Smart Village Collaboration',
                 'icon' => '🔗',
                 'bs_icon' => 'bi-diagram-3',
-                'description' => 'Sistem integrasi data dan koordinasi terpadu seluruh kelurahan se-Kecamatan Sorean.',
+                'description' => 'Sistem integrasi data dan koordinasi terpadu seluruh kelurahan se-Kecamatan Soreang.',
                 'link' => '#keunggulan',
                 'link_text' => 'Pelajari Integrasi',
                 'badge' => 'Satu Data'
@@ -156,7 +156,7 @@ class HomeController extends Controller
             [
                 'icon' => 'bi-layers-half',
                 'title' => 'Terintegrasi Lintas Kelurahan',
-                'description' => 'Menghubungkan kantor kecamatan dan 5 kelurahan secara seamless dalam satu pangkalan data.'
+                'description' => 'Menghubungkan kantor kecamatan dan 7 kelurahan secara seamless dalam satu pangkalan data.'
             ],
             [
                 'icon' => 'bi-bar-chart-line-fill',
@@ -212,7 +212,7 @@ class HomeController extends Controller
                 'count' => '100',
                 'suffix' => '%',
                 'label' => 'Coverage Kelurahan',
-                'description' => 'Terhubung di 5 Kelurahan Kecamatan Sorean',
+                'description' => 'Terhubung di 7 Kelurahan Kecamatan Soreang',
                 'icon' => 'bi-geo-alt-fill'
             ],
             [
@@ -257,10 +257,10 @@ class HomeController extends Controller
         if ($beritaList->isEmpty()) {
             $beritaList = collect([
                 (object)[
-                    'judul' => 'Peluncuran Resmi Sorean Smart Service (3S)',
+                    'judul' => 'Peluncuran Resmi Soreang Smart Service (3S)',
                     'slug' => 'peluncuran-resmi-3s',
                     'kategori' => 'Pengumuman',
-                    'ringkasan' => 'Kecamatan Sorean resmi meluncurkan platform digital 3S untuk seluruh pelayanan kelurahan.',
+                    'ringkasan' => 'Kecamatan Soreang resmi meluncurkan platform digital 3S untuk seluruh pelayanan kelurahan.',
                     'published_at' => now()->subDays(5),
                     'penulis' => 'Admin Kecamatan',
                 ],
@@ -273,8 +273,8 @@ class HomeController extends Controller
                     'penulis' => 'Tim Digital 3S',
                 ],
                 (object)[
-                    'judul' => 'Program Smart UMKM Sorean Buka Pendaftaran',
-                    'slug' => 'program-smart-umkm-sorean',
+                    'judul' => 'Program Smart UMKM Soreang Buka Pendaftaran',
+                    'slug' => 'program-smart-umkm-soreang',
                     'kategori' => 'Program',
                     'ringkasan' => 'Bantuan perizinan gratis dan promosi digital untuk pelaku UMKM lokal.',
                     'published_at' => now()->subDay(),
@@ -284,7 +284,7 @@ class HomeController extends Controller
         }
 
         // 8. Jadwal Pelayanan per Kelurahan
-        $jadwalList = JadwalPelayanan::active()->get();
+        $jadwalList = JadwalPelayanan::active()->with('kelurahan')->get();
 
         // 9. Daftar Jenis Surat untuk Modal Quick View
         $jenisSuratList = JenisSurat::where('is_active', true)->get();
@@ -309,7 +309,7 @@ class HomeController extends Controller
             ],
             [
                 'question' => 'Apakah pengajuan surat online dipungut biaya?',
-                'answer'   => 'Tidak. Seluruh pelayanan publik di Kecamatan Sorean melalui platform Sorean Smart Service (3S) adalah GRATIS (Rp 0).'
+                'answer'   => 'Tidak. Seluruh pelayanan publik di Kecamatan Soreang melalui platform Soreang Smart Service (3S) adalah GRATIS (Rp 0).'
             ],
             [
                 'question' => 'Bagaimana jika surat membutuhkan tanda tangan dan pengantar RT/RW?',

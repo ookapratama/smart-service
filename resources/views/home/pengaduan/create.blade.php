@@ -1,7 +1,7 @@
 @extends('home.layouts.app')
 
-@section('title', 'Formulir Layanan Pengaduan & Aspirasi Masyarakat - 3S Sorean')
-@section('meta_description', 'Isi formulir pengaduan resmi Kecamatan Sorean. Mudah, transparan, dan terjamin kerahasiaan pelapor.')
+@section('title', 'Formulir Layanan Pengaduan & Aspirasi Masyarakat - 3S Soreang')
+@section('meta_description', 'Isi formulir pengaduan resmi Kecamatan Soreang. Mudah, transparan, dan terjamin kerahasiaan pelapor.')
 
 @section('content')
 
@@ -18,7 +18,7 @@
           </div>
           <h2 class="fw-bold text-dark mb-2">Formulir Layanan Pengaduan, Aspirasi & Informasi Masyarakat</h2>
           <p class="text-muted mb-3">
-            Silakan isi formulir di bawah ini dengan data yang benar dan dapat dipertanggungjawabkan. Identitas Anda dijamin kerahasiaannya oleh Pemerintah Kecamatan Sorean.
+            Silakan isi formulir di bawah ini dengan data yang benar dan dapat dipertanggungjawabkan. Identitas Anda dijamin kerahasiaannya oleh Pemerintah Kecamatan Soreang.
           </p>
           <div class="alert alert-info border-0 rounded-3 mb-0 d-flex align-items-center">
             <i class="bi bi-info-circle-fill fs-4 me-3 text-info flex-shrink-0"></i>
@@ -76,21 +76,21 @@
               </div>
 
               <div class="col-md-6">
-                <label for="kelurahan" class="form-label fw-semibold">Kelurahan / Desa Asal</label>
-                <select class="form-select @error('kelurahan') is-invalid @enderror" id="kelurahan" name="kelurahan">
+                <label for="kelurahan_id" class="form-label fw-semibold">Kelurahan / Desa Asal</label>
+                <select class="form-select @error('kelurahan_id') is-invalid @enderror" id="kelurahan_id" name="kelurahan_id">
                   <option value="">Pilih Kelurahan</option>
                   @foreach($kelurahanList as $k)
-                    <option value="{{ $k }}" {{ old('kelurahan') == $k ? 'selected' : '' }}>Kelurahan {{ $k }}</option>
+                    <option value="{{ $k->id }}" {{ old('kelurahan_id') == $k->id ? 'selected' : '' }}>Kelurahan {{ $k->nama }}</option>
                   @endforeach
                 </select>
-                @error('kelurahan')
+                @error('kelurahan_id')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
               </div>
 
               <div class="col-md-6">
                 <label for="alamat" class="form-label fw-semibold">Alamat Lengkap Tempat Tinggal</label>
-                <input type="text" class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" value="{{ old('alamat') }}" placeholder="Jl. Raya Sorean No. 12 RT 02/05">
+                <input type="text" class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" value="{{ old('alamat') }}" placeholder="Jl. Raya Soreang No. 12 RT 02/05">
                 @error('alamat')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -157,7 +157,7 @@
 
               <div class="col-md-6">
                 <label for="judul" class="form-label fw-semibold">Judul Laporan / Subjek <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('judul') is-invalid @enderror" id="judul" name="judul" value="{{ old('judul') }}" placeholder="Contoh: Jalan Berlubang di Dekat Pasar Sorean" required>
+                <input type="text" class="form-control @error('judul') is-invalid @enderror" id="judul" name="judul" value="{{ old('judul') }}" placeholder="Contoh: Jalan Berlubang di Dekat Pasar Soreang" required>
                 @error('judul')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -165,7 +165,7 @@
 
               <div class="col-md-6">
                 <label for="lokasi" class="form-label fw-semibold">Lokasi Kejadian / Objek Laporan <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('lokasi') is-invalid @enderror" id="lokasi" name="lokasi" value="{{ old('lokasi') }}" placeholder="Contoh: Pertigaan Jalan Raya Sorean KM 2" required>
+                <input type="text" class="form-control @error('lokasi') is-invalid @enderror" id="lokasi" name="lokasi" value="{{ old('lokasi') }}" placeholder="Contoh: Pertigaan Jalan Raya Soreang KM 2" required>
                 @error('lokasi')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror

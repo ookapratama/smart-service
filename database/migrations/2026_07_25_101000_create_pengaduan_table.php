@@ -15,6 +15,9 @@ return new class extends Migration
             $table->string('lokasi')->nullable();
             $table->decimal('lat', 10, 7)->nullable();
             $table->decimal('lng', 10, 7)->nullable();
+            $table->boolean('is_anonim')->default(false);
+            $table->string('jenis_laporan', 50)->nullable();
+            $table->date('tanggal_kejadian')->nullable();
             $table->timestamps();
         });
     }

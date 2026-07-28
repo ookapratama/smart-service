@@ -31,7 +31,6 @@ class CheckPermission
         $routeNameMap = [
             'settings.clear-cache' => 'update',
             'tiket.update-status' => 'update',
-            'instansi.wilayah-sync' => 'update',
         ];
 
         $routeName = $request->route()->getName();

@@ -5,8 +5,14 @@ namespace App\Providers;
 use App\Helpers\ViewConfigHelper;
 use App\Models\Pengaduan;
 use App\Models\PengajuanSurat;
+use App\Repositories\BeritaRepository;
+use App\Repositories\JadwalPelayananRepository;
+use App\Repositories\JenisSuratRepository;
+use App\Repositories\KategoriPengaduanRepository;
 use App\Repositories\MenuRepository;
+use App\Repositories\PemohonRepository;
 use App\Repositories\RoleRepository;
+use App\Repositories\TiketRepository;
 use App\Repositories\UserRepository;
 use App\Services\SettingService;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -25,31 +31,27 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(
             \App\Contracts\Repositories\TiketRepository::class,
-            \App\Repositories\TiketRepository::class
+            TiketRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\PemohonRepository::class,
-            \App\Repositories\PemohonRepository::class
+            PemohonRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\KategoriPengaduanRepository::class,
-            \App\Repositories\KategoriPengaduanRepository::class
+            KategoriPengaduanRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\JenisSuratRepository::class,
-            \App\Repositories\JenisSuratRepository::class
+            JenisSuratRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\BeritaRepository::class,
-            \App\Repositories\BeritaRepository::class
+            BeritaRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\JadwalPelayananRepository::class,
-            \App\Repositories\JadwalPelayananRepository::class
-        );
-        $this->app->bind(
-            \App\Contracts\Repositories\InstansiRepository::class,
-            \App\Repositories\InstansiRepository::class
+            JadwalPelayananRepository::class
         );
         // Repository bindings (contract => concrete)
         $this->app->bind(

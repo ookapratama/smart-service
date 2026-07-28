@@ -99,3 +99,14 @@ jobs:
       # app/Http/Controllers/DeployWebhookController.php + DEPLOYMENT.md. The token is
       # compared with hash_equals() server-side, so it must match DEPLOY_WEBHOOK_TOKEN
       # in the server's .env exactly.
+      - name: Trigger post-deploy commands via webhook
+        run: |
+          http_status=$(curl -s -o /tmp/webhook_response.json -w "%{http_code}" -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}" \
+            -H "X-Deploy-Token: ${{ secrets.DEPLOY_WEBHOOK_TOKEN }}" \
+            --max-time 120)
+          echo "HTTP status: $http_status"
+          cat /tmp/webhook_response.json
+          echo
+          if [ "$http_status" -lt 200 ] || [ "$http_status" -ge 300 ]; then
+            exit 1
+          fi

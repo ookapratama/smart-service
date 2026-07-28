@@ -1,15 +1,18 @@
 <?php
 
-use App\Models\Instansi;
 use App\Models\JenisSurat;
 use App\Models\Pemohon;
 use App\Models\PengajuanSurat;
-use App\Models\Tiket;
+use App\Services\TiketService;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-test('new s3 tables and columns exist', function () {
-    expect(Schema::hasTable('instansi'))->toBeTrue();
+test('new s3 tables and columns exist, tenancy tables do not', function () {
+    expect(Schema::hasTable('instansi'))->toBeFalse();
+    expect(Schema::hasTable('wilayah'))->toBeFalse();
+
+    expect(Schema::hasTable('kelurahan'))->toBeTrue();
     expect(Schema::hasTable('pemohon'))->toBeTrue();
     expect(Schema::hasTable('jenis_surat'))->toBeTrue();
     expect(Schema::hasTable('kategori_pengaduan'))->toBeTrue();
@@ -17,68 +20,32 @@ test('new s3 tables and columns exist', function () {
     expect(Schema::hasTable('status_log'))->toBeTrue();
     expect(Schema::hasTable('pengajuan_surat'))->toBeTrue();
     expect(Schema::hasTable('pengaduan'))->toBeTrue();
+    expect(Schema::hasTable('agenda'))->toBeTrue();
+    expect(Schema::hasTable('galeri'))->toBeTrue();
+    expect(Schema::hasTable('notifikasi_wa'))->toBeTrue();
+    expect(Schema::hasTable('surat_counters'))->toBeTrue();
 
-    expect(Schema::hasColumns('users', ['instansi_id']))->toBeTrue();
-    expect(Schema::hasColumns('settings', ['instansi_id']))->toBeTrue();
+    expect(Schema::hasColumns('users', ['instansi_id']))->toBeFalse();
+    expect(Schema::hasColumns('settings', ['instansi_id']))->toBeFalse();
+    expect(Schema::hasColumns('pemohon', ['instansi_id']))->toBeFalse();
+    expect(Schema::hasColumns('tiket', ['instansi_id']))->toBeFalse();
+    expect(Schema::hasColumns('tiket_counters', ['instansi_id']))->toBeFalse();
+
     expect(Schema::hasColumns('media', ['mediable_type', 'mediable_id']))->toBeTrue();
-    expect(Schema::hasColumns('tiket', ['instansi_id', 'nomor_tiket', 'pemohon_id', 'detail_type', 'detail_id', 'status', 'channel']))->toBeTrue();
-});
-
-test('tenant scope filters tiket by currentInstansi and auto-fills instansi_id on create', function () {
-    $instansiA = Instansi::create(['name' => 'Kelurahan A', 'level' => 'kelurahan', 'kode' => 'AAA']);
-    $instansiB = Instansi::create(['name' => 'Kelurahan B', 'level' => 'kelurahan', 'kode' => 'BBB']);
-
-    $pemohonA = Pemohon::create(['instansi_id' => $instansiA->id, 'nik' => '1111111111111111', 'name' => 'Warga A']);
-    $pemohonB = Pemohon::create(['instansi_id' => $instansiB->id, 'nik' => '2222222222222222', 'name' => 'Warga B']);
-
-    $jenis = JenisSurat::create(['kode' => 'TST', 'nama' => 'Test Surat']);
-
-    $pengajuanA = PengajuanSurat::create(['jenis_surat_id' => $jenis->id, 'keperluan' => 'test']);
-    $pengajuanA->tiket()->create([
-        'instansi_id' => $instansiA->id,
-        'nomor_tiket' => 'AAA-2607-00001',
-        'pemohon_id' => $pemohonA->id,
-        'judul' => 'Tiket A',
-        'status' => 'baru',
-        'channel' => 'web',
-    ]);
-
-    $pengajuanB = PengajuanSurat::create(['jenis_surat_id' => $jenis->id, 'keperluan' => 'test']);
-    $pengajuanB->tiket()->create([
-        'instansi_id' => $instansiB->id,
-        'nomor_tiket' => 'BBB-2607-00001',
-        'pemohon_id' => $pemohonB->id,
-        'judul' => 'Tiket B',
-        'status' => 'baru',
-        'channel' => 'web',
-    ]);
-
-    app()->instance('currentInstansi', $instansiA);
-
-    expect(Tiket::count())->toBe(1);
-    expect(Tiket::first()->nomor_tiket)->toBe('AAA-2607-00001');
-    expect(Tiket::withoutGlobalScope('instansi')->count())->toBe(2);
-
-    $pengajuanC = PengajuanSurat::create(['jenis_surat_id' => $jenis->id, 'keperluan' => 'auto']);
-    $autoTiket = $pengajuanC->tiket()->create([
-        'nomor_tiket' => 'AAA-2607-00002',
-        'pemohon_id' => $pemohonA->id,
-        'judul' => 'Tiket Auto',
-        'status' => 'baru',
-        'channel' => 'web',
-    ]);
-
-    expect($autoTiket->instansi_id)->toBe($instansiA->id);
+    expect(Schema::hasColumns('tiket', ['nomor_tiket', 'pemohon_id', 'detail_type', 'detail_id', 'status', 'channel']))->toBeTrue();
+    expect(Schema::hasColumns('pemohon', ['kelurahan_id']))->toBeTrue();
+    expect(Schema::hasColumns('pengaduan', ['is_anonim', 'jenis_laporan', 'tanggal_kejadian']))->toBeTrue();
+    expect(Schema::hasColumns('pengajuan_surat', ['nomor_surat']))->toBeTrue();
+    expect(Schema::hasColumns('jenis_surat', ['template_view']))->toBeTrue();
+    expect(Schema::hasColumns('jadwal_pelayanan', ['kelurahan_id']))->toBeTrue();
 });
 
 test('tiket detail morph resolves via morph map', function () {
-    $instansi = Instansi::create(['name' => 'Kelurahan C', 'level' => 'kelurahan', 'kode' => 'CCC']);
-    $pemohon = Pemohon::create(['instansi_id' => $instansi->id, 'nik' => '3333333333333333', 'name' => 'Warga C']);
+    $pemohon = Pemohon::create(['nik' => '3333333333333333', 'name' => 'Warga C']);
     $jenis = JenisSurat::create(['kode' => 'MRF', 'nama' => 'Morph Test']);
     $pengajuan = PengajuanSurat::create(['jenis_surat_id' => $jenis->id, 'keperluan' => 'morph test']);
 
     $tiket = $pengajuan->tiket()->create([
-        'instansi_id' => $instansi->id,
         'nomor_tiket' => 'CCC-2607-00001',
         'pemohon_id' => $pemohon->id,
         'judul' => 'Morph Tiket',
@@ -93,27 +60,19 @@ test('tiket detail morph resolves via morph map', function () {
     expect($pengajuan->fresh()->tiket->id)->toBe($tiket->id);
 });
 
-test('nik is unique per instansi but reusable across instansi', function () {
-    $instansiA = Instansi::create(['name' => 'Kelurahan D', 'level' => 'kelurahan', 'kode' => 'DDD']);
-    $instansiE = Instansi::create(['name' => 'Kelurahan E', 'level' => 'kelurahan', 'kode' => 'EEE']);
+test('nik is unique globally', function () {
+    Pemohon::create(['nik' => '4444444444444444', 'name' => 'Warga D']);
 
-    Pemohon::create(['instansi_id' => $instansiA->id, 'nik' => '4444444444444444', 'name' => 'Warga D']);
-
-    expect(fn () => Pemohon::create(['instansi_id' => $instansiA->id, 'nik' => '4444444444444444', 'name' => 'Dup']))
+    expect(fn () => Pemohon::create(['nik' => '4444444444444444', 'name' => 'Dup']))
         ->toThrow(QueryException::class);
-
-    $crossTenant = Pemohon::create(['instansi_id' => $instansiE->id, 'nik' => '4444444444444444', 'name' => 'Warga E']);
-    expect($crossTenant->id)->not->toBeNull();
 });
 
-test('nomor tiket is unique per instansi', function () {
-    $instansi = Instansi::create(['name' => 'Kelurahan F', 'level' => 'kelurahan', 'kode' => 'FFF']);
-    $pemohon = Pemohon::create(['instansi_id' => $instansi->id, 'nik' => '5555555555555555', 'name' => 'Warga F']);
+test('nomor tiket is unique globally', function () {
+    $pemohon = Pemohon::create(['nik' => '5555555555555555', 'name' => 'Warga F']);
     $jenis = JenisSurat::create(['kode' => 'DUP', 'nama' => 'Dup Test']);
 
     $pengajuan1 = PengajuanSurat::create(['jenis_surat_id' => $jenis->id, 'keperluan' => 'test']);
     $pengajuan1->tiket()->create([
-        'instansi_id' => $instansi->id,
         'nomor_tiket' => 'FFF-2607-00001',
         'pemohon_id' => $pemohon->id,
         'judul' => 'Tiket 1',
@@ -124,11 +83,21 @@ test('nomor tiket is unique per instansi', function () {
     $pengajuan2 = PengajuanSurat::create(['jenis_surat_id' => $jenis->id, 'keperluan' => 'test']);
 
     expect(fn () => $pengajuan2->tiket()->create([
-        'instansi_id' => $instansi->id,
         'nomor_tiket' => 'FFF-2607-00001',
         'pemohon_id' => $pemohon->id,
         'judul' => 'Tiket Dup',
         'status' => 'baru',
         'channel' => 'web',
     ]))->toThrow(QueryException::class);
+});
+
+test('generateNomorTiket is race-safe via atomic upsert', function () {
+    $service = app(TiketService::class);
+
+    $first = DB::transaction(fn () => $service->generateNomorTiket());
+    $second = DB::transaction(fn () => $service->generateNomorTiket());
+
+    $periode = now()->format('ym');
+    expect($first)->toBe("SRG-{$periode}-00001");
+    expect($second)->toBe("SRG-{$periode}-00002");
 });

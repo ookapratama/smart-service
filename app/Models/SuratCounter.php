@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TiketCounter extends Model
+class SuratCounter extends Model
 {
-    protected $table = 'tiket_counters';
+    protected $table = 'surat_counters';
 
     protected $fillable = [
         'periode',

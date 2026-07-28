@@ -8,9 +8,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('tiket_counters', function (Blueprint $table) {
+        Schema::create('surat_counters', function (Blueprint $table) {
             $table->id();
-            $table->char('periode', 4)->unique();
+            $table->char('periode', 4)->unique(); // YYYY
             $table->unsignedInteger('last_seq')->default(0);
             $table->timestamps();
         });
@@ -18,6 +18,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('tiket_counters');
+        Schema::dropIfExists('surat_counters');
     }
 };

@@ -15,12 +15,6 @@ class S3MenuSeeder extends Seeder
         $readUpdateOnly = ['can_create' => false, 'can_read' => true, 'can_update' => true, 'can_delete' => false];
         $readOnly = ['can_create' => false, 'can_read' => true, 'can_update' => false, 'can_delete' => false];
 
-        // Top-level: Manajemen Instansi
-        $instansiMenu = Menu::updateOrCreate(
-            ['slug' => 'instansi.index'],
-            ['name' => 'Manajemen Instansi', 'icon' => 'ri-building-4-line', 'path' => 'instansi', 'parent_id' => null, 'order_no' => 10]
-        );
-
         // Master Data group
         $masterDataMenu = Menu::updateOrCreate(
             ['slug' => 'master-data'],
@@ -59,11 +53,10 @@ class S3MenuSeeder extends Seeder
 
         $superAdmin = Role::where('slug', 'super-admin')->first();
         $admin = Role::where('slug', 'admin')->first();
-        $petugasInstansi = Role::where('slug', 'petugas-instansi')->first();
+        $petugas = Role::where('slug', 'petugas')->first();
 
         if ($superAdmin) {
             $superAdmin->menus()->syncWithoutDetaching([
-                $instansiMenu->id => $fullCrud,
                 $masterDataMenu->id => $readOnly,
                 $jenisSuratMenu->id => $fullCrud,
                 $kategoriPengaduanMenu->id => $fullCrud,
@@ -77,7 +70,6 @@ class S3MenuSeeder extends Seeder
 
         if ($admin) {
             $admin->menus()->syncWithoutDetaching([
-                $instansiMenu->id => $noDelete,
                 $masterDataMenu->id => $readOnly,
                 $jenisSuratMenu->id => $noDelete,
                 $kategoriPengaduanMenu->id => $noDelete,
@@ -89,11 +81,10 @@ class S3MenuSeeder extends Seeder
             ]);
         }
 
-        // Petugas Instansi: only Tiket (process) + Pemohon (register/manage), scoped to
-        // their own instansi once tenant-resolution middleware exists — see REFACTOR_BACKLOG.md.
-        // No access to Instansi/Master Data management (platform-level concerns).
-        if ($petugasInstansi) {
-            $petugasInstansi->menus()->syncWithoutDetaching([
+        // Petugas: only Tiket (process) + Pemohon (register/manage). No access to
+        // Master Data management (admin-level concern).
+        if ($petugas) {
+            $petugas->menus()->syncWithoutDetaching([
                 $pelayananMenu->id => $readOnly,
                 $tiketMenu->id => $readUpdateOnly,
                 $pemohonMenu->id => $noDelete,

@@ -10,9 +10,8 @@ return new class extends Migration
     {
         Schema::create('tiket', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('instansi_id')->constrained('instansi')->cascadeOnDelete();
-            $table->string('nomor_tiket', 30);
-            $table->foreignId('pemohon_id')->constrained('pemohon')->cascadeOnDelete();
+            $table->string('nomor_tiket', 30)->unique();
+            $table->foreignId('pemohon_id')->constrained('pemohon')->restrictOnDelete();
             $table->morphs('detail');
             $table->string('status')->default('baru');
             $table->string('channel')->default('web');
@@ -22,8 +21,7 @@ return new class extends Migration
             $table->timestamp('selesai_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['instansi_id', 'nomor_tiket']);
-            $table->index(['instansi_id', 'status', 'created_at']);
+            $table->index(['status', 'created_at']);
             $table->index(['pemohon_id', 'created_at']);
         });
     }

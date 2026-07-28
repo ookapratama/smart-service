@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\ActivityLogService;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
+use App\Services\ActivityLogService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -29,11 +29,11 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            
+
             // Log aktivitas login
             $this->activityLogService->logLogin();
-            
-            return redirect()->intended('/');
+
+            return redirect()->intended(route('dashboard'));
         }
 
         return back()->withErrors([
@@ -66,7 +66,7 @@ class AuthController extends Controller
 
         // Find Visitor Role
         $visitorRole = Role::where('slug', 'visitor')->first();
-        if (!$visitorRole) {
+        if (! $visitorRole) {
             // Fallback to User role if visitor doesn't exist
             $visitorRole = Role::where('slug', 'user')->first();
         }
@@ -83,18 +83,18 @@ class AuthController extends Controller
         // Log aktivitas register
         $this->activityLogService->log('register', 'User baru terdaftar sebagai Visitor', $user);
 
-        return redirect()->intended('/')->with('success', 'Registrasi berhasil! Selamat datang di dashboard pengunjung.');
+        return redirect()->intended(route('dashboard'))->with('success', 'Registrasi berhasil! Selamat datang di dashboard pengunjung.');
     }
 
     public function logout(Request $request)
     {
         // Log aktivitas logout sebelum logout
         $this->activityLogService->logLogout();
-        
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect('/login');
     }
 }
-

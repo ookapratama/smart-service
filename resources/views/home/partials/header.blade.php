@@ -5,10 +5,10 @@
     <div class="container d-flex justify-content-center justify-content-md-between">
       <div class="contact-info d-flex align-items-center">
         <i class="bi bi-envelope d-flex align-items-center">
-          <a href="mailto:{{ $siteInfo['email'] ?? 'layanan@sorean.go.id' }}">{{ $siteInfo['email'] ?? 'layanan@sorean.go.id' }}</a>
+          <a href="mailto:{{ $siteInfo['email'] ?? 'layanan@soreang.parepare.go.id' }}">{{ $siteInfo['email'] ?? 'layanan@soreang.parepare.go.id' }}</a>
         </i>
         <i class="bi bi-phone d-flex align-items-center ms-4">
-          <span>{{ $siteInfo['phone'] ?? '(0251) 833-3373' }}</span>
+          <span>{{ $siteInfo['phone'] ?? '(0421) 21055' }}</span>
         </i>
       </div>
       <div class="social-links d-none d-md-flex align-items-center">
@@ -28,7 +28,7 @@
   <div class="branding d-flex align-items-center">
     <div class="container position-relative d-flex align-items-center justify-content-between">
       <a href="{{ route('home') }}" class="logo d-flex align-items-center me-auto me-xl-0 text-decoration-none">
-        <h1 class="sitename">3S Sorean<span>.</span></h1>
+        <h1 class="sitename">3S Soreang<span>.</span></h1>
       </a>
 
       <nav id="navmenu" class="navmenu">

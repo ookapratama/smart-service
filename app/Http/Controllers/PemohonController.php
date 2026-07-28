@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\PemohonRequest;
-use App\Models\Instansi;
+use App\Models\Kelurahan;
 use App\Services\PemohonService;
+use Illuminate\Database\QueryException;
 
 class PemohonController extends Controller
 {
@@ -18,7 +19,7 @@ class PemohonController extends Controller
      */
     public function index()
     {
-        $data = $this->service->all()->load('instansi');
+        $data = $this->service->all()->load('kelurahan');
 
         return view('pages.pemohon.index', compact('data'));
     }
@@ -28,9 +29,9 @@ class PemohonController extends Controller
      */
     public function create()
     {
-        $instansiList = Instansi::orderBy('name')->get();
+        $kelurahanList = Kelurahan::orderBy('nama')->get();
 
-        return view('pages.pemohon.create', compact('instansiList'));
+        return view('pages.pemohon.create', compact('kelurahanList'));
     }
 
     /**
@@ -50,7 +51,7 @@ class PemohonController extends Controller
      */
     public function show(int $id)
     {
-        $data = $this->service->find($id)->load('instansi', 'tikets');
+        $data = $this->service->find($id)->load('kelurahan', 'tikets');
 
         return view('pages.pemohon.show', compact('data'));
     }
@@ -61,9 +62,9 @@ class PemohonController extends Controller
     public function edit(int $id)
     {
         $data = $this->service->find($id);
-        $instansiList = Instansi::orderBy('name')->get();
+        $kelurahanList = Kelurahan::orderBy('nama')->get();
 
-        return view('pages.pemohon.edit', compact('data', 'instansiList'));
+        return view('pages.pemohon.edit', compact('data', 'kelurahanList'));
     }
 
     /**
@@ -83,7 +84,17 @@ class PemohonController extends Controller
      */
     public function destroy(int $id)
     {
-        $this->service->delete($id);
+        try {
+            $this->service->delete($id);
+        } catch (QueryException $e) {
+            $message = 'Pemohon tidak dapat dihapus karena masih memiliki riwayat tiket.';
+
+            if (request()->wantsJson()) {
+                return ResponseHelper::error($message, 409);
+            }
+
+            return redirect()->route('pemohon.index')->with('error', $message);
+        }
 
         if (request()->wantsJson()) {
             return ResponseHelper::success(null, 'Data berhasil dihapus!');

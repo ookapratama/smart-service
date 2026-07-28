@@ -20,11 +20,16 @@ class Pengaduan extends Model
         'lokasi',
         'lat',
         'lng',
+        'is_anonim',
+        'jenis_laporan',
+        'tanggal_kejadian',
     ];
 
     protected $casts = [
         'lat' => 'decimal:7',
         'lng' => 'decimal:7',
+        'is_anonim' => 'boolean',
+        'tanggal_kejadian' => 'date',
     ];
 
     public function kategori(): BelongsTo

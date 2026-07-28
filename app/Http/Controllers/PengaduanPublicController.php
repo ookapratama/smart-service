@@ -4,23 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Enums\TiketChannel;
 use App\Enums\TiketStatus;
-use App\Http\Requests\BaseRequest;
-use App\Models\Instansi;
 use App\Models\KategoriPengaduan;
-use App\Models\Media;
+use App\Models\Kelurahan;
 use App\Models\Pemohon;
 use App\Models\Pengaduan;
 use App\Models\Tiket;
-use App\Models\TiketCounter;
 use App\Services\FileUploadService;
+use App\Services\TiketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class PengaduanPublicController extends Controller
 {
     public function __construct(
-        protected FileUploadService $fileUploadService
+        protected FileUploadService $fileUploadService,
+        protected TiketService $tiketService
     ) {}
 
     /**
@@ -43,15 +41,7 @@ class PengaduanPublicController extends Controller
     public function create()
     {
         $kategoriList = KategoriPengaduan::where('is_active', true)->get();
-        $kelurahanList = [
-            'Mekarjaya',
-            'Sorean',
-            'Tanjungsari',
-            'Sukadamai',
-            'Cikatomas',
-            'Cikadu',
-            'Margarahayu'
-        ];
+        $kelurahanList = Kelurahan::where('is_active', true)->orderBy('nama')->get();
 
         return view('home.pengaduan.create', compact('kategoriList', 'kelurahanList'));
     }
@@ -63,10 +53,10 @@ class PengaduanPublicController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'nik' => 'required|string|size:16',
+            'nik' => 'required|digits:16',
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:50',
-            'kelurahan' => 'nullable|string|max:100',
+            'kelurahan_id' => 'nullable|exists:kelurahan,id',
             'alamat' => 'nullable|string',
             'jenis_laporan' => 'required|string|max:50',
             'kategori_pengaduan_id' => 'required|exists:kategori_pengaduan,id',
@@ -79,7 +69,7 @@ class PengaduanPublicController extends Controller
         ], [
             'nama.required' => 'Nama lengkap wajib diisi.',
             'nik.required' => 'NIK wajib diisi 16 digit.',
-            'nik.size' => 'NIK harus persis 16 digit angka.',
+            'nik.digits' => 'NIK harus persis 16 digit angka.',
             'email.required' => 'Alamat email wajib diisi.',
             'phone.required' => 'Nomor Telepon / WhatsApp wajib diisi.',
             'kategori_pengaduan_id.required' => 'Pilih kategori pengaduan.',
@@ -89,31 +79,27 @@ class PengaduanPublicController extends Controller
         ]);
 
         return DB::transaction(function () use ($request, $validated) {
-            // 1. Get Default Instansi (Kecamatan Sorean)
-            $instansi = Instansi::first();
-            $instansiId = $instansi ? $instansi->id : 1;
-            $kodeInstansi = $instansi && $instansi->kode ? $instansi->kode : 'SRG';
-
-            // 2. Find or Create Pemohon
-            $isAnonim = $request->boolean('is_anonim');
-            $pemohonNama = $isAnonim ? 'Anonim (Pelapor Rahasia)' : $validated['nama'];
-            
+            // 1. Find or Create Pemohon — nama asli selalu tersimpan; is_anonim
+            //    hanya mengatur penyamaran identitas di sisi tampilan petugas.
             $pemohon = Pemohon::firstOrCreate(
                 ['nik' => $validated['nik']],
                 [
-                    'instansi_id' => $instansiId,
-                    'name' => $pemohonNama,
+                    'name' => $validated['nama'],
                     'email' => $validated['email'],
                     'phone' => $validated['phone'],
-                    'alamat' => ($validated['alamat'] ?? '') . ($validated['kelurahan'] ? " (Kel. {$validated['kelurahan']})" : ''),
+                    'alamat' => $validated['alamat'] ?? null,
+                    'kelurahan_id' => $validated['kelurahan_id'] ?? null,
                 ]
             );
 
-            // 3. Create Detail Pengaduan
+            // 2. Create Detail Pengaduan
             $pengaduan = Pengaduan::create([
                 'kategori_pengaduan_id' => $validated['kategori_pengaduan_id'],
-                'deskripsi' => "[$validated[jenis_laporan]] " . $validated['deskripsi'] . ($validated['tanggal_kejadian'] ? " (Tanggal Kejadian: {$validated['tanggal_kejadian']})" : ''),
+                'deskripsi' => $validated['deskripsi'],
                 'lokasi' => $validated['lokasi'],
+                'is_anonim' => $request->boolean('is_anonim'),
+                'jenis_laporan' => $validated['jenis_laporan'],
+                'tanggal_kejadian' => $validated['tanggal_kejadian'] ?? null,
             ]);
 
             // Handle Media attachment upload if present
@@ -122,32 +108,13 @@ class PengaduanPublicController extends Controller
                 $pengaduan->media()->save($media);
             }
 
-            // 4. Generate Thread-safe Nomor Tiket
-            $periode = date('ym');
-            $counter = TiketCounter::where('instansi_id', $instansiId)
-                ->where('periode', $periode)
-                ->lockForUpdate()
-                ->first();
+            // 3. Generate Thread-safe Nomor Tiket
+            $nomorTiket = $this->tiketService->generateNomorTiket();
 
-            if (!$counter) {
-                $counter = TiketCounter::create([
-                    'instansi_id' => $instansiId,
-                    'periode' => $periode,
-                    'last_seq' => 1
-                ]);
-            } else {
-                $counter->increment('last_seq');
-            }
-
-            $nomorTiket = sprintf('%s-%s-%05d', $kodeInstansi, $periode, $counter->last_seq);
-
-            // 5. Create Tiket Record
-            $tiket = Tiket::create([
-                'instansi_id' => $instansiId,
+            // 4. Create Tiket via morph relation (alias 'pengaduan' dari morph map)
+            $tiket = $pengaduan->tiket()->create([
                 'nomor_tiket' => $nomorTiket,
                 'pemohon_id' => $pemohon->id,
-                'detail_type' => Pengaduan::class,
-                'detail_id' => $pengaduan->id,
                 'status' => TiketStatus::Baru,
                 'channel' => TiketChannel::Web,
                 'judul' => $validated['judul'],

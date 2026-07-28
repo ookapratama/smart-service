@@ -5,7 +5,7 @@
       <div class="row justify-content-center text-center">
         <div class="col-lg-6">
           <h4>Dapatkan Informasi Terbaru Service 3S</h4>
-          <p>Berlangganan buletin layanan kependudukan dan kegiatan pembangunan Kecamatan Sorean.</p>
+          <p>Berlangganan buletin layanan kependudukan dan kegiatan pembangunan Kecamatan Soreang.</p>
           <form action="#" method="post" class="php-email-form">
             @csrf
             <div class="newsletter-form">
@@ -25,13 +25,13 @@
     <div class="row gy-4">
       <div class="col-lg-4 col-md-6 footer-about">
         <a href="{{ route('home') }}" class="d-flex align-items-center">
-          <span class="sitename">Sorean Smart Service (3S)</span>
+          <span class="sitename">Soreang Smart Service (3S)</span>
         </a>
         <div class="footer-contact pt-3">
-          <p>{{ $siteInfo['address_line1'] ?? 'Jl. Raya Sorean No. 45' }}</p>
-          <p>{{ $siteInfo['address_line2'] ?? 'Kabupaten Bandung, Jawa Barat' }}</p>
-          <p class="mt-3"><strong>Telepon:</strong> <span>{{ $siteInfo['phone'] ?? '(0251) 833-3373' }}</span></p>
-          <p><strong>Email:</strong> <span>{{ $siteInfo['email'] ?? 'layanan@sorean.go.id' }}</span></p>
+          <p>{{ $siteInfo['address_line1'] ?? 'Jl. Jenderal Sudirman No. 45' }}</p>
+          <p>{{ $siteInfo['address_line2'] ?? 'Kota Parepare, Sulawesi Selatan' }}</p>
+          <p class="mt-3"><strong>Telepon:</strong> <span>{{ $siteInfo['phone'] ?? '(0421) 21055' }}</span></p>
+          <p><strong>Email:</strong> <span>{{ $siteInfo['email'] ?? 'layanan@soreang.parepare.go.id' }}</span></p>
         </div>
       </div>
 
@@ -49,17 +49,19 @@
       <div class="col-lg-3 col-md-3 footer-links">
         <h4>Kelurahan Terintegrasi</h4>
         <ul>
-          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Sorean</a></li>
-          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Mekarjaya</a></li>
-          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Sukamaju</a></li>
-          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Cibunar</a></li>
-          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Pasirjaya</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Bukit Harapan</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Bukit Indah</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Kampung Pisang</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Lakessi</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Ujung Baru</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Ujung Lare</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="#jadwal-pelayanan-modal" data-bs-toggle="modal">Kelurahan Watang Soreang</a></li>
         </ul>
       </div>
 
       <div class="col-lg-3 col-md-12">
         <h4>Media Sosial</h4>
-        <p>{{ $siteInfo['about_short'] ?? 'Sistem Pelayanan Publik Terintegrasi Berbasis Digital Kecamatan Sorean.' }}</p>
+        <p>{{ $siteInfo['about_short'] ?? 'Sistem Pelayanan Publik Terintegrasi Berbasis Digital Kecamatan Soreang.' }}</p>
         <div class="social-links d-flex">
           <a href="{{ $siteInfo['social_links']['instagram'] ?? '#' }}"><i class="bi bi-instagram"></i></a>
           <a href="{{ $siteInfo['social_links']['facebook'] ?? '#' }}"><i class="bi bi-facebook"></i></a>
@@ -72,9 +74,9 @@
   </div>
 
   <div class="container copyright text-center mt-4">
-    <p>© <span>Copyright 2026</span> <strong class="px-1 sitename">Sorean Smart Service (3S)</strong> <span>All Rights Reserved</span></p>
+    <p>© <span>Copyright 2026</span> <strong class="px-1 sitename">Soreang Smart Service (3S)</strong> <span>All Rights Reserved</span></p>
     <div class="credits">
-      Pemerintah Kecamatan Sorean
+      Pemerintah Kecamatan Soreang
     </div>
   </div>
 

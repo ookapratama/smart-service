@@ -10,8 +10,7 @@ return new class extends Migration
     {
         Schema::create('jadwal_pelayanan', function (Blueprint $table) {
             $table->id();
-            $table->string('kelurahan');
-            $table->string('kecamatan')->default('Sorean');
+            $table->foreignId('kelurahan_id')->constrained('kelurahan')->restrictOnDelete();
             $table->json('hari');          // e.g. ["Senin","Selasa","Rabu","Kamis","Jumat"]
             $table->string('jam_buka')->default('08:00');
             $table->string('jam_tutup')->default('15:00');

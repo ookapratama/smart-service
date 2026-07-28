@@ -35,10 +35,6 @@ return [
         ],
     ],
 
-    'wilayah_id' => [
-        'base_url' => env('WILAYAH_ID_BASE_URL', 'https://wilayah.id/api'),
-    ],
-
     'deploy' => [
         'webhook_token' => env('DEPLOY_WEBHOOK_TOKEN'),
     ],

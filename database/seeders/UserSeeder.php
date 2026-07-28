@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Instansi;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -17,7 +16,7 @@ class UserSeeder extends Seeder
     {
         $superAdminRole = Role::where('slug', 'super-admin')->first();
         $adminRole = Role::where('slug', 'admin')->first();
-        $petugasRole = Role::where('slug', 'petugas-instansi')->first();
+        $petugasRole = Role::where('slug', 'petugas')->first();
         $userRole = Role::where('slug', 'user')->first();
 
         // 1. Super Admin
@@ -50,34 +49,16 @@ class UserSeeder extends Seeder
             ]
         );
 
-        // 4. Petugas Instansi — demo accounts tied to two different instansi levels
+        // 4. Petugas — staff account that processes tiket & pemohon
         if ($petugasRole) {
-            $kecamatanSoreang = Instansi::where('kode', 'SRG')->first();
-            $desaPamekaran = Instansi::where('kode', 'PMK')->first();
-
-            if ($kecamatanSoreang) {
-                User::updateOrCreate(
-                    ['email' => 'petugas.soreang@gmail.com'],
-                    [
-                        'name' => 'Petugas Kecamatan Soreang',
-                        'password' => Hash::make('password'),
-                        'role_id' => $petugasRole->id,
-                        'instansi_id' => $kecamatanSoreang->id,
-                    ]
-                );
-            }
-
-            if ($desaPamekaran) {
-                User::updateOrCreate(
-                    ['email' => 'petugas.pamekaran@gmail.com'],
-                    [
-                        'name' => 'Petugas Desa Pamekaran',
-                        'password' => Hash::make('password'),
-                        'role_id' => $petugasRole->id,
-                        'instansi_id' => $desaPamekaran->id,
-                    ]
-                );
-            }
+            User::updateOrCreate(
+                ['email' => 'petugas.soreang@gmail.com'],
+                [
+                    'name' => 'Petugas Kecamatan Soreang',
+                    'password' => Hash::make('password'),
+                    'role_id' => $petugasRole->id,
+                ]
+            );
         }
 
         $this->command->info('Users created with password: password');

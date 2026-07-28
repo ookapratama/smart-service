@@ -8,14 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('jenis_surat', function (Blueprint $table) {
+        Schema::create('kelurahan', function (Blueprint $table) {
             $table->id();
-            $table->string('kode', 20)->unique();
             $table->string('nama');
-            $table->text('deskripsi')->nullable();
-            $table->json('fields')->nullable();
-            $table->string('template_view')->nullable();
-            $table->boolean('wajib_pengantar_rt_rw')->default(true);
+            $table->string('kode', 10)->unique();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
@@ -23,6 +19,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('jenis_surat');
+        Schema::dropIfExists('kelurahan');
     }
 };

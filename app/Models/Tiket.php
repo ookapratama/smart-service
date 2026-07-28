@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\TiketChannel;
 use App\Enums\TiketStatus;
-use App\Traits\BelongsToInstansi;
 use App\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,18 +11,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
- * Format nomor_tiket: {kode_instansi}-{YYMM}-{seq %05d}, mis. SRG-2607-00123.
- * Sequence dijaga race-safe oleh tabel tiket_counters (lihat TiketCounter).
+ * Format nomor_tiket: {prefix}-{YYMM}-{seq %05d}, mis. SRG-2607-00123.
+ * Sequence dijaga race-safe oleh tabel tiket_counters (lihat TiketService::generateNomorTiket()).
  */
 class Tiket extends Model
 {
-    use BelongsToInstansi;
     use LogsActivity;
+
+    public const NOMOR_PREFIX = 'SRG';
 
     protected $table = 'tiket';
 
     protected $fillable = [
-        'instansi_id',
         'nomor_tiket',
         'pemohon_id',
         'detail_type',
