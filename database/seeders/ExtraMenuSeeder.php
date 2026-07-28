@@ -16,7 +16,7 @@ class ExtraMenuSeeder extends Seeder
             [
                 'name' => 'Pengaturan Website',
                 'icon' => 'ri-settings-4-line',
-                'path' => 'settings',
+                'path' => 'admin/settings',
                 'order_no' => 99, // Place it at the bottom
             ]
         );
@@ -27,7 +27,7 @@ class ExtraMenuSeeder extends Seeder
             [
                 'name' => 'Profil Saya',
                 'icon' => 'ri-user-settings-line',
-                'path' => 'profile',
+                'path' => 'admin/profile',
                 'order_no' => 98,
             ]
         );
@@ -38,7 +38,7 @@ class ExtraMenuSeeder extends Seeder
             [
                 'name' => 'Status & Backup',
                 'icon' => 'ri-pulse-line',
-                'path' => 'system/health',
+                'path' => 'admin/system/health',
                 'order_no' => 100,
             ]
         );
