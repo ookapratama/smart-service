@@ -35,13 +35,13 @@ class RoleAndMenuSeeder extends Seeder
 
         // 2. Menus
         $menus = [
-            ['name' => 'Dashboard', 'slug' => 'dashboard', 'path' => '/dashboard', 'icon' => 'ri-home-smile-line', 'order_no' => 1],
+            ['name' => 'Dashboard', 'slug' => 'dashboard', 'path' => 'admin/dashboard', 'icon' => 'ri-home-smile-line', 'order_no' => 1],
             ['name' => 'User Management', 'slug' => 'user-management', 'path' => null, 'icon' => 'ri-user-settings-line', 'order_no' => 2],
-            ['parent' => 'User Management', 'name' => 'Users', 'slug' => 'user.index', 'path' => '/user', 'icon' => 'ri-user-line', 'order_no' => 1],
-            ['parent' => 'User Management', 'name' => 'Roles', 'slug' => 'role.index', 'path' => '/role', 'icon' => 'ri-shield-user-line', 'order_no' => 2],
-            ['parent' => 'User Management', 'name' => 'Menus', 'slug' => 'menu.index', 'path' => '/menu', 'icon' => 'ri-menu-search-line', 'order_no' => 3],
-            ['parent' => 'User Management', 'name' => 'Permissions', 'slug' => 'permission.index', 'path' => '/permission', 'icon' => 'ri-lock-password-line', 'order_no' => 4],
-            ['name' => 'Activity Log', 'slug' => 'activity-log.index', 'path' => '/activity-log', 'icon' => 'ri-history-line', 'order_no' => 4],
+            ['parent' => 'User Management', 'name' => 'Users', 'slug' => 'user.index', 'path' => 'admin/user', 'icon' => 'ri-user-line', 'order_no' => 1],
+            ['parent' => 'User Management', 'name' => 'Roles', 'slug' => 'role.index', 'path' => 'admin/role', 'icon' => 'ri-shield-user-line', 'order_no' => 2],
+            ['parent' => 'User Management', 'name' => 'Menus', 'slug' => 'menu.index', 'path' => 'admin/menu', 'icon' => 'ri-menu-search-line', 'order_no' => 3],
+            ['parent' => 'User Management', 'name' => 'Permissions', 'slug' => 'permission.index', 'path' => 'admin/permission', 'icon' => 'ri-lock-password-line', 'order_no' => 4],
+            ['name' => 'Activity Log', 'slug' => 'activity-log.index', 'path' => 'admin/activity-log', 'icon' => 'ri-history-line', 'order_no' => 4],
         ];
 
         $menuIdMap = [];

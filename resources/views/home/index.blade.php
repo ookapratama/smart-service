@@ -260,7 +260,7 @@
           'description' => 'Lacak progres permohonan via NIK/Tiket',
           'icon' => 'bi-search',
           'badge' => 'Real-Time',
-          'link' => '#cek-status',
+          'link' => route('cek-status.index'),
           'delay' => 200,
           'color' => 'success'
         ])
@@ -554,83 +554,7 @@
     </div>
   </section>
 
-  <!-- 9. SECTION QUICK ACCESS / CTA WIDGET UTAMA -->
-  <section id="cek-status" class="py-5 bg-light border-top border-bottom">
-    
-    @include('home.components.section-title', [
-      'subtitle' => 'Layanan Mandiri',
-      'title' => 'Cek Status & Akses Cepat Tiket',
-      'description' => 'Periksa progres surat permohonan Anda, jadwal pelayanan, atau scan QR code tiket secara langsung.'
-    ])
 
-    <div class="container mt-4" data-aos="fade-up">
-      <div class="row gy-4 align-items-stretch">
-
-        <!-- Box 1: Form AJAX Cek Status -->
-        <div class="col-lg-4 col-md-6">
-          <div class="p-4 p-lg-5 bg-white rounded-4 shadow-sm border h-100 d-flex flex-column justify-content-between">
-            <div>
-              <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
-                <i class="bi bi-search"></i>
-              </div>
-              <h5 class="fw-bold text-dark text-center mb-2">Cek Status Permohonan</h5>
-              <p class="text-muted small text-center mb-0">Masukkan NIK atau Nomor Tiket permohonan Anda untuk mengecek progres live.</p>
-            </div>
-
-            <div class="w-100 mt-4">
-              <form id="s3FormCekStatus" class="w-100">
-                <div class="mb-3">
-                  <input type="text" id="s3InputKeyword" class="form-control form-control-lg rounded-pill fs-6 px-3" placeholder="SRG-2607-00123 atau NIK" required>
-                </div>
-                <button type="submit" id="s3BtnCekStatus" class="btn btn-primary btn-lg rounded-pill w-100 fw-bold fs-6 hover-lift">
-                  <i class="bi bi-search me-1"></i> Cek Status Now
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <!-- Box 2: Modal Jadwal Kelurahan Trigger -->
-        <div class="col-lg-4 col-md-6">
-          <div class="p-4 p-lg-5 bg-white rounded-4 shadow-sm border h-100 d-flex flex-column justify-content-between">
-            <div>
-              <div class="d-flex align-items-center justify-content-center rounded-circle bg-success-subtle text-success mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
-                <i class="bi bi-clock-history"></i>
-              </div>
-              <h5 class="fw-bold text-dark text-center mb-2">Jadwal Pelayanan</h5>
-              <p class="text-muted small text-center mb-0">Jadwal operasional kantor kelurahan & jam kerja pelayanan publik se-Kecamatan Soreang.</p>
-            </div>
-
-            <div class="w-100 mt-4">
-              <button type="button" class="btn btn-outline-success btn-lg rounded-pill w-100 fw-bold fs-6 hover-lift" data-bs-toggle="modal" data-bs-target="#jadwal-pelayanan-modal">
-                <i class="bi bi-calendar-event me-1"></i> Lihat Jadwal Kelurahan
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Box 3: Scan QR Code Trigger -->
-        <div class="col-lg-4 col-md-12">
-          <div class="p-4 p-lg-5 bg-white rounded-4 shadow-sm border h-100 d-flex flex-column justify-content-between">
-            <div>
-              <div class="d-flex align-items-center justify-content-center rounded-circle bg-dark-subtle text-dark mx-auto mb-3" style="width: 60px; height: 60px; font-size: 1.6rem;">
-                <i class="bi bi-qr-code-scan"></i>
-              </div>
-              <h5 class="fw-bold text-dark text-center mb-2">Scan QR Code Tiket</h5>
-              <p class="text-muted small text-center mb-0">Pindai QR Code yang tercetak pada resi tiket permohonan untuk verifikasi instan.</p>
-            </div>
-
-            <div class="w-100 mt-4">
-              <button type="button" class="btn btn-dark btn-lg rounded-pill w-100 fw-bold fs-6 hover-lift" onclick="s3TriggerQrScan()">
-                <i class="bi bi-camera me-1"></i> Buka QR Scanner
-              </button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
 
   <!-- 10. SECTION FAQ ACCORDION -->
   <section id="faq" class="py-5">

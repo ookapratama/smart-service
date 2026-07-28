@@ -15,7 +15,7 @@
           </p>
         </div>
         <div class="row g-3">
-          @forelse($jenisSuratList as $js)
+          @forelse($jenisSuratList ?? [] as $js)
             <div class="col-md-6">
               <div class="p-3 border rounded-3 bg-white shadow-sm h-100 transition-all hover-lift">
                 <div class="d-flex align-items-center justify-content-between mb-2">
@@ -72,7 +72,7 @@
               </tr>
             </thead>
             <tbody id="s3JadwalTableBody">
-              @forelse($jadwalList as $j)
+              @forelse($jadwalList ?? [] as $j)
                 <tr>
                   <td class="fw-bold text-primary py-3 px-3">{{ $j->kelurahan->nama ?? '-' }}</td>
                   <td class="py-3 px-3"><span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">{{ $j->jam_buka }} - {{ $j->jam_tutup }}</span></td>

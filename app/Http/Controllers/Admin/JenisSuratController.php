@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use App\Helpers\ResponseHelper;
-use App\Http\Requests\KategoriPengaduanRequest;
-use App\Services\KategoriPengaduanService;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\JenisSuratRequest;
+use App\Services\JenisSuratService;
 
-class KategoriPengaduanController extends Controller
+class JenisSuratController extends Controller
 {
     public function __construct(
-        protected KategoriPengaduanService $service
+        protected JenisSuratService $service
     ) {}
 
     /**
@@ -19,7 +20,7 @@ class KategoriPengaduanController extends Controller
     {
         $data = $this->service->all();
 
-        return view('pages.kategori-pengaduan.index', compact('data'));
+        return view('pages.jenis-surat.index', compact('data'));
     }
 
     /**
@@ -27,18 +28,18 @@ class KategoriPengaduanController extends Controller
      */
     public function create()
     {
-        return view('pages.kategori-pengaduan.create');
+        return view('pages.jenis-surat.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(KategoriPengaduanRequest $request)
+    public function store(JenisSuratRequest $request)
     {
         $data = $request->validated();
         $this->service->create($data);
 
-        return redirect()->route('kategori-pengaduan.index')
+        return redirect()->route('jenis-surat.index')
             ->with('success', 'Data berhasil ditambahkan!');
     }
 
@@ -49,7 +50,7 @@ class KategoriPengaduanController extends Controller
     {
         $data = $this->service->find($id);
 
-        return view('pages.kategori-pengaduan.show', compact('data'));
+        return view('pages.jenis-surat.show', compact('data'));
     }
 
     /**
@@ -59,18 +60,18 @@ class KategoriPengaduanController extends Controller
     {
         $data = $this->service->find($id);
 
-        return view('pages.kategori-pengaduan.edit', compact('data'));
+        return view('pages.jenis-surat.edit', compact('data'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(KategoriPengaduanRequest $request, int $id)
+    public function update(JenisSuratRequest $request, int $id)
     {
         $data = $request->validated();
         $this->service->update($id, $data);
 
-        return redirect()->route('kategori-pengaduan.index')
+        return redirect()->route('jenis-surat.index')
             ->with('success', 'Data berhasil diperbarui!');
     }
 
@@ -85,7 +86,7 @@ class KategoriPengaduanController extends Controller
             return ResponseHelper::success(null, 'Data berhasil dihapus!');
         }
 
-        return redirect()->route('kategori-pengaduan.index')
+        return redirect()->route('jenis-surat.index')
             ->with('success', 'Data berhasil dihapus!');
     }
 }

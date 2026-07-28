@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Services\MenuService;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\MenuRequest;
+use App\Services\MenuService;
 use Illuminate\Http\Request;
 
 class MenuController extends Controller

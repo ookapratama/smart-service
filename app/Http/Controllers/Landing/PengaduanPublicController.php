@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Landing;
 
 use App\Enums\TiketChannel;
 use App\Enums\TiketStatus;
+use App\Http\Controllers\Controller;
 use App\Models\KategoriPengaduan;
 use App\Models\Kelurahan;
 use App\Models\Pemohon;

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
-use App\Services\ImpersonateService;
+use App\Http\Controllers\Controller;
 use App\Services\ActivityLogService;
+use App\Services\ImpersonateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -19,7 +20,7 @@ class ImpersonateController extends Controller
      */
     public function start(int $id)
     {
-        // Security check: Only Super Admin and Admin can impersonate
+        // Security check: Only Super Admin can impersonate
         if (!auth()->user()->role || !in_array(auth()->user()->role->slug, ['super-admin'])) {
             abort(403, 'Akses ditolak.');
         }
