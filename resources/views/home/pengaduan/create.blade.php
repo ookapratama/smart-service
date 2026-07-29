@@ -43,57 +43,76 @@
           <div class="card-body p-4">
             <div class="row g-3">
               
-              <div class="col-md-6">
-                <label for="nama" class="form-label fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama') }}" placeholder="Contoh: Ahmad Subagja" required>
-                @error('nama')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
-
-              <div class="col-md-6">
+              <!-- NIK Input & Verifikasi Button -->
+              <div class="col-12">
                 <label for="nik" class="form-label fw-semibold">NIK (No. KTP) <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('nik') is-invalid @enderror" id="nik" name="nik" value="{{ old('nik') }}" maxlength="16" placeholder="16 digit NIK sesuai KTP" required>
+                <div class="input-group">
+                  <input type="text" class="form-control form-control-lg fs-6 @error('nik') is-invalid @enderror" id="nik" name="nik" value="{{ old('nik') }}" maxlength="16" placeholder="Masukkan 16 digit NIK sesuai KTP" required>
+                  <button class="btn btn-primary fw-bold px-4" type="button" id="btn-verifikasi-nik">
+                    <i class="bi bi-shield-check me-1"></i> Verifikasi NIK
+                  </button>
+                </div>
+                <div id="nik-feedback" class="mt-2"></div>
                 @error('nik')
-                  <div class="invalid-feedback">{{ $message }}</div>
+                  <div class="text-danger small mt-1">{{ $message }}</div>
                 @enderror
               </div>
 
-              <div class="col-md-6">
-                <label for="email" class="form-label fw-semibold">Alamat Email <span class="text-danger">*</span></label>
-                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com" required>
-                @error('email')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+              <!-- Container Input Form Pemohon Baru / Terverifikasi -->
+              <div id="pemohon-fields-container" class="col-12 border-top pt-3" style="display: {{ (old('nik') || $errors->any()) ? 'block' : 'none' }};">
+                <div class="alert alert-light border rounded-3 p-3 mb-0">
+                  <div class="d-flex align-items-center gap-2 mb-3 text-primary fw-semibold border-bottom pb-2">
+                    <i class="bi bi-person-lines-fill"></i> Rincian Data Pelapor
+                  </div>
+                  <div class="row g-3">
+                    
+                    <div class="col-md-6">
+                      <label for="nama" class="form-label fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama') }}" placeholder="Contoh: Ahmad Subagja">
+                      @error('nama')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
 
-              <div class="col-md-6">
-                <label for="phone" class="form-label fw-semibold">No. Telepon / WhatsApp <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}" placeholder="Contoh: 081234567890" required>
-                @error('phone')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+                    <div class="col-md-6">
+                      <label for="email" class="form-label fw-semibold">Alamat Email <span class="text-danger">*</span></label>
+                      <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com">
+                      @error('email')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
 
-              <div class="col-md-6">
-                <label for="kelurahan_id" class="form-label fw-semibold">Kelurahan / Desa Asal</label>
-                <select class="form-select @error('kelurahan_id') is-invalid @enderror" id="kelurahan_id" name="kelurahan_id">
-                  <option value="">Pilih Kelurahan</option>
-                  @foreach($kelurahanList as $k)
-                    <option value="{{ $k->id }}" {{ old('kelurahan_id') == $k->id ? 'selected' : '' }}>Kelurahan {{ $k->nama }}</option>
-                  @endforeach
-                </select>
-                @error('kelurahan_id')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-              </div>
+                    <div class="col-md-6">
+                      <label for="phone" class="form-label fw-semibold">No. Telepon / WhatsApp <span class="text-danger">*</span></label>
+                      <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}" placeholder="Contoh: 081234567890">
+                      @error('phone')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
 
-              <div class="col-md-6">
-                <label for="alamat" class="form-label fw-semibold">Alamat Lengkap Tempat Tinggal</label>
-                <input type="text" class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" value="{{ old('alamat') }}" placeholder="Jl. Raya Soreang No. 12 RT 02/05">
-                @error('alamat')
-                  <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                    <div class="col-md-6">
+                      <label for="kelurahan_id" class="form-label fw-semibold">Kelurahan / Desa Asal</label>
+                      <select class="form-select @error('kelurahan_id') is-invalid @enderror" id="kelurahan_id" name="kelurahan_id">
+                        <option value="">Pilih Kelurahan</option>
+                        @foreach($kelurahanList as $k)
+                          <option value="{{ $k->id }}" {{ old('kelurahan_id') == $k->id ? 'selected' : '' }}>Kelurahan {{ $k->nama }}</option>
+                        @endforeach
+                      </select>
+                      @error('kelurahan_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
+
+                    <div class="col-12">
+                      <label for="alamat" class="form-label fw-semibold">Alamat Lengkap Tempat Tinggal</label>
+                      <input type="text" class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" value="{{ old('alamat') }}" placeholder="Jl. Raya Soreang No. 12 RT 02/05">
+                      @error('alamat')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
+
+                  </div>
+                </div>
               </div>
 
             </div>
@@ -108,6 +127,18 @@
             </h5>
           </div>
           <div class="card-body p-4">
+
+            <!-- Banner / Badge Nama Pelapor Terverifikasi -->
+            <div id="nama-pelapor-preview-card" class="alert alert-primary border-0 rounded-3 mb-4 d-flex align-items-center">
+              <i class="bi bi-person-check-fill fs-3 me-3 text-primary flex-shrink-0"></i>
+              <div>
+                <span class="text-muted d-block small fw-medium">Identitas Nama Pelapor:</span>
+                <strong class="fs-6 text-primary" id="display-nama-pelapor">
+                  {{ old('nama') ? old('nama') : '(Belum diverifikasi - silakan masukkan NIK dan klik Verifikasi NIK)' }}
+                </strong>
+              </div>
+            </div>
+
             <div class="row g-3">
 
               <div class="col-12 mb-2">
@@ -240,5 +271,104 @@
 
     </div>
   </section>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const nikInput = document.getElementById('nik');
+    const btnVerifikasi = document.getElementById('btn-verifikasi-nik');
+    const nikFeedback = document.getElementById('nik-feedback');
+    const pemohonContainer = document.getElementById('pemohon-fields-container');
+    const namaInput = document.getElementById('nama');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const kelurahanSelect = document.getElementById('kelurahan_id');
+    const alamatInput = document.getElementById('alamat');
+    const displayNama = document.getElementById('display-nama-pelapor');
+
+    function updateNamaDisplay(name) {
+      if (displayNama) {
+        displayNama.textContent = name && name.trim() !== '' 
+          ? name 
+          : '(Belum diverifikasi - silakan masukkan NIK dan klik Verifikasi NIK)';
+      }
+    }
+
+    if (namaInput) {
+      namaInput.addEventListener('input', function () {
+        updateNamaDisplay(this.value);
+      });
+    }
+
+    async function checkNik() {
+      const nik = nikInput.value.trim();
+      if (!nik) {
+        nikFeedback.innerHTML = '<div class="alert alert-warning py-2 mb-0 small"><i class="bi bi-exclamation-circle me-1"></i> Silakan masukkan NIK 16 digit.</div>';
+        return;
+      }
+      if (nik.length !== 16 || isNaN(nik)) {
+        nikFeedback.innerHTML = '<div class="alert alert-danger py-2 mb-0 small"><i class="bi bi-x-circle me-1"></i> NIK harus terdiri dari 16 digit angka.</div>';
+        return;
+      }
+
+      nikFeedback.innerHTML = '<div class="alert alert-info py-2 mb-0 small d-flex align-items-center"><span class="spinner-border spinner-border-sm me-2" role="status"></span> Memeriksa NIK ke sistem...</div>';
+      btnVerifikasi.disabled = true;
+
+      try {
+        const response = await fetch("{{ route('pengaduan.cek-nik') }}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ nik: nik })
+        });
+
+        const data = await response.json();
+        btnVerifikasi.disabled = false;
+
+        if (response.ok && data.exists) {
+          nikFeedback.innerHTML = `<div class="alert alert-success py-2 mb-0 small d-flex align-items-center"><i class="bi bi-check-circle-fill me-2 fs-6"></i> NIK Terverifikasi! Pemohon: <strong>${data.pemohon.name}</strong></div>`;
+          
+          if (namaInput) namaInput.value = data.pemohon.name || '';
+          if (emailInput) emailInput.value = data.pemohon.email || '';
+          if (phoneInput) phoneInput.value = data.pemohon.phone || '';
+          if (kelurahanSelect && data.pemohon.kelurahan_id) {
+            kelurahanSelect.value = data.pemohon.kelurahan_id;
+          }
+          if (alamatInput) alamatInput.value = data.pemohon.alamat || '';
+
+          updateNamaDisplay(data.pemohon.name);
+          pemohonContainer.style.display = 'block';
+
+        } else {
+          nikFeedback.innerHTML = `<div class="alert alert-info py-2 mb-0 small"><i class="bi bi-info-circle me-1"></i> NIK belum terdaftar di database. Silakan isi data pelapor pada form di bawah ini.</div>`;
+          pemohonContainer.style.display = 'block';
+          updateNamaDisplay(namaInput ? namaInput.value : '');
+        }
+      } catch (error) {
+        btnVerifikasi.disabled = false;
+        nikFeedback.innerHTML = '<div class="alert alert-danger py-2 mb-0 small"><i class="bi bi-exclamation-triangle me-1"></i> Terjadi kesalahan jaringan saat verifikasi NIK.</div>';
+      }
+    }
+
+    if (btnVerifikasi) {
+      btnVerifikasi.addEventListener('click', checkNik);
+    }
+
+    if (nikInput) {
+      nikInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          checkNik();
+        }
+      });
+    }
+
+    @if(old('nik'))
+      checkNik();
+    @endif
+  });
+  </script>
 
 @endsection

@@ -38,6 +38,7 @@ Route::get('/cek-status', [CekStatusPublicController::class, 'index'])->name('ce
 // Public Pengaduan Routes
 Route::get('/pengaduan', [PengaduanPublicController::class, 'index'])->name('pengaduan.index');
 Route::get('/pengaduan/create', [PengaduanPublicController::class, 'create'])->name('pengaduan.create');
+Route::post('/pengaduan/cek-nik', [PengaduanPublicController::class, 'cekNik'])->name('pengaduan.cek-nik');
 Route::post('/pengaduan', [PengaduanPublicController::class, 'store'])->name('pengaduan.store');
 Route::get('/pengaduan/sukses/{nomor_tiket}', [PengaduanPublicController::class, 'sukses'])->name('pengaduan.sukses');
 

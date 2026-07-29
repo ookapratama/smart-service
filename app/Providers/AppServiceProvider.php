@@ -17,6 +17,7 @@ use App\Repositories\RoleRepository;
 use App\Repositories\TiketRepository;
 use App\Repositories\UserRepository;
 use App\Services\SettingService;
+use App\Services\Wa\FonnteWhatsAppNotifier;
 use App\Services\Wa\LogWhatsAppNotifier;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
@@ -75,12 +76,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(WhatsAppNotifier::class, function () {
             $drivers = [
                 'log' => LogWhatsAppNotifier::class,
+                'fonnte' => FonnteWhatsAppNotifier::class,
             ];
 
             try {
-                $driver = Setting::getByKey('wa_driver') ?: 'log';
+                $driver = Setting::getByKey('wa_driver') ?: env('WA_DRIVER', 'log');
             } catch (\Throwable) {
-                $driver = 'log'; // tabel settings belum tersedia (migrasi awal / bootstrap test)
+                $driver = env('WA_DRIVER', 'log'); // tabel settings belum tersedia (migrasi awal / bootstrap test)
             }
 
             return $this->app->make($drivers[$driver] ?? $drivers['log']);

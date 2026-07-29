@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Contracts\Services\WhatsAppNotifier;
+use App\Enums\NotifikasiWaStatus;
 use App\Enums\TiketStatus;
+use App\Models\NotifikasiWa;
 use App\Models\Setting;
 use App\Models\Tiket;
 use App\Models\TiketCounter;
@@ -19,9 +22,15 @@ class TiketService extends BaseService
      */
     public ?string $pdfWarning = null;
 
-    public function __construct(TiketRepository $repository, protected SuratService $suratService)
-    {
+    protected WhatsAppNotifier $whatsAppNotifier;
+
+    public function __construct(
+        TiketRepository $repository,
+        protected SuratService $suratService,
+        ?WhatsAppNotifier $whatsAppNotifier = null
+    ) {
         parent::__construct($repository);
+        $this->whatsAppNotifier = $whatsAppNotifier ?? app(WhatsAppNotifier::class);
     }
 
     public function filtered(array $filters = [])
@@ -107,6 +116,51 @@ class TiketService extends BaseService
             }
         }
 
+        // Kirim notifikasi WhatsApp ke pemohon via Fonnte / WhatsAppNotifier jika no HP tersedia
+        if ($tiket->pemohon && !empty($tiket->pemohon->phone)) {
+            $this->kirimNotifikasiUpdateStatus($tiket, $newStatus->label(), $catatan);
+        }
+
         return $tiket;
+    }
+
+    /**
+     * Kirim notifikasi WA saat petugas memperbarui status dan/atau catatan tiket.
+     */
+    protected function kirimNotifikasiUpdateStatus(Tiket $tiket, string $statusLabel, ?string $catatan): void
+    {
+        $phone = $tiket->pemohon->phone;
+        if (empty($phone)) {
+            return;
+        }
+
+        $pesanCatatan = !empty($catatan) ? "\nCatatan Petugas: " . $catatan : "";
+
+        $pesan = sprintf(
+            "Halo %s,\n\nStatus tiket pengaduan #%s Anda telah diperbarui menjadi [%s].%s\n\nCek perkembangan detail pengaduan Anda di:\n%s\n\nTerima kasih,\nPemerintah Kecamatan Soreang",
+            $tiket->pemohon->name ?? 'Warga',
+            $tiket->nomor_tiket,
+            $statusLabel,
+            $pesanCatatan,
+            route('cek-status.index')
+        );
+
+        $error = null;
+
+        try {
+            $terkirim = $this->whatsAppNotifier->send($phone, $pesan);
+        } catch (\Throwable $e) {
+            $terkirim = false;
+            $error = $e->getMessage();
+        }
+
+        NotifikasiWa::create([
+            'tiket_id' => $tiket->id,
+            'phone' => $phone,
+            'pesan' => $pesan,
+            'status' => $terkirim ? NotifikasiWaStatus::Terkirim : NotifikasiWaStatus::Gagal,
+            'error' => $error,
+            'sent_at' => $terkirim ? now() : null,
+        ]);
     }
 }

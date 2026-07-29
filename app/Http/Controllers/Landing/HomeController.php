@@ -32,8 +32,8 @@ class HomeController extends Controller
             'email' => 'layanan@soreang.parepare.go.id',
             'phone' => '(0421) 21055',
             'whatsapp' => '+6281234567890',
-            'address_line1' => 'Jl. Jenderal Sudirman No. 45, Kecamatan Soreang',
-            'address_line2' => 'Kota Parepare, Sulawesi Selatan 91131',
+            'address_line1' => 'Jl. Laupe Kota Parepare, Sulawesi Selatan 91131',
+            'address_line2' => '',
             'about_short' => 'Platform digital terpadu untuk pengurusan surat online, pengaduan masyarakat, monitoring real-time, dan kolaborasi antarkelurahan.',
             'video_url' => 'https://www.youtube.com/watch?v=Y7f98aduVJ8',
             'social_links' => [
