@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Landing;
 
+use App\Contracts\Services\WhatsAppNotifier;
+use App\Enums\NotifikasiWaStatus;
 use App\Enums\TiketChannel;
 use App\Enums\TiketStatus;
 use App\Http\Controllers\Controller;
 use App\Models\KategoriPengaduan;
 use App\Models\Kelurahan;
+use App\Models\NotifikasiWa;
 use App\Models\Pemohon;
 use App\Models\Pengaduan;
 use App\Models\Tiket;
@@ -19,7 +22,8 @@ class PengaduanPublicController extends Controller
 {
     public function __construct(
         protected FileUploadService $fileUploadService,
-        protected TiketService $tiketService
+        protected TiketService $tiketService,
+        protected WhatsAppNotifier $whatsAppNotifier
     ) {}
 
     /**
@@ -48,15 +52,53 @@ class PengaduanPublicController extends Controller
     }
 
     /**
+     * AJAX Endpoint untuk verifikasi NIK pemohon di tabel pemohon
+     */
+    public function cekNik(Request $request)
+    {
+        $request->validate([
+            'nik' => 'required|digits:16',
+        ], [
+            'nik.required' => 'NIK wajib diisi.',
+            'nik.digits' => 'NIK harus 16 digit angka.',
+        ]);
+
+        $pemohon = Pemohon::where('nik', $request->nik)->first();
+
+        if ($pemohon) {
+            return response()->json([
+                'exists' => true,
+                'message' => 'NIK terverifikasi di sistem.',
+                'pemohon' => [
+                    'id' => $pemohon->id,
+                    'nik' => $pemohon->nik,
+                    'name' => $pemohon->name,
+                    'email' => $pemohon->email,
+                    'phone' => $pemohon->phone,
+                    'alamat' => $pemohon->alamat,
+                    'kelurahan_id' => $pemohon->kelurahan_id,
+                ],
+            ]);
+        }
+
+        return response()->json([
+            'exists' => false,
+            'message' => 'NIK belum terdaftar di sistem. Silakan lengkapi data pemohon.',
+        ]);
+    }
+
+    /**
      * Process & Store Public Pengaduan Form
      */
     public function store(Request $request)
     {
+        $existingPemohon = Pemohon::where('nik', $request->nik)->first();
+
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
             'nik' => 'required|digits:16',
-            'email' => 'required|email|max:255',
-            'phone' => 'required|string|max:50',
+            'nama' => $existingPemohon ? 'nullable|string|max:255' : 'required|string|max:255',
+            'email' => $existingPemohon ? 'nullable|email|max:255' : 'required|email|max:255',
+            'phone' => $existingPemohon ? 'nullable|string|max:50' : 'required|string|max:50',
             'kelurahan_id' => 'nullable|exists:kelurahan,id',
             'alamat' => 'nullable|string',
             'jenis_laporan' => 'required|string|max:50',
@@ -79,19 +121,30 @@ class PengaduanPublicController extends Controller
             'deskripsi.required' => 'Rincian pengaduan wajib diisi minimal 15 karakter.',
         ]);
 
-        return DB::transaction(function () use ($request, $validated) {
-            // 1. Find or Create Pemohon — nama asli selalu tersimpan; is_anonim
-            //    hanya mengatur penyamaran identitas di sisi tampilan petugas.
-            $pemohon = Pemohon::firstOrCreate(
-                ['nik' => $validated['nik']],
-                [
+        $tiket = DB::transaction(function () use ($request, $validated, $existingPemohon) {
+            // 1. Find or Create Pemohon — jika eksis, gunakan data tersimpan / perbarui jika diisi
+            if ($existingPemohon) {
+                $pemohon = $existingPemohon;
+                $updateData = array_filter([
+                    'name' => $validated['nama'] ?? null,
+                    'email' => $validated['email'] ?? null,
+                    'phone' => $validated['phone'] ?? null,
+                    'alamat' => $validated['alamat'] ?? null,
+                    'kelurahan_id' => $validated['kelurahan_id'] ?? null,
+                ]);
+                if (!empty($updateData)) {
+                    $pemohon->update($updateData);
+                }
+            } else {
+                $pemohon = Pemohon::create([
+                    'nik' => $validated['nik'],
                     'name' => $validated['nama'],
                     'email' => $validated['email'],
                     'phone' => $validated['phone'],
                     'alamat' => $validated['alamat'] ?? null,
                     'kelurahan_id' => $validated['kelurahan_id'] ?? null,
-                ]
-            );
+                ]);
+            }
 
             // 2. Create Detail Pengaduan
             $pengaduan = Pengaduan::create([
@@ -112,7 +165,7 @@ class PengaduanPublicController extends Controller
             // 3. Generate Thread-safe Nomor Tiket
             $nomorTiket = $this->tiketService->generateNomorTiket();
 
-            // 4. Create Tiket via morph relation (alias 'pengaduan' dari morph map)
+            // 4. Create Tiket via morph relation
             $tiket = $pengaduan->tiket()->create([
                 'nomor_tiket' => $nomorTiket,
                 'pemohon_id' => $pemohon->id,
@@ -130,9 +183,48 @@ class PengaduanPublicController extends Controller
                 'catatan' => 'Pengaduan publik baru diterima via portal 3S.',
             ]);
 
-            return redirect()->route('pengaduan.sukses', $tiket->nomor_tiket)
-                ->with('success', 'Laporan pengaduan Anda berhasil terkirim!');
+            return $tiket;
         });
+
+        // Kirim notifikasi WhatsApp via Fonnte / WhatsAppNotifier
+        if ($tiket && $tiket->pemohon && !empty($tiket->pemohon->phone)) {
+            $this->kirimNotifikasiTiket($tiket, $tiket->pemohon->phone);
+        }
+
+        return redirect()->route('pengaduan.sukses', $tiket->nomor_tiket)
+            ->with('success', 'Laporan pengaduan Anda berhasil terkirim!');
+    }
+
+    /**
+     * Kirim WA nomor tiket + info pengaduan, catat hasilnya di notifikasi_wa.
+     */
+    protected function kirimNotifikasiTiket(Tiket $tiket, string $phone): void
+    {
+        $pesan = sprintf(
+            "Halo %s,\n\nLaporan pengaduan Anda telah kami terima.\nNomor Tiket: %s\nJudul: %s\n\nPantau perkembangan status pengaduan Anda melalui link berikut:\n%s\n\nTerima kasih,\nPemerintah Kecamatan Soreang",
+            $tiket->pemohon->name ?? 'Warga',
+            $tiket->nomor_tiket,
+            $tiket->judul,
+            route('cek-status.index')
+        );
+
+        $error = null;
+
+        try {
+            $terkirim = $this->whatsAppNotifier->send($phone, $pesan);
+        } catch (\Throwable $e) {
+            $terkirim = false;
+            $error = $e->getMessage();
+        }
+
+        NotifikasiWa::create([
+            'tiket_id' => $tiket->id,
+            'phone' => $phone,
+            'pesan' => $pesan,
+            'status' => $terkirim ? NotifikasiWaStatus::Terkirim : NotifikasiWaStatus::Gagal,
+            'error' => $error,
+            'sent_at' => $terkirim ? now() : null,
+        ]);
     }
 
     /**

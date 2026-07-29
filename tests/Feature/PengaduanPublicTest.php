@@ -1,8 +1,10 @@
 <?php
 
 use App\Models\KategoriPengaduan;
+use App\Models\NotifikasiWa;
 use App\Models\Pemohon;
 use App\Models\Tiket;
+use App\Services\TiketService;
 
 beforeEach(function () {
     $this->kategori = KategoriPengaduan::create(['nama' => 'Infrastruktur', 'is_active' => true]);
@@ -80,4 +82,47 @@ test('cek status api finds tiket by nomor or nik', function () {
 
     $byNik = $this->postJson('/api/cek-status', ['keyword' => '3204011234567890']);
     $byNik->assertOk()->assertJsonPath('data.nomor_tiket', $nomor);
+});
+
+test('cek nik endpoint returns correct status for existing and non-existing pemohon', function () {
+    Pemohon::create([
+        'nik' => '3204011111222233',
+        'name' => 'Budi Santoso',
+        'email' => 'budi@example.com',
+        'phone' => '081299998888',
+    ]);
+
+    $existsRes = $this->postJson(route('pengaduan.cek-nik'), ['nik' => '3204011111222233']);
+    $existsRes->assertOk()
+        ->assertJsonPath('exists', true)
+        ->assertJsonPath('pemohon.name', 'Budi Santoso');
+
+    $notExistsRes = $this->postJson(route('pengaduan.cek-nik'), ['nik' => '3204019999999999']);
+    $notExistsRes->assertOk()
+        ->assertJsonPath('exists', false);
+});
+
+test('submitting pengaduan sends wa notification and logs to notifikasi_wa', function () {
+    $payload = pengaduanPayload(['kategori_pengaduan_id' => $this->kategori->id]);
+    $this->post(route('pengaduan.store'), $payload);
+
+    $notif = NotifikasiWa::latest()->first();
+    expect($notif)->not->toBeNull();
+    expect($notif->phone)->toBe('081234567890');
+    expect($notif->pesan)->toContain('Laporan pengaduan Anda telah kami terima');
+});
+
+test('officer updating status sends wa notification with catatan', function () {
+    $payload = pengaduanPayload(['kategori_pengaduan_id' => $this->kategori->id]);
+    $this->post(route('pengaduan.store'), $payload);
+
+    $tiket = Tiket::firstOrFail();
+
+    $tiketService = app(TiketService::class);
+    $tiketService->updateStatus($tiket->id, 'diproses', 'Petugas sedang menuju lokasi.');
+
+    $latestNotif = NotifikasiWa::orderByDesc('id')->first();
+    expect($latestNotif)->not->toBeNull();
+    expect($latestNotif->pesan)->toContain('telah diperbarui menjadi [Diproses]');
+    expect($latestNotif->pesan)->toContain('Petugas sedang menuju lokasi.');
 });
