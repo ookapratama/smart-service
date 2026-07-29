@@ -59,7 +59,7 @@
 @section('content')
 
   <!-- 1. HERO BANNER SECTION (Rich Dark Blue Overlay with Soreang Background Photo & High Contrast Text) -->
-  <section id="hero" class="hero section position-relative py-5 overflow-hidden" style="background: linear-gradient(135deg, rgba(8, 35, 95, 0.88) 0%, rgba(4, 18, 55, 0.92) 100%), url('{{ asset('assets/home/img/soreang-hero.png') }}') center/cover no-repeat !important; min-height: 80vh; display: flex; align-items: center;">
+  <section id="hero" class="hero section position-relative py-5 overflow-hidden" style="background: linear-gradient(135deg, rgba(8, 35, 95, 0.88) 0%, rgba(4, 18, 55, 0.92) 100%), url('{{ asset('assets/home/img/soreang-hero.jpeg') }}') center/cover no-repeat !important; min-height: 80vh; display: flex; align-items: center;">
     
     <div class="container position-relative z-2 text-white py-4">
       <div class="row align-items-center gy-5">
@@ -94,7 +94,7 @@
         <div class="col-lg-5 order-1 order-lg-2 text-center" data-aos="zoom-in" data-aos-delay="200">
           <div class="position-relative d-inline-block w-100">
             <div class="p-2 bg-white bg-opacity-15 rounded-4 border border-white border-opacity-30 shadow-2xl backdrop-blur">
-              <img src="{{ asset('assets/home/img/soreang-hero.png') }}" class="img-fluid rounded-4 shadow-lg w-100 object-fit-cover" alt="Kantor Kecamatan Soreang Kota Parepare" style="max-height: 360px;">
+              <img src="{{ asset('assets/home/img/soreang-hero.jpeg') }}" class="img-fluid rounded-4 shadow-lg w-100 object-fit-cover" alt="Kantor Kecamatan Soreang Kota Parepare" style="max-height: 360px;">
             </div>
           </div>
         </div>
@@ -365,7 +365,7 @@
             
             <div class="position-relative mb-4">
               <div class="p-2 bg-white rounded-4 border shadow-sm">
-                <img src="{{ asset('assets/home/img/soreang-service.png') }}" class="img-fluid rounded-4 w-100 object-fit-cover shadow-sm" alt="Pusat Pelayanan Publik Kecamatan Soreang Parepare" style="max-height: 280px;">
+                <img src="{{ asset('assets/home/img/soreang-service.jpeg') }}" class="img-fluid rounded-4 w-100 object-fit-cover shadow-sm" alt="Pusat Pelayanan Publik Kecamatan Soreang Parepare" style="max-height: 280px;">
               </div>
             </div>
 
