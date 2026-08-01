@@ -60,7 +60,7 @@
 
   <!-- 1. HERO BANNER SECTION (Rich Dark Blue Overlay with Soreang Background Photo & High Contrast Text) -->
   <section id="hero" class="hero section position-relative py-5 overflow-hidden" style="background: linear-gradient(135deg, rgba(8, 35, 95, 0.88) 0%, rgba(4, 18, 55, 0.92) 100%), url('{{ !empty($siteInfo['hero_bg']) ? asset('storage/' . $siteInfo['hero_bg']) : asset('assets/home/img/soreang-hero.png') }}') center/cover no-repeat !important; min-height: 80vh; display: flex; align-items: center;">
-    
+  
     <div class="container position-relative z-2 text-white py-4">
       <div class="row align-items-center gy-5">
         
