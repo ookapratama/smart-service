@@ -80,7 +80,7 @@ class AppServiceProvider extends ServiceProvider
             ];
 
             try {
-                $driver = Setting::getByKey('wa_driver') ?: env('WA_DRIVER', 'log');
+                $driver = env('WA_DRIVER') ?: (Setting::getByKey('wa_driver') ?: 'log');
             } catch (\Throwable) {
                 $driver = env('WA_DRIVER', 'log'); // tabel settings belum tersedia (migrasi awal / bootstrap test)
             }

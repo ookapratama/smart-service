@@ -201,7 +201,7 @@ test('wizard happy path: cek nik found, verify without phone, then submit with t
     {
         public array $sent = [];
 
-        public function send(string $phone, string $message): bool
+        public function send(string $phone, string $message, array $options = []): bool
         {
             $this->sent[] = ['phone' => $phone, 'message' => $message];
 
@@ -262,7 +262,7 @@ test('wizard happy path: cek nik not found falls back to the manual identity + b
     {
         public array $sent = [];
 
-        public function send(string $phone, string $message): bool
+        public function send(string $phone, string $message, array $options = []): bool
         {
             $this->sent[] = ['phone' => $phone, 'message' => $message];
 
