@@ -17,7 +17,7 @@ class WizardSpyWhatsAppNotifier implements WhatsAppNotifier
     /** @var array<int, array{phone: string, message: string}> */
     public array $sent = [];
 
-    public function send(string $phone, string $message): bool
+    public function send(string $phone, string $message, array $options = []): bool
     {
         $this->sent[] = ['phone' => $phone, 'message' => $message];
 

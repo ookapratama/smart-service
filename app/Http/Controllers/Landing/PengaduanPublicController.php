@@ -201,10 +201,21 @@ class PengaduanPublicController extends Controller
     protected function kirimNotifikasiTiket(Tiket $tiket, string $phone): void
     {
         $pesan = sprintf(
-            "Halo %s,\n\nLaporan pengaduan Anda telah kami terima.\nNomor Tiket: %s\nJudul: %s\n\nPantau perkembangan status pengaduan Anda melalui link berikut:\n%s\n\nTerima kasih,\nPemerintah Kecamatan Soreang",
+            "Halo, %s!\n\n" .
+            "Laporan pengaduan Anda telah kami terima di portal Soreang Smart Service (3S).\n\n" .
+            "RINCIAN LAPORAN PENGADUAN\n" .
+            "Nomor Tiket: %s\n" .
+            "Judul: %s\n" .
+            "Tanggal: %s WIB\n" .
+            "Status: Baru / Diterima\n\n" .
+            "PANTAU PROGRES STATUS\n" .
+            "Gunakan nomor tiket di atas untuk mengecek progres tindakan petugas melalui link berikut:\n" .
+            "%s\n\n" .
+            "Pemerintah Kecamatan Soreang",
             $tiket->pemohon->name ?? 'Warga',
             $tiket->nomor_tiket,
             $tiket->judul,
+            $tiket->created_at->format('d M Y H:i'),
             route('cek-status.index')
         );
 

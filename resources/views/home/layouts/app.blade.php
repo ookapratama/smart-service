@@ -5,15 +5,20 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>@yield('title', 'SOREAN SMART SERVICE (3S) - Pelayanan Publik Terintegrasi')</title>
+  <title>@yield('title', ($siteInfo['name'] ?? 'SOREANG SMART SERVICE (3S)') . ' - Pelayanan Publik Terintegrasi')</title>
   <meta name="description"
-    content="@yield('meta_description', 'Soreang Smart Service (3S) - Cepat, Mudah, Transparan, dan Melayani dengan Hati.')">
+    content="@yield('meta_description', $siteInfo['description'] ?? 'Soreang Smart Service (3S) - Cepat, Mudah, Transparan, dan Melayani dengan Hati.')">
   <meta name="keywords"
-    content="@yield('meta_keywords', 'Soreang Smart Service, 3S, Pelayanan Publik, Surat Online, Kecamatan Soreang')">
+    content="@yield('meta_keywords', $siteInfo['keywords'] ?? 'Soreang Smart Service, 3S, Pelayanan Publik, Surat Online, Kecamatan Soreang')">
 
   <!-- Favicons -->
-  <link href="{{ asset('assets/home/img/favicon.png') }}" rel="icon">
-  <link href="{{ asset('assets/home/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+  @if(!empty($siteInfo['favicon']))
+    <link href="{{ asset('storage/' . $siteInfo['favicon']) }}" rel="icon">
+    <link href="{{ asset('storage/' . $siteInfo['favicon']) }}" rel="apple-touch-icon">
+  @else
+    <link href="{{ asset('assets/home/img/favicon.png') }}" rel="icon">
+    <link href="{{ asset('assets/home/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+  @endif
 
   <!-- Template Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">

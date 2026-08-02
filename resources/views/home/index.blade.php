@@ -59,33 +59,33 @@
 @section('content')
 
   <!-- 1. HERO BANNER SECTION (Rich Dark Blue Overlay with Soreang Background Photo & High Contrast Text) -->
-  <section id="hero" class="hero section position-relative py-5 overflow-hidden" style="background: linear-gradient(135deg, rgba(8, 35, 95, 0.88) 0%, rgba(4, 18, 55, 0.92) 100%), url('{{ asset('assets/home/img/soreang-hero.jpeg') }}') center/cover no-repeat !important; min-height: 80vh; display: flex; align-items: center;">
-    
+  <section id="hero" class="hero section position-relative py-5 overflow-hidden" style="background: linear-gradient(135deg, rgba(8, 35, 95, 0.88) 0%, rgba(4, 18, 55, 0.92) 100%), url('{{ !empty($siteInfo['hero_bg']) ? asset('storage/' . $siteInfo['hero_bg']) : asset('assets/home/img/soreang-hero.png') }}') center/cover no-repeat !important; min-height: 80vh; display: flex; align-items: center;">
+  
     <div class="container position-relative z-2 text-white py-4">
       <div class="row align-items-center gy-5">
         
         <!-- Left Content -->
         <div class="col-lg-7 order-2 order-lg-1" data-aos="fade-right">
           <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3 bg-white bg-opacity-20 border border-white border-opacity-30 shadow-sm">
-            <span class="small fw-semibold text-dark">Portal Resmi Kecamatan Soreang • Kota Parepare</span>
+            <span class="small fw-semibold text-dark">{{ $siteInfo['hero_badge'] ?? ('Portal Resmi ' . ($siteInfo['kecamatan'] ?? 'Kecamatan Soreang') . ' • ' . ($siteInfo['kota'] ?? 'Kota Parepare')) }}</span>
           </div>
 
           <h1 class="display-4 fw-extrabold mb-3" style="color: #ffffff !important; line-height: 1.15; letter-spacing: -0.5px; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);">
-            Soreang Smart Service (3S)
+            {{ $siteInfo['hero_title'] ?? ($siteInfo['name'] ?? 'Soreang Smart Service (3S)') }}
           </h1>
           
           <p class="fs-5 mb-4 me-lg-4" style="color: #f1f5f9 !important; line-height: 1.65; font-weight: 400; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);">
-            Pelayanan kependudukan digital terpadu, pengaduan publik, dan portal informasi resmi Kecamatan Soreang Kota Parepare secara cepat, mudah, dan transparan.
+            {{ $siteInfo['hero_subtitle'] ?? ($siteInfo['description'] ?? 'Pelayanan kependudukan digital terpadu, pengaduan publik, dan portal informasi resmi Kecamatan Soreang Kota Parepare secara cepat, mudah, dan transparan.') }}
           </p>
 
           <div class="d-flex flex-wrap gap-3 align-items-center">
             <a href="#jenis-surat-modal" data-bs-toggle="modal" class="btn btn-light btn-lg rounded-pill px-4 py-3 fw-bold text-primary shadow-lg d-inline-flex align-items-center gap-2 hover-lift">
               <i class="bi bi-file-earmark-plus-fill fs-5"></i>
-              <span>Pengajuan Surat Online</span>
+              <span>{{ $siteInfo['hero_btn1_text'] ?? 'Pengajuan Surat Online' }}</span>
             </a>
             <a href="#profil" class="btn btn-outline-light btn-lg rounded-pill px-4 py-3 fw-semibold shadow-sm d-inline-flex align-items-center gap-2 hover-lift">
               <i class="bi bi-info-circle fs-5"></i>
-              <span>Profil Kecamatan</span>
+              <span>{{ $siteInfo['hero_btn2_text'] ?? 'Profil Kecamatan' }}</span>
             </a>
           </div>
         </div>
@@ -94,7 +94,7 @@
         <div class="col-lg-5 order-1 order-lg-2 text-center" data-aos="zoom-in" data-aos-delay="200">
           <div class="position-relative d-inline-block w-100">
             <div class="p-2 bg-white bg-opacity-15 rounded-4 border border-white border-opacity-30 shadow-2xl backdrop-blur">
-              <img src="{{ asset('assets/home/img/soreang-hero.jpeg') }}" class="img-fluid rounded-4 shadow-lg w-100 object-fit-cover" alt="Kantor Kecamatan Soreang Kota Parepare" style="max-height: 360px;">
+              <img src="{{ !empty($siteInfo['hero_image']) ? asset('storage/' . $siteInfo['hero_image']) : asset('assets/home/img/soreang-hero.png') }}" class="img-fluid rounded-4 shadow-lg w-100 object-fit-cover" alt="Kantor {{ $siteInfo['kecamatan'] ?? 'Kecamatan Soreang' }}" style="max-height: 360px;">
             </div>
           </div>
         </div>
@@ -109,8 +109,8 @@
       
       @include('home.components.section-title', [
         'subtitle' => 'Profil & Arah Kebijakan',
-        'title' => 'Profil & Visi Misi Kecamatan Soreang',
-        'description' => 'Mengenal profil wilayah Kecamatan Soreang Kota Parepare serta arah komitmen pelayanan publik.'
+        'title' => 'Profil & Visi Misi ' . ($siteInfo['kecamatan'] ?? 'Kecamatan Soreang'),
+        'description' => 'Mengenal profil wilayah ' . ($siteInfo['kecamatan'] ?? 'Kecamatan Soreang') . ' ' . ($siteInfo['kota'] ?? 'Kota Parepare') . ' serta arah komitmen pelayanan publik.'
       ])
 
       <div class="row gy-4 align-items-stretch mt-3">
@@ -124,13 +124,13 @@
                   <i class="bi bi-building-check"></i>
                 </div>
                 <div>
-                  <h4 class="fw-bold text-dark m-0">Kecamatan Soreang</h4>
-                  <span class="text-primary fw-semibold small">Kota Parepare • Sulawesi Selatan</span>
+                  <h4 class="fw-bold text-dark m-0">{{ $siteInfo['kecamatan'] ?? 'Kecamatan Soreang' }}</h4>
+                  <span class="text-primary fw-semibold small">{{ $siteInfo['kota'] ?? 'Kota Parepare' }} • Sulawesi Selatan</span>
                 </div>
               </div>
 
               <p class="text-secondary leading-relaxed mb-4" style="font-size: 0.96rem; line-height: 1.7;">
-                Kecamatan Soreang merupakan salah satu kawasan pusat pemerintahan dan aktivitas ekonomi masyarakat di Kota Parepare. Terdiri dari <strong>7 Kelurahan</strong>, Kecamatan Soreang mengusung inovasi pelayanan digital <strong>Soreang Smart Service (3S)</strong> untuk memudahkan pengurusan surat, pengaduan publik, serta transparansi data kependudukan.
+                {{ $siteInfo['deskripsi_lengkap'] ?? 'Kecamatan Soreang merupakan salah satu kawasan pusat pemerintahan dan aktivitas ekonomi masyarakat di Kota Parepare.' }}
               </p>
             </div>
 
@@ -138,7 +138,7 @@
               <div class="col-6">
                 <div class="p-3 bg-white rounded-4 border shadow-sm text-center">
                   <span class="d-block text-muted small fw-semibold mb-1">Kode Wilayah</span>
-                  <h4 class="fw-bold text-primary m-0">73.72.03</h4>
+                  <h4 class="fw-bold text-primary m-0">{{ $siteInfo['kode_wilayah'] ?? '73.72.03' }}</h4>
                 </div>
               </div>
               <div class="col-6">
@@ -159,9 +159,9 @@
             <div class="p-4 p-lg-4 bg-white rounded-4 border border-primary-subtle shadow-sm">
               <div class="d-flex align-items-center justify-content-between mb-2">
                 <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 fw-bold">VISI UTAMA</span>
-                <span class="small text-muted">Kecamatan Soreang</span>
+                <span class="small text-muted">{{ $siteInfo['kecamatan'] ?? 'Kecamatan Soreang' }}</span>
               </div>
-              <h4 class="fw-bold text-dark mb-2">"Parepare Terkemuka & Soreang Smart Sejahtera"</h4>
+              <h4 class="fw-bold text-dark mb-2">{{ $siteInfo['visi'] ?? '"Parepare Terkemuka & Soreang Smart Sejahtera"' }}</h4>
               <p class="text-secondary m-0 small" style="line-height: 1.6;">
                 Mewujudkan tata kelola pemerintahan Kecamatan Soreang yang responsif, berbasis data digital, transparan, dan melayani masyarakat dengan integritas serta akuntabilitas tinggi.
               </p>
@@ -365,15 +365,15 @@
             
             <div class="position-relative mb-4">
               <div class="p-2 bg-white rounded-4 border shadow-sm">
-                <img src="{{ asset('assets/home/img/soreang-service.jpeg') }}" class="img-fluid rounded-4 w-100 object-fit-cover shadow-sm" alt="Pusat Pelayanan Publik Kecamatan Soreang Parepare" style="max-height: 280px;">
+                <img src="{{ !empty($siteInfo['service_image']) ? asset('storage/' . $siteInfo['service_image']) : asset('assets/home/img/soreang-service.png') }}" class="img-fluid rounded-4 w-100 object-fit-cover shadow-sm" alt="Pusat Pelayanan Publik {{ $siteInfo['kecamatan'] ?? 'Kecamatan Soreang' }}" style="max-height: 280px;">
               </div>
             </div>
 
             <div class="p-4 bg-white rounded-4 border shadow-sm position-relative overflow-hidden">
-              <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill fw-bold mb-2">Solusi Terintegrasi</span>
-              <h4 class="fw-bold text-dark mb-2">Pelayanan Cepat, Transparan, & Tanpa Antri</h4>
+              <span class="badge bg-primary-subtle text-primary px-3 py-1 rounded-pill fw-bold mb-2">{{ $siteInfo['service_badge'] ?? 'Solusi Terintegrasi' }}</span>
+              <h4 class="fw-bold text-dark mb-2">{{ $siteInfo['service_title'] ?? 'Pelayanan Cepat, Transparan, & Tanpa Antri' }}</h4>
               <p class="text-muted small leading-relaxed mb-3">
-                Warga Kecamatan Soreang kini dapat mengajukan surat keterangan online, melacak tiket status permohonan secara real-time, dan menyampaikan aspirasi tanpa harus datang mengantri di kantor kelurahan.
+                {{ $siteInfo['service_subtitle'] ?? ('Warga ' . ($siteInfo['kecamatan'] ?? 'Kecamatan Soreang') . ' kini dapat mengajukan surat keterangan online, melacak tiket status permohonan secara real-time, dan menyampaikan aspirasi tanpa harus datang mengantri di kantor kelurahan.') }}
               </p>
               <a href="#jenis-surat-modal" data-bs-toggle="modal" class="btn btn-primary text-white font-semibold rounded-pill px-4 py-2 hover-lift btn-sm">
                 Pengajuan Online Now <i class="bi bi-arrow-right ms-1"></i>

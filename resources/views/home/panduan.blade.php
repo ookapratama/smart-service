@@ -61,8 +61,8 @@
       <div class="row justify-content-center text-center">
         <div class="col-lg-9" data-aos="fade-up">
           <div class="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3 bg-white bg-opacity-20 border border-white border-opacity-30 shadow-sm mx-auto">
-            <i class="bi bi-book text-white"></i>
-            <span class="small fw-semibold text-white">Pusat Bantuan Warga</span>
+            <i class="bi bi-book text-dark"></i>
+            <span class="small fw-semibold text-dark">Pusat Bantuan Warga</span>
           </div>
           <h1 class="display-5 fw-bold mb-3 text-white">Panduan Layanan 3S</h1>
           <p class="fs-5 mb-0 px-lg-5" style="color: #f1f5f9;">
