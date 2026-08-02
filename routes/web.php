@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\ActivityLogController;
+use App\Http\Controllers\Admin\AgendaController;
 use App\Http\Controllers\Admin\BeritaController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\GaleriController;
 use App\Http\Controllers\Admin\ImpersonateController;
 use App\Http\Controllers\Admin\JadwalPelayananController;
 use App\Http\Controllers\Admin\JenisSuratController;
@@ -17,8 +19,10 @@ use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\Admin\TiketController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Landing\AgendaPublicController;
 use App\Http\Controllers\Landing\BeritaPublicController;
 use App\Http\Controllers\Landing\CekStatusPublicController;
+use App\Http\Controllers\Landing\GaleriPublicController;
 use App\Http\Controllers\Landing\HomeController;
 use App\Http\Controllers\Landing\OtpController;
 use App\Http\Controllers\Landing\PengaduanPublicController;
@@ -31,6 +35,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Public Berita Routes (Landing Page Template)
 Route::get('/berita', [BeritaPublicController::class, 'index'])->name('berita.public.index');
 Route::get('/berita/{slug}', [BeritaPublicController::class, 'show'])->name('berita.public.show');
+
+// Public Galeri Routes
+Route::get('/galeri', [GaleriPublicController::class, 'index'])->name('galeri.public.index');
+Route::get('/galeri/{slug}', [GaleriPublicController::class, 'show'])->name('galeri.public.show');
+
+// Public Agenda Routes
+Route::get('/agenda', [AgendaPublicController::class, 'index'])->name('agenda.public.index');
+Route::get('/agenda/{slug}', [AgendaPublicController::class, 'show'])->name('agenda.public.show');
 
 // Public Cek Status Route
 Route::get('/cek-status', [CekStatusPublicController::class, 'index'])->name('cek-status.index');
@@ -102,6 +114,8 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     Route::get('system/backup', [SystemController::class, 'backup'])->name('system.backup')->middleware('check.permission:system.health');
     Route::resource('jenis-surat', JenisSuratController::class)->middleware('check.permission:jenis-surat.index');
     Route::resource('berita', BeritaController::class)->middleware('check.permission:berita.index');
+    Route::resource('galeri', GaleriController::class)->middleware('check.permission:galeri.index');
+    Route::resource('agenda', AgendaController::class)->middleware('check.permission:agenda.index');
     Route::resource('jadwal-pelayanan', JadwalPelayananController::class)->middleware('check.permission:jadwal-pelayanan.index');
     Route::resource('kategori-pengaduan', KategoriPengaduanController::class)->middleware('check.permission:kategori-pengaduan.index');
     Route::resource('pemohon', PemohonController::class)->middleware('check.permission:pemohon.index');

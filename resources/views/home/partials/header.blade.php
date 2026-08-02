@@ -34,13 +34,17 @@
       <!-- Brand & Logo -->
       <a href="{{ route('home') }}" class="logo d-flex align-items-center me-auto me-xl-0 text-decoration-none">
         <div class="d-flex align-items-center gap-2">
-          <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px; font-weight: 800; font-size: 1.1rem;">
-            3S
-          </div>
-          <div>
-            <h1 class="sitename fs-5 fw-bold text-dark m-0 leading-tight">Kecamatan Soreang</h1>
-            <small class="text-muted font-monospace d-block" style="font-size: 0.72rem; letter-spacing: 0.5px;">PAREPARE DIGITAL SERVICE</small>
-          </div>
+          @if(!empty($siteInfo['logo']))
+            <img src="{{ asset('storage/' . $siteInfo['logo']) }}" alt="{{ $siteInfo['name'] ?? '3S' }}" style="max-height: 44px; object-fit: contain;">
+          @else
+            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px; font-weight: 800; font-size: 1.1rem;">
+              {{ $siteInfo['code'] ?? '3S' }}
+            </div>
+            <div>
+              <h1 class="sitename fs-5 fw-bold text-dark m-0 leading-tight">{{ $siteInfo['kecamatan'] ?? 'Kecamatan Soreang' }}</h1>
+              <small class="text-muted font-monospace d-block" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ strtoupper($siteInfo['kota'] ?? 'PAREPARE') }} DIGITAL SERVICE</small>
+            </div>
+          @endif
         </div>
       </a>
 
@@ -59,6 +63,8 @@
             </ul>
           </li>
           <li><a href="{{ route('berita.public.index') }}" class="{{ request()->routeIs('berita.public.*') ? 'active' : '' }}">Berita</a></li>
+          <li><a href="{{ route('galeri.public.index') }}" class="{{ request()->routeIs('galeri.public.*') ? 'active' : '' }}">Galeri</a></li>
+          <li><a href="{{ route('agenda.public.index') }}" class="{{ request()->routeIs('agenda.public.*') ? 'active' : '' }}">Agenda</a></li>
           <li><a href="{{ route('panduan') }}" class="{{ request()->routeIs('panduan') ? 'active' : '' }}">Panduan</a></li>
           <li>
             <a href="{{ route('login') }}" class="btn btn-sm btn-primary text-white rounded-pill px-3 py-1 ms-lg-2">

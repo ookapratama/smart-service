@@ -7,15 +7,14 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Driver dev/test: tulis pesan WA ke log alih-alih mengirim sungguhan.
- * Driver HTTP gateway (Fonnte/Watzap/sejenis) menyusul tanpa mengubah call site.
  */
 class LogWhatsAppNotifier implements WhatsAppNotifier
 {
     public const LOG_PREFIX = '[WA-LOG]';
 
-    public function send(string $phone, string $message): bool
+    public function send(string $phone, string $message, array $options = []): bool
     {
-        Log::info(sprintf('%s to=%s message=%s', self::LOG_PREFIX, $phone, $message));
+        Log::info(sprintf('%s to=%s message=%s options=%s', self::LOG_PREFIX, $phone, $message, json_encode($options)));
 
         return true;
     }

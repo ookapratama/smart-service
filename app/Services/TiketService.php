@@ -134,10 +134,15 @@ class TiketService extends BaseService
             return;
         }
 
-        $pesanCatatan = !empty($catatan) ? "\nCatatan Petugas: " . $catatan : "";
+        $pesanCatatan = !empty($catatan) ? "\n\nCatatan Petugas:\n" . $catatan : "";
 
         $pesan = sprintf(
-            "Halo %s,\n\nStatus tiket pengaduan #%s Anda telah diperbarui menjadi [%s].%s\n\nCek perkembangan detail pengaduan Anda di:\n%s\n\nTerima kasih,\nPemerintah Kecamatan Soreang",
+            "Halo, %s!\n\n" .
+            "Status tiket pengaduan #%s Anda telah diperbarui menjadi [%s].%s\n\n" .
+            "PANTAU PROGRES STATUS\n" .
+            "Cek perkembangan detail pengaduan Anda di link berikut:\n" .
+            "%s\n\n" .
+            "Pemerintah Kecamatan Soreang",
             $tiket->pemohon->name ?? 'Warga',
             $tiket->nomor_tiket,
             $statusLabel,

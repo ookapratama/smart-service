@@ -60,7 +60,7 @@ class SettingService
     public function updateMany(array $data)
     {
         foreach ($data as $key => $value) {
-            Setting::where('key', $key)->update(['value' => $value]);
+            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
         
         $this->clearCache();

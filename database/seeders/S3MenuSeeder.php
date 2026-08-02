@@ -32,9 +32,17 @@ class S3MenuSeeder extends Seeder
             ['slug' => 'berita.index'],
             ['name' => 'Berita & Informasi', 'icon' => 'ri-newspaper-line', 'path' => 'admin/berita', 'parent_id' => $masterDataMenu->id, 'order_no' => 3]
         );
+        $galeriMenu = Menu::updateOrCreate(
+            ['slug' => 'galeri.index'],
+            ['name' => 'Galeri Foto & Video', 'icon' => 'ri-gallery-line', 'path' => 'admin/galeri', 'parent_id' => $masterDataMenu->id, 'order_no' => 4]
+        );
+        $agendaMenu = Menu::updateOrCreate(
+            ['slug' => 'agenda.index'],
+            ['name' => 'Agenda Kegiatan', 'icon' => 'ri-calendar-todo-line', 'path' => 'admin/agenda', 'parent_id' => $masterDataMenu->id, 'order_no' => 5]
+        );
         $jadwalPelayananMenu = Menu::updateOrCreate(
             ['slug' => 'jadwal-pelayanan.index'],
-            ['name' => 'Jadwal Pelayanan', 'icon' => 'ri-calendar-event-line', 'path' => 'admin/jadwal-pelayanan', 'parent_id' => $masterDataMenu->id, 'order_no' => 4]
+            ['name' => 'Jadwal Pelayanan', 'icon' => 'ri-calendar-event-line', 'path' => 'admin/jadwal-pelayanan', 'parent_id' => $masterDataMenu->id, 'order_no' => 6]
         );
 
         // Pelayanan group
@@ -61,6 +69,8 @@ class S3MenuSeeder extends Seeder
                 $jenisSuratMenu->id => $fullCrud,
                 $kategoriPengaduanMenu->id => $fullCrud,
                 $beritaMenu->id => $fullCrud,
+                $galeriMenu->id => $fullCrud,
+                $agendaMenu->id => $fullCrud,
                 $jadwalPelayananMenu->id => $fullCrud,
                 $pelayananMenu->id => $readOnly,
                 $tiketMenu->id => $fullCrud,
@@ -74,6 +84,8 @@ class S3MenuSeeder extends Seeder
                 $jenisSuratMenu->id => $noDelete,
                 $kategoriPengaduanMenu->id => $noDelete,
                 $beritaMenu->id => $noDelete,
+                $galeriMenu->id => $noDelete,
+                $agendaMenu->id => $noDelete,
                 $jadwalPelayananMenu->id => $noDelete,
                 $pelayananMenu->id => $readOnly,
                 $tiketMenu->id => $readUpdateOnly,

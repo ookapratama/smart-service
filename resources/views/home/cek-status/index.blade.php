@@ -30,7 +30,7 @@
 @section('content')
 
   <!-- 1. HERO BANNER CEK STATUS -->
-  <section id="hero-cek-status" class="py-5 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(8, 35, 95, 0.88) 0%, rgba(4, 18, 55, 0.92) 100%), url('{{ asset('assets/home/img/soreang-hero.png') }}') center/cover no-repeat !important; min-height: 48vh; display: flex; align-items: center;">
+  <section id="hero-cek-status" class="py-5 text-white position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(8, 35, 95, 0.88) 0%, rgba(4, 18, 55, 0.92) 100%), url('{{ !empty($siteInfo['hero_bg']) ? asset('storage/' . $siteInfo['hero_bg']) : asset('assets/home/img/soreang-hero.png') }}') center/cover no-repeat !important; min-height: 48vh; display: flex; align-items: center;">
     <div class="container py-4 position-relative z-2">
       <div class="row justify-content-center text-center">
         <div class="col-lg-9" data-aos="fade-up">

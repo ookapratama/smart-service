@@ -93,6 +93,85 @@ class SettingSeeder extends Seeder
                 'label' => 'Warna Tema Utama',
             ],
 
+            // Banner & Hero Landing Page
+            [
+                'key' => 'hero_bg',
+                'value' => null,
+                'group' => 'banner',
+                'type' => 'image',
+                'label' => 'Gambar Background Banner Hero',
+            ],
+            [
+                'key' => 'hero_image',
+                'value' => null,
+                'group' => 'banner',
+                'type' => 'image',
+                'label' => 'Gambar Banner Samping Hero',
+            ],
+            [
+                'key' => 'hero_badge',
+                'value' => 'Portal Resmi Kecamatan Soreang • Kota Parepare',
+                'group' => 'banner',
+                'type' => 'text',
+                'label' => 'Teks Badge Hero Banner',
+            ],
+            [
+                'key' => 'hero_title',
+                'value' => 'Soreang Smart Service (3S)',
+                'group' => 'banner',
+                'type' => 'text',
+                'label' => 'Judul Utama Hero Banner',
+            ],
+            [
+                'key' => 'hero_subtitle',
+                'value' => 'Pelayanan kependudukan digital terpadu, pengaduan publik, dan portal informasi resmi Kecamatan Soreang Kota Parepare secara cepat, mudah, dan transparan.',
+                'group' => 'banner',
+                'type' => 'textarea',
+                'label' => 'Subjudul / Keterangan Hero Banner',
+            ],
+            [
+                'key' => 'hero_btn1_text',
+                'value' => 'Pengajuan Surat Online',
+                'group' => 'banner',
+                'type' => 'text',
+                'label' => 'Teks Tombol Utama 1',
+            ],
+            [
+                'key' => 'hero_btn2_text',
+                'value' => 'Profil Kecamatan',
+                'group' => 'banner',
+                'type' => 'text',
+                'label' => 'Teks Tombol Utama 2',
+            ],
+            [
+                'key' => 'service_image',
+                'value' => null,
+                'group' => 'banner',
+                'type' => 'image',
+                'label' => 'Gambar Banner Pelayanan Terpadu (Solusi 3S)',
+            ],
+            [
+                'key' => 'service_badge',
+                'value' => 'Solusi Terintegrasi',
+                'group' => 'banner',
+                'type' => 'text',
+                'label' => 'Teks Badge Pelayanan Terpadu',
+            ],
+            [
+                'key' => 'service_title',
+                'value' => 'Pelayanan Cepat, Transparan, & Tanpa Antri',
+                'group' => 'banner',
+                'type' => 'text',
+                'label' => 'Judul Banner Pelayanan Terpadu',
+            ],
+            [
+                'key' => 'service_subtitle',
+                'value' => 'Warga Kecamatan Soreang kini dapat mengajukan surat keterangan online, melacak tiket status permohonan secara real-time, dan menyampaikan aspirasi tanpa harus datang mengantri di kantor kelurahan.',
+                'group' => 'banner',
+                'type' => 'textarea',
+                'label' => 'Keterangan Banner Pelayanan Terpadu',
+            ],
+
             // Profil Website (halaman landing + footer)
             [
                 'key' => 'profile_kecamatan',
@@ -107,6 +186,13 @@ class SettingSeeder extends Seeder
                 'group' => 'profil',
                 'type' => 'text',
                 'label' => 'Nama Kota/Kabupaten',
+            ],
+            [
+                'key' => 'profile_kode_wilayah',
+                'value' => '73.72.03',
+                'group' => 'profil',
+                'type' => 'text',
+                'label' => 'Kode Wilayah Administrasi',
             ],
             [
                 'key' => 'profile_alamat',
@@ -128,6 +214,20 @@ class SettingSeeder extends Seeder
                 'group' => 'profil',
                 'type' => 'text',
                 'label' => 'Email Kontak',
+            ],
+            [
+                'key' => 'profile_visi',
+                'value' => '"Parepare Terkemuka & Soreang Smart Sejahtera"',
+                'group' => 'profil',
+                'type' => 'textarea',
+                'label' => 'Visi Utama Kecamatan',
+            ],
+            [
+                'key' => 'profile_deskripsi_lengkap',
+                'value' => 'Kecamatan Soreang merupakan salah satu kawasan pusat pemerintahan dan aktivitas ekonomi masyarakat di Kota Parepare. Terdiri dari 7 Kelurahan, Kecamatan Soreang mengusung inovasi pelayanan digital Soreang Smart Service (3S) untuk memudahkan pengurusan surat, pengaduan publik, serta transparansi data kependudukan.',
+                'group' => 'profil',
+                'type' => 'textarea',
+                'label' => 'Deskripsi Ringkas Profil Wilayah',
             ],
             [
                 'key' => 'profile_map_embed',
