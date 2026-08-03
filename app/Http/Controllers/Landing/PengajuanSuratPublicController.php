@@ -45,13 +45,25 @@ class PengajuanSuratPublicController extends Controller
     /**
      * Form dinamis: blok identitas + field dari jenis_surat.fields JSON + OTP.
      */
-    public function create(JenisSurat $jenisSurat)
+    public function create(Request $request, JenisSurat $jenisSurat)
     {
         abort_unless($jenisSurat->is_active, 404);
 
         $kelurahanList = Kelurahan::where('is_active', true)->orderBy('nama')->get();
 
-        return view('home.surat.create', compact('jenisSurat', 'kelurahanList'));
+        // Submit yang gagal validasi tidak menghanguskan flag OTP — beri tahu
+        // front-end NIK mana yang masih terverifikasi supaya wizard tidak
+        // kembali ke keadaan awal (yang membuat tombol submit terkunci lagi).
+        $flag = $request->session()->get(OtpController::SESSION_KEY);
+        $otpVerifiedNik = null;
+
+        if (is_array($flag)
+            && ($flag['purpose'] ?? null) === OtpController::PURPOSE_PERSURATAN
+            && ($flag['expires_at'] ?? 0) >= now()->getTimestamp()) {
+            $otpVerifiedNik = $flag['nik'] ?? null;
+        }
+
+        return view('home.surat.create', compact('jenisSurat', 'kelurahanList', 'otpVerifiedNik'));
     }
 
     /**

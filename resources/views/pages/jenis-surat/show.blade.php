@@ -29,16 +29,6 @@
                                 <td>: {{ $data->deskripsi ?? '-' }}</td>
                             </tr>
                             <tr>
-                                <th class="text-muted">Wajib Pengantar RT/RW</th>
-                                <td>:
-                                    @if ($data->wajib_pengantar_rt_rw)
-                                        <span class="badge bg-label-warning">Wajib</span>
-                                    @else
-                                        <span class="badge bg-label-secondary">Tidak Wajib</span>
-                                    @endif
-                                </td>
-                            </tr>
-                            <tr>
                                 <th class="text-muted">Status</th>
                                 <td>:
                                     @if ($data->is_active)
@@ -49,12 +39,48 @@
                                 </td>
                             </tr>
                             <tr>
+                                <th class="text-muted">Template PDF</th>
+                                <td>: <code>{{ $data->template_view ?: 'otomatis (kode / generik)' }}</code></td>
+                            </tr>
+                            <tr>
                                 <th class="text-muted">Dibuat Pada</th>
                                 <td>: {{ $data->created_at->format('d F Y H:i') }}</td>
                             </tr>
                         </table>
                     </div>
                 </div>
+
+                <h6 class="fw-bold mt-2 mb-2">Field Formulir Warga</h6>
+                @if (empty($data->fields))
+                    <p class="text-muted mb-0">Belum ada field — formulir warga hanya menampilkan blok identitas + keperluan.</p>
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nama (kode)</th>
+                                    <th>Label</th>
+                                    <th>Tipe</th>
+                                    <th>Wajib</th>
+                                    <th>Opsi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($data->fields as $field)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td><code>{{ $field['name'] ?? '-' }}</code></td>
+                                        <td>{{ $field['label'] ?? '-' }}</td>
+                                        <td><span class="badge bg-label-primary">{{ $field['type'] ?? 'text' }}</span></td>
+                                        <td>{{ ($field['required'] ?? false) ? 'Ya' : 'Tidak' }}</td>
+                                        <td>{{ implode(', ', $field['options'] ?? []) ?: '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

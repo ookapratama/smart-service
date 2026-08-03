@@ -22,8 +22,8 @@
     </div>
 
     <p style="margin-top: 24px;">
-        Yang bertanda tangan di bawah ini, Camat Soreang {{ $profil['kota'] ?? 'Kota Parepare' }},
-        dengan ini menerangkan bahwa:
+        Yang bertanda tangan di bawah ini, {{ $penandatangan['jabatan'] ?? 'Camat Soreang' }}
+        {{ $profil['kota'] ?? 'Kota Parepare' }}, dengan ini menerangkan bahwa:
     </p>
 
     <table style="width: 100%; margin-left: 24px;">
@@ -64,18 +64,7 @@
         Demikian surat keterangan ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.
     </p>
 
-    <table style="width: 100%; margin-top: 32px;">
-        <tr>
-            <td style="width: 55%;"></td>
-            <td style="text-align: center;">
-                <div>{{ ($profil['kota'] ?? 'Parepare') === 'Kota Parepare' ? 'Parepare' : ($profil['kota'] ?? 'Parepare') }}, {{ $tanggal }}</div>
-                <div>a.n. Camat Soreang</div>
-                <div style="height: 70px;"></div>
-                <div style="font-weight: bold; text-decoration: underline;">(..............................................)</div>
-                <div>NIP. ..............................................</div>
-            </td>
-        </tr>
-    </table>
+    @include('surat.templates.partials.ttd')
 
 </body>
 </html>

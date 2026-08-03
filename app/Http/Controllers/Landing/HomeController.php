@@ -23,28 +23,9 @@ class HomeController extends Controller
      */
     public function index(): View
     {
-        // 1. Informasi Produk
-        $siteInfo = [
-            'name' => 'SOREANG SMART SERVICE',
-            'code' => '3S',
-            'tagline' => 'Cepat, Mudah, Transparan, dan Melayani dengan Hati.',
-            'description' => 'Sistem Pelayanan Publik Terintegrasi Berbasis Digital dan Kolaboratif Kecamatan Soreang',
-            'email' => 'layanan@soreang.parepare.go.id',
-            'phone' => '(0421) 21055',
-            'whatsapp' => '+6281234567890',
-            'address_line1' => 'Jl. Laupe Kota Parepare, Sulawesi Selatan 91131',
-            'address_line2' => '',
-            'about_short' => 'Platform digital terpadu untuk pengurusan surat online, pengaduan masyarakat, monitoring real-time, dan kolaborasi antarkelurahan.',
-            'video_url' => 'https://www.youtube.com/watch?v=Y7f98aduVJ8',
-            'social_links' => [
-                'twitter' => 'https://twitter.com/soreang_smart',
-                'facebook' => 'https://facebook.com/soreangsmartservice',
-                'instagram' => 'https://instagram.com/soreang.smartservice',
-                'youtube' => 'https://youtube.com/c/SoreangSmartService',
-            ],
-        ];
+        // $siteInfo disuntik oleh View composer global (AppServiceProvider) dari settings.
 
-        // 2. Section Masalah & Solusi (Why 3S Needed?)
+        // Section Masalah & Solusi (Why 3S Needed?)
         $challenges = [
             [
                 'icon' => 'bi-file-earmark-x',
@@ -328,7 +309,6 @@ class HomeController extends Controller
         ];
 
         return view('home.index', compact(
-            'siteInfo',
             'challenges',
             'smartComponents',
             'advantages',

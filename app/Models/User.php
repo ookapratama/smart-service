@@ -33,6 +33,16 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function pemohon()
+    {
+        return $this->hasOne(Pemohon::class);
+    }
+
+    public function isWarga(): bool
+    {
+        return $this->role?->slug === 'warga';
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *

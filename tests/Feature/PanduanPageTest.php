@@ -9,6 +9,7 @@ test('panduan page renders with all key sections', function () {
     $response->assertSee('Cara Mengajukan Surat');
     $response->assertSee('Cara Cek Status Tiket');
     $response->assertSee('Login Warga');
-    $response->assertSee('Segera Hadir');
+    $response->assertDontSee('Segera Hadir');
+    $response->assertSee('Masuk Warga');
     $response->assertSee('Pertanyaan yang Sering Diajukan');
 });

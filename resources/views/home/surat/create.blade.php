@@ -344,6 +344,13 @@
       return errors ? Object.values(errors)[0][0] : json.message;
     }
 
+    // Hanya terisi saat APP_DEBUG + driver WA `log` (lihat OtpService) — testing tanpa gateway.
+    function logDebugCode(json) {
+      if (json.data && json.data.debug_code) {
+        console.log('[DEV] Kode OTP:', json.data.debug_code);
+      }
+    }
+
     function showErrorIn(el, message) {
       el.textContent = message;
       el.classList.remove('d-none');
@@ -411,6 +418,8 @@
           showErrorIn(cekNikError, firstErrorMessage(result.json));
           return;
         }
+
+        logDebugCode(result.json);
 
         // Kunci NIK ke nilai yang sudah dicek, apa pun hasilnya (found atau tidak).
         nikInput.readOnly = true;
@@ -508,6 +517,7 @@
           showErrorIn(otpError, firstErrorMessage(result.json));
           return;
         }
+        logDebugCode(result.json);
         document.getElementById('otpStepRequest').classList.add('d-none');
         document.getElementById('otpStepVerify').classList.remove('d-none');
         document.getElementById('otpSentInfo').innerHTML =
@@ -551,6 +561,22 @@
         showErrorIn(otpError, 'Gagal menghubungi server. Periksa koneksi Anda.');
       });
     });
+
+    // --- Restore state pasca submit gagal validasi ---------------------
+    // Flag OTP di session selamat dari submit yang gagal; tanpa restore ini
+    // wizard kembali ke keadaan awal dan tombol kirim terkunci padahal user
+    // sudah terverifikasi.
+    var verifiedNik = @json($otpVerifiedNik ?? null);
+    if (verifiedNik && nikInput.value.trim() === verifiedNik) {
+      nikInput.readOnly = true;
+      cekNikStep.classList.add('d-none');
+      restOfForm.classList.remove('d-none');
+      sectionOtpBottom.classList.add('d-none');
+      submitHint.textContent = 'Nomor WhatsApp Anda sudah terverifikasi — silakan lengkapi dan kirim ulang formulir.';
+      submitHint.classList.remove('text-muted');
+      submitHint.classList.add('text-success');
+      btnSubmit.disabled = false;
+    }
   })();
 </script>
 @endpush

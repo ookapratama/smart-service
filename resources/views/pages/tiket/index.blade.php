@@ -11,9 +11,29 @@
     </div>
 
     <div class="card">
+        <div class="card-header border-bottom pb-0">
+            <ul class="nav nav-tabs card-header-tabs">
+                @foreach ([null => 'Semua', 'persuratan' => 'Persuratan', 'pengaduan' => 'Pengaduan'] as $tabKey => $tabLabel)
+                    <li class="nav-item">
+                        <a class="nav-link {{ ($tab ?? null) === $tabKey ? 'active' : '' }}"
+                           href="{{ route('tiket.index', array_filter(['tab' => $tabKey, 'status' => $filters['status'] ?? null, 'channel' => $filters['channel'] ?? null, 'q' => $filters['q'] ?? null])) }}">
+                            {{ $tabLabel }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
         <div class="card-header border-bottom">
             <form method="GET" action="{{ route('tiket.index') }}" class="row g-2 align-items-end">
-                <div class="col-md-3">
+                @if ($tab)
+                    <input type="hidden" name="tab" value="{{ $tab }}">
+                @endif
+                <div class="col-md-4">
+                    <label class="form-label mb-1">Cari</label>
+                    <input type="search" name="q" class="form-control" value="{{ $filters['q'] ?? '' }}"
+                        placeholder="Nomor tiket / nama / NIK pemohon">
+                </div>
+                <div class="col-md-2">
                     <label class="form-label mb-1">Status</label>
                     <select name="status" class="form-select" onchange="this.form.submit()">
                         <option value="">Semua Status</option>
@@ -24,7 +44,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label mb-1">Channel</label>
                     <select name="channel" class="form-select" onchange="this.form.submit()">
                         <option value="">Semua Channel</option>
@@ -35,11 +55,25 @@
                         @endforeach
                     </select>
                 </div>
-                @if (($filters['status'] ?? null) || ($filters['channel'] ?? null))
-                    <div class="col-md-auto">
-                        <a href="{{ route('tiket.index') }}" class="btn btn-outline-secondary">Reset</a>
+                @if (($tab ?? null) === 'persuratan')
+                    <div class="col-md-2">
+                        <label class="form-label mb-1">Jenis Surat</label>
+                        <select name="jenis_surat_id" class="form-select" onchange="this.form.submit()">
+                            <option value="">Semua Jenis</option>
+                            @foreach ($jenisSuratList as $jenis)
+                                <option value="{{ $jenis->id }}" {{ ($filters['jenis_surat_id'] ?? '') == $jenis->id ? 'selected' : '' }}>
+                                    {{ $jenis->nama }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 @endif
+                <div class="col-md-auto d-flex gap-2">
+                    <button type="submit" class="btn btn-primary"><i class="ri-search-line"></i></button>
+                    @if (array_filter($filters))
+                        <a href="{{ route('tiket.index', array_filter(['tab' => $tab])) }}" class="btn btn-outline-secondary">Reset</a>
+                    @endif
+                </div>
             </form>
         </div>
         <div class="table-responsive">
@@ -57,9 +91,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($data as $index => $item)
+                    @forelse($data as $item)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $data->firstItem() + $loop->index }}</td>
                             <td><code>{{ $item->nomor_tiket }}</code></td>
                             <td>{{ $item->judul }}</td>
                             <td>{{ $item->pemohon->name ?? '-' }}</td>
@@ -95,6 +129,14 @@
                 </tbody>
             </table>
         </div>
+        @if ($data->hasPages())
+            <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <small class="text-muted">
+                    Menampilkan {{ $data->firstItem() }}–{{ $data->lastItem() }} dari {{ $data->total() }} tiket
+                </small>
+                {{ $data->links() }}
+            </div>
+        @endif
     </div>
 </div>
 @endsection

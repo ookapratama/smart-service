@@ -218,25 +218,29 @@
         </div>
       </div>
 
-      <!-- D. LOGIN WARGA (SEGERA HADIR) -->
+      <!-- D. LOGIN WARGA -->
       <div id="panduan-login" class="p-4 p-md-5 bg-white rounded-4 shadow-sm border mb-4 overflow-hidden" data-aos="fade-up">
         <div class="row align-items-center g-4 g-lg-5">
           <div class="col-lg-5 order-lg-2 text-center">
-            <img src="{{ asset('assets/img/illustrations/misc-coming-soon-illustration.png') }}" alt="Ilustrasi fitur login warga yang segera hadir" class="img-fluid" style="max-width: 280px;" loading="lazy">
+            <img src="{{ asset('assets/img/illustrations/auth-two-steps-illustration-light.png') }}" alt="Ilustrasi login warga dengan NIK dan kode WhatsApp" class="img-fluid" style="max-width: 280px;" loading="lazy">
           </div>
           <div class="col-lg-7 order-lg-1">
             <div class="d-flex align-items-center gap-3 mb-3">
               <div class="d-flex align-items-center justify-content-center rounded-circle bg-primary-subtle text-primary flex-shrink-0" style="width: 48px; height: 48px; font-size: 1.3rem;">
                 <i class="bi bi-person-circle"></i>
               </div>
-              <h2 class="fs-4 fw-bold text-dark mb-0">Login Warga <span class="badge bg-warning text-dark align-middle ms-1" style="font-size: 0.7rem;">Segera Hadir</span></h2>
+              <h2 class="fs-4 fw-bold text-dark mb-0">Login Warga</h2>
             </div>
             <p class="text-muted mb-2">
-              Ke depan, Anda akan bisa <strong>masuk (login) cukup dengan NIK</strong> — tanpa password. Caranya: masukkan NIK,
-              sistem mengirim <strong>kode WhatsApp</strong> ke nomor Anda yang terdaftar, masukkan kodenya, dan Anda langsung masuk.
+              Anda bisa <strong>masuk (login) cukup dengan NIK</strong> — tanpa password:
             </p>
-            <p class="text-muted mb-2">Setelah login Anda dapat melihat <strong>seluruh riwayat tiket</strong> (pengaduan dan surat) dalam satu halaman serta mengunduh surat-surat yang sudah terbit — tanpa mengetik nomor tiket satu per satu.</p>
-            <p class="text-muted mb-0"><strong>Tidak ada pendaftaran akun.</strong> Cukup sekali mengajukan surat atau membuat pengaduan, data Anda otomatis dikenali saat fitur login tersedia.</p>
+            <ol class="panduan-steps text-dark">
+              <li>Buka halaman <a href="{{ route('warga.login') }}" class="fw-semibold">Masuk Warga</a>.</li>
+              <li>Masukkan <strong>NIK 16 digit</strong> Anda, lalu tekan <strong>Kirim Kode OTP</strong>.</li>
+              <li>Masukkan <strong>kode WhatsApp 6 digit</strong> yang dikirim ke nomor Anda yang terdaftar — Anda langsung masuk.</li>
+            </ol>
+            <p class="text-muted mb-2">Setelah login Anda dapat melihat <strong>seluruh riwayat tiket</strong> (pengaduan dan surat) di halaman <strong>Tiket Saya</strong> serta mengunduh surat-surat yang sudah terbit — tanpa mengetik nomor tiket satu per satu.</p>
+            <p class="text-muted mb-0"><strong>Tidak ada pendaftaran akun.</strong> Cukup sekali mengajukan surat atau membuat pengaduan, data Anda otomatis dikenali saat pertama kali login.</p>
           </div>
         </div>
       </div>

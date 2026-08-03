@@ -2,4 +2,9 @@
 
 namespace App\Contracts\Repositories;
 
-interface TiketRepository extends Repository {}
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+
+interface TiketRepository extends Repository
+{
+    public function filtered(array $filters = [], int $perPage = 20): LengthAwarePaginator;
+}
