@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DeployWebhookController extends Controller
 {
@@ -36,25 +37,49 @@ class DeployWebhookController extends Controller
             return ResponseHelper::error('Forbidden', 403);
         }
 
-        try {
-            if (! Storage::disk('local')->exists(self::SCHEMA_REBUILD_MARKER)) {
-                Artisan::call('migrate:fresh', ['--force' => true]);
-                Storage::disk('local')->put(self::SCHEMA_REBUILD_MARKER, now()->toDateTimeString());
-            } else {
-                Artisan::call('migrate', ['--force' => true]);
-            }
-
-            Artisan::call('db:seed', ['--force' => true]);
-            Artisan::call('config:cache');
-            Artisan::call('route:cache');
-            Artisan::call('view:cache');
-            Artisan::call('queue:restart');
-        } catch (\Exception $e) {
-            report($e);
-
-            return ResponseHelper::error('Deploy command failed', 500);
+        // OPcache may still hold bytecode of the files FTP just overwrote; without
+        // this reset, config:cache/route:cache below would rebuild from STALE code.
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
         }
 
-        return ResponseHelper::success(message: 'Deployed');
+        $needsFresh = ! Storage::disk('local')->exists(self::SCHEMA_REBUILD_MARKER);
+
+        // Clear compiled caches FIRST so a failed deploy fails open (uncached but
+        // correct) instead of keeping a stale route/config table. Deliberately not
+        // cache:clear — that would wipe live OTP codes/cooldowns in the app cache.
+        $commands = [
+            ['config:clear', []],
+            ['route:clear', []],
+            ['view:clear', []],
+            [$needsFresh ? 'migrate:fresh' : 'migrate', ['--force' => true]],
+            ['db:seed', ['--force' => true]],
+            ['config:cache', []],
+            ['route:cache', []],
+            ['view:cache', []],
+            ['queue:restart', []],
+        ];
+
+        $results = [];
+
+        // Per-command try/catch: report exactly which command failed instead of a
+        // generic 500, and stop there so the response shows what already ran.
+        foreach ($commands as [$command, $arguments]) {
+            try {
+                Artisan::call($command, $arguments);
+                $results[$command] = Str::limit(trim(Artisan::output()), 1000) ?: 'OK';
+
+                if ($command === 'migrate:fresh') {
+                    Storage::disk('local')->put(self::SCHEMA_REBUILD_MARKER, now()->toDateTimeString());
+                }
+            } catch (\Throwable $e) {
+                report($e);
+                $results[$command] = 'FAILED: '.$e->getMessage();
+
+                return ResponseHelper::error("Deploy command failed: {$command}", 500, $results);
+            }
+        }
+
+        return ResponseHelper::success($results, 'Deployed');
     }
 }
