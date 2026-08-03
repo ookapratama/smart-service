@@ -104,7 +104,6 @@ test('should deny settings cache clear when user has read-only permission', func
     $user = createReadOnlyUser(['settings.index']);
 
     $this->actingAs($user)
-        ->get(route('settings.clear-cache'))
+        ->post(route('settings.clear-cache'))
         ->assertStatus(403);
 });
-

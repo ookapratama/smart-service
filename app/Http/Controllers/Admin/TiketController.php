@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\TiketStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TiketRequest;
+use App\Models\JenisSurat;
 use App\Services\FileUploadService;
 use App\Services\SuratService;
 use App\Services\TiketService;
@@ -24,14 +25,24 @@ class TiketController extends Controller
     ) {}
 
     /**
-     * Antrian tiket dengan filter status/channel.
+     * Antrian tiket berpaginasi: tab layanan (semua/persuratan/pengaduan),
+     * pencarian nomor tiket / nama / NIK, filter status/channel/jenis surat.
      */
     public function index(Request $request)
     {
-        $filters = $request->only(['status', 'channel']);
-        $data = $this->service->filtered($filters);
+        $filters = $request->only(['status', 'channel', 'q', 'jenis_surat_id']);
 
-        return view('pages.tiket.index', compact('data', 'filters'));
+        $tab = $request->query('tab');
+        $filters['detail_type'] = match ($tab) {
+            'persuratan' => 'pengajuan_surat',
+            'pengaduan' => 'pengaduan',
+            default => null,
+        };
+
+        $data = $this->service->filtered($filters)->withQueryString();
+        $jenisSuratList = JenisSurat::orderBy('nama')->get(['id', 'nama']);
+
+        return view('pages.tiket.index', compact('data', 'filters', 'tab', 'jenisSuratList'));
     }
 
     /**

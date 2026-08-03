@@ -19,6 +19,16 @@ enum TiketStatus: string
         };
     }
 
+    public function badgeClass(): string
+    {
+        return match ($this) {
+            self::Baru => 'bg-primary',
+            self::Diproses => 'bg-warning text-dark',
+            self::Selesai => 'bg-success',
+            self::Ditolak => 'bg-danger',
+        };
+    }
+
     /**
      * Status lanjutan yang valid dari status saat ini.
      *

@@ -1,9 +1,9 @@
-{{-- Template khusus SKD (Surat Keterangan Domisili) — contoh mekanisme template per-jenis ({kode}.blade.php). --}}
+{{-- Template kategori PENGANTAR (SPKTP, SPKK, SPSKCK): "memberikan pengantar kepada" — bukan surat keterangan. --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>Surat Keterangan Domisili - {{ $nomorSurat ?? 'Draft' }}</title>
+    <title>{{ $jenisSurat->nama }} - {{ $nomorSurat ?? 'Draft' }}</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #000; margin: 24px 36px; }
         table { border-collapse: collapse; }
@@ -16,14 +16,14 @@
 
     <div style="text-align: center; margin-top: 24px;">
         <div style="font-size: 14px; font-weight: bold; text-decoration: underline; text-transform: uppercase;">
-            Surat Keterangan Domisili
+            {{ $jenisSurat->nama }}
         </div>
         <div style="font-size: 12px;">Nomor: {{ $nomorSurat ?? '............................' }}</div>
     </div>
 
     <p style="margin-top: 24px;">
         Yang bertanda tangan di bawah ini, {{ $penandatangan['jabatan'] ?? 'Camat Soreang' }}
-        {{ $profil['kota'] ?? 'Kota Parepare' }}, dengan ini menerangkan bahwa:
+        {{ $profil['kota'] ?? 'Kota Parepare' }}, dengan ini memberikan pengantar kepada:
     </p>
 
     <table style="width: 100%; margin-left: 24px;">
@@ -38,25 +38,31 @@
             <td>{{ $pemohon->nik ?? '-' }}</td>
         </tr>
         <tr>
-            <td style="padding: 2px 0;">Alamat Domisili</td>
+            <td style="padding: 2px 0;">Alamat</td>
             <td>:</td>
-            <td>{{ $pengajuan->data['alamat_domisili'] ?? ($pemohon->alamat ?? '-') }}@if ($pemohon?->kelurahan), Kelurahan {{ $pemohon->kelurahan->nama }}@endif</td>
+            <td>{{ $pemohon->alamat ?? '-' }}@if ($pemohon?->kelurahan), Kelurahan {{ $pemohon->kelurahan->nama }}@endif</td>
         </tr>
+        @foreach ($pengajuan->data ?? [] as $fieldName => $fieldValue)
+            @php
+                $fieldLabel = collect($jenisSurat->fields ?? [])->firstWhere('name', $fieldName)['label']
+                    ?? \Illuminate\Support\Str::headline($fieldName);
+            @endphp
+            <tr>
+                <td style="padding: 2px 0;">{{ $fieldLabel }}</td>
+                <td>:</td>
+                <td>{{ is_array($fieldValue) ? implode(', ', $fieldValue) : $fieldValue }}</td>
+            </tr>
+        @endforeach
     </table>
 
     <p style="margin-top: 16px;">
-        Berdasarkan data yang ada, nama tersebut di atas benar berdomisili dan bertempat tinggal di alamat tersebut,
-        wilayah {{ $profil['kecamatan'] ?? 'Kecamatan Soreang' }}, {{ $profil['kota'] ?? 'Kota Parepare' }}@if (!empty($pengajuan->data['sejak_tahun'])),
-        sejak tahun {{ $pengajuan->data['sejak_tahun'] }}@endif.
+        Surat pengantar ini diberikan kepada yang bersangkutan untuk keperluan:
+        <strong>{{ $pengajuan->keperluan }}</strong>.
+        Mohon kepada instansi terkait untuk memberikan pelayanan sebagaimana mestinya.
     </p>
 
     <p>
-        Surat keterangan domisili ini diterbitkan untuk keperluan:
-        <strong>{{ $pengajuan->data['keperluan_domisili'] ?? $pengajuan->keperluan }}</strong>.
-    </p>
-
-    <p>
-        Demikian surat keterangan ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.
+        Demikian surat pengantar ini dibuat untuk dipergunakan seperlunya.
     </p>
 
     @include('surat.templates.partials.ttd')

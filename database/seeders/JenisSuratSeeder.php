@@ -12,6 +12,7 @@ class JenisSuratSeeder extends Seeder
         $jenisSurat = [
             [
                 'kode' => 'SKD',
+                'template_view' => 'skd',
                 'nama' => 'Surat Keterangan Domisili',
                 'deskripsi' => 'Surat keterangan tempat tinggal yang diterbitkan oleh kelurahan.',
                 'fields' => [
@@ -24,6 +25,7 @@ class JenisSuratSeeder extends Seeder
             ],
             [
                 'kode' => 'SKTM',
+                'template_view' => 'keterangan',
                 'nama' => 'Surat Keterangan Tidak Mampu',
                 'deskripsi' => 'Surat keterangan status ekonomi tidak mampu untuk keperluan bantuan/beasiswa.',
                 'fields' => [
@@ -37,6 +39,7 @@ class JenisSuratSeeder extends Seeder
             ],
             [
                 'kode' => 'SKU',
+                'template_view' => 'keterangan',
                 'nama' => 'Surat Keterangan Usaha',
                 'deskripsi' => 'Surat keterangan kepemilikan usaha untuk keperluan perizinan/perbankan.',
                 'fields' => [
@@ -50,6 +53,7 @@ class JenisSuratSeeder extends Seeder
             ],
             [
                 'kode' => 'SKBM',
+                'template_view' => 'keterangan',
                 'nama' => 'Surat Keterangan Belum Menikah',
                 'deskripsi' => 'Surat keterangan status belum menikah untuk keperluan administrasi.',
                 'fields' => [
@@ -62,6 +66,7 @@ class JenisSuratSeeder extends Seeder
             ],
             [
                 'kode' => 'SPKTP',
+                'template_view' => 'pengantar',
                 'nama' => 'Surat Pengantar KTP',
                 'deskripsi' => 'Surat pengantar untuk pembuatan/perpanjangan/penggantian KTP di Disdukcapil.',
                 'fields' => [
@@ -72,6 +77,7 @@ class JenisSuratSeeder extends Seeder
             ],
             [
                 'kode' => 'SPKK',
+                'template_view' => 'pengantar',
                 'nama' => 'Surat Pengantar Kartu Keluarga',
                 'deskripsi' => 'Surat pengantar untuk pembuatan/perubahan Kartu Keluarga di Disdukcapil.',
                 'fields' => [
@@ -83,6 +89,7 @@ class JenisSuratSeeder extends Seeder
             ],
             [
                 'kode' => 'SKKL',
+                'template_view' => 'keterangan',
                 'nama' => 'Surat Keterangan Kelahiran',
                 'deskripsi' => 'Surat keterangan kelahiran untuk dasar penerbitan akta kelahiran.',
                 'fields' => [
@@ -97,6 +104,7 @@ class JenisSuratSeeder extends Seeder
             ],
             [
                 'kode' => 'SKKM',
+                'template_view' => 'keterangan',
                 'nama' => 'Surat Keterangan Kematian',
                 'deskripsi' => 'Surat keterangan kematian untuk dasar penerbitan akta kematian.',
                 'fields' => [
@@ -110,6 +118,7 @@ class JenisSuratSeeder extends Seeder
             ],
             [
                 'kode' => 'SPSKCK',
+                'template_view' => 'pengantar',
                 'nama' => 'Surat Pengantar SKCK',
                 'deskripsi' => 'Surat pengantar untuk permohonan Surat Keterangan Catatan Kepolisian.',
                 'fields' => [
@@ -120,6 +129,7 @@ class JenisSuratSeeder extends Seeder
             ],
             [
                 'kode' => 'SKP',
+                'template_view' => 'keterangan',
                 'nama' => 'Surat Keterangan Pindah',
                 'deskripsi' => 'Surat keterangan pindah domisili untuk proses administrasi kependudukan.',
                 'fields' => [
@@ -133,7 +143,21 @@ class JenisSuratSeeder extends Seeder
         ];
 
         foreach ($jenisSurat as $jenis) {
-            JenisSurat::updateOrCreate(['kode' => $jenis['kode']], $jenis);
+            // Lampiran pengantar RT/RW dimodelkan sebagai field type:file di
+            // `fields` (S3_MVP_DESIGN.md §6) — kolom wajib_pengantar_rt_rw
+            // deprecated dan hanya diisi untuk kompatibilitas tampilan lama.
+            if ($jenis['wajib_pengantar_rt_rw']) {
+                $jenis['fields'][] = [
+                    'name' => 'pengantar_rt_rw',
+                    'type' => 'file',
+                    'label' => 'Scan Surat Pengantar RT/RW',
+                    'required' => true,
+                ];
+            }
+
+            // firstOrCreate (bukan updateOrCreate): db:seed berjalan di setiap
+            // deploy — definisi `fields` hasil edit admin tidak boleh direset.
+            JenisSurat::firstOrCreate(['kode' => $jenis['kode']], $jenis);
         }
     }
 }

@@ -3,6 +3,7 @@
 use App\Helpers\ResponseHelper;
 use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\CheckPermission;
+use App\Http\Middleware\EnsureStaffUser;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -22,16 +23,22 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'check.permission' => CheckPermission::class,
             'maintenance' => CheckMaintenanceMode::class,
+            'staff' => EnsureStaffUser::class,
         ]);
 
         $middleware->appendToGroup('web', [
             CheckMaintenanceMode::class,
         ]);
 
-        $middleware->redirectTo(
-            guests: '/login',
-            users: '/dashboard'
-        );
+        // Guest area warga (tiket-saya) diarahkan ke login warga, bukan login
+        // admin; user login yang menyasar halaman guest diarahkan per role.
+        $middleware->redirectGuestsTo(fn ($request) => $request->routeIs('tiket-saya.*')
+            ? route('warga.login')
+            : route('login'));
+
+        $middleware->redirectUsersTo(fn ($request) => $request->user()?->isWarga()
+            ? route('tiket-saya.index')
+            : route('dashboard'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (Throwable $e, $request) {

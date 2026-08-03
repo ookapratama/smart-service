@@ -27,6 +27,8 @@ use App\Http\Controllers\Landing\HomeController;
 use App\Http\Controllers\Landing\OtpController;
 use App\Http\Controllers\Landing\PengaduanPublicController;
 use App\Http\Controllers\Landing\PengajuanSuratPublicController;
+use App\Http\Controllers\Landing\TiketSayaController;
+use App\Http\Controllers\Landing\WargaAuthController;
 use Illuminate\Support\Facades\Route;
 
 // Public Landing Home Route
@@ -70,6 +72,19 @@ Route::get('/panduan', [HomeController::class, 'panduan'])->name('panduan');
 Route::post('/otp/request', [OtpController::class, 'request'])->name('otp.request');
 Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify');
 
+// Login warga passwordless by NIK (§4) — endpoint terpisah dari wizard
+// persuratan karena kontrak anti-enumeration-nya berbeda (lihat controller).
+Route::get('/masuk', [WargaAuthController::class, 'showLogin'])->name('warga.login')->middleware('guest');
+Route::post('/masuk/otp', [WargaAuthController::class, 'requestOtp'])->name('warga.login.otp')->middleware('throttle:10,1');
+Route::post('/masuk/verifikasi', [WargaAuthController::class, 'verifyOtp'])->name('warga.login.verify')->middleware('throttle:20,1');
+
+// Tiket Saya (§5.2) — riwayat tiket milik warga login; ownership di controller.
+Route::middleware('auth')->group(function () {
+    Route::get('/tiket-saya', [TiketSayaController::class, 'index'])->name('tiket-saya.index');
+    Route::get('/tiket-saya/{nomorTiket}', [TiketSayaController::class, 'show'])->name('tiket-saya.show');
+    Route::get('/tiket-saya/{nomorTiket}/unduh', [TiketSayaController::class, 'unduhSurat'])->name('tiket-saya.unduh');
+});
+
 // Auth Routes
 Route::get('login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('login', [AuthController::class, 'login']);
@@ -77,7 +92,7 @@ Route::get('register', [AuthController::class, 'showRegister'])->name('register'
 Route::post('register', [AuthController::class, 'register']);
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware(['auth'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'staff'])->prefix('admin')->group(function () {
     // Dashboard (admin landing after login)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -98,7 +113,7 @@ Route::middleware(['auth'])->prefix('admin')->group(function () {
     // Website Settings
     Route::get('settings', [SettingController::class, 'index'])->name('settings.index')->middleware('check.permission:settings.index');
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update')->middleware('check.permission:settings.index');
-    Route::get('settings/clear-cache', [SettingController::class, 'clearCache'])->name('settings.clear-cache')->middleware('check.permission:settings.index');
+    Route::post('settings/clear-cache', [SettingController::class, 'clearCache'])->name('settings.clear-cache')->middleware('check.permission:settings.index');
 
     // Personal Profile
     Route::get('profile', [ProfileController::class, 'index'])->name('profile.index');

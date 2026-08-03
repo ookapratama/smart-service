@@ -54,6 +54,8 @@ ln -s ~/soreang/laravel_soreang/public/storage storage
 
 Do **not** touch `php.ini`, `.user.ini`, or `.well-known/` — leave them exactly as cPanel created them.
 
+> **Gotcha (terjadi 2026-07-28):** mengekstrak zip secara manual ke `~/soreang/laravel_soreang` (mis. restore dari backup) **menghapus symlink `public/storage`** hasil `php artisan storage:link` — zip tidak menyimpan symlink — sehingga semua gambar upload (logo, hero, galeri) mati. Setelah ekstraksi zip apa pun, jalankan ulang `php artisan storage:link`. Deploy FTP normal tidak terpengaruh (diff berbasis state file, tidak menghapus file yang tidak dikenalnya).
+
 This is a **one-time** setup. Future deploys only update the contents of `~/soreang/laravel_soreang` (via FTP — see section 4); the symlinks in `~/soreang` keep pointing at the same (now-updated) files automatically, so nothing here needs to be redone per deploy.
 
 **Verify the `.htaccess` protection** once the symlinks and a real `.env` are in place:

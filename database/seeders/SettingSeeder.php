@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 class SettingSeeder extends Seeder
@@ -26,13 +27,6 @@ class SettingSeeder extends Seeder
                 'label' => 'Deskripsi Aplikasi',
             ],
             [
-                'key' => 'app_keywords',
-                'value' => 'laravel, base template, premium dashboard',
-                'group' => 'general',
-                'type' => 'text',
-                'label' => 'Kata Kunci SEO',
-            ],
-            [
                 'key' => 'app_logo',
                 'value' => null,
                 'group' => 'general',
@@ -45,29 +39,6 @@ class SettingSeeder extends Seeder
                 'group' => 'general',
                 'type' => 'image',
                 'label' => 'Favicon',
-            ],
-
-            // Contact & Social
-            [
-                'key' => 'contact_email',
-                'value' => 'admin@ooka.id',
-                'group' => 'contact',
-                'type' => 'text',
-                'label' => 'Email Kontak',
-            ],
-            [
-                'key' => 'contact_phone',
-                'value' => '08123456789',
-                'group' => 'contact',
-                'type' => 'text',
-                'label' => 'Nomor WhatsApp',
-            ],
-            [
-                'key' => 'social_instagram',
-                'value' => 'https://instagram.com/ookapratama',
-                'group' => 'contact',
-                'type' => 'text',
-                'label' => 'URL Instagram',
             ],
 
             // System
@@ -84,13 +55,6 @@ class SettingSeeder extends Seeder
                 'group' => 'system',
                 'type' => 'boolean',
                 'label' => 'Izinkan Registrasi Baru',
-            ],
-            [
-                'key' => 'theme_color',
-                'value' => '#666cff',
-                'group' => 'general',
-                'type' => 'color',
-                'label' => 'Warna Tema Utama',
             ],
 
             // Banner & Hero Landing Page
@@ -172,7 +136,7 @@ class SettingSeeder extends Seeder
                 'label' => 'Keterangan Banner Pelayanan Terpadu',
             ],
 
-            // Profil Website (halaman landing + footer)
+            // Profil Website (halaman landing + footer + kop surat PDF)
             [
                 'key' => 'profile_kecamatan',
                 'value' => 'Kecamatan Soreang',
@@ -186,13 +150,6 @@ class SettingSeeder extends Seeder
                 'group' => 'profil',
                 'type' => 'text',
                 'label' => 'Nama Kota/Kabupaten',
-            ],
-            [
-                'key' => 'profile_kode_wilayah',
-                'value' => '73.72.03',
-                'group' => 'profil',
-                'type' => 'text',
-                'label' => 'Kode Wilayah Administrasi',
             ],
             [
                 'key' => 'profile_alamat',
@@ -230,23 +187,30 @@ class SettingSeeder extends Seeder
                 'label' => 'Deskripsi Ringkas Profil Wilayah',
             ],
             [
-                'key' => 'profile_map_embed',
-                'value' => null,
+                'key' => 'contact_phone',
+                'value' => '08123456789',
                 'group' => 'profil',
-                'type' => 'textarea',
-                'label' => 'Embed Map (iframe URL)',
+                'type' => 'text',
+                'label' => 'Nomor WhatsApp',
+            ],
+            [
+                'key' => 'social_instagram',
+                'value' => 'https://instagram.com/ookapratama',
+                'group' => 'profil',
+                'type' => 'text',
+                'label' => 'URL Instagram',
             ],
             [
                 'key' => 'social_facebook',
                 'value' => null,
-                'group' => 'contact',
+                'group' => 'profil',
                 'type' => 'text',
                 'label' => 'URL Facebook',
             ],
             [
                 'key' => 'social_youtube',
                 'value' => null,
-                'group' => 'contact',
+                'group' => 'profil',
                 'type' => 'text',
                 'label' => 'URL Youtube',
             ],
@@ -256,8 +220,8 @@ class SettingSeeder extends Seeder
                 'key' => 'wa_driver',
                 'value' => 'log',
                 'group' => 'whatsapp',
-                'type' => 'text',
-                'label' => 'Driver Notifikasi WA (log/gateway)',
+                'type' => 'select',
+                'label' => 'Driver Notifikasi WA',
             ],
             [
                 'key' => 'wa_gateway_url',
@@ -282,12 +246,47 @@ class SettingSeeder extends Seeder
                 'type' => 'text',
                 'label' => 'Prefix Nomor Tiket',
             ],
+
+            // Penandatangan surat resmi (blok ttd PDF — surat/templates/partials/ttd)
+            [
+                'key' => 'ttd_jabatan',
+                'value' => 'Camat Soreang',
+                'group' => 'penandatangan',
+                'type' => 'text',
+                'label' => 'Jabatan Penandatangan',
+            ],
+            [
+                'key' => 'ttd_nama',
+                'value' => null,
+                'group' => 'penandatangan',
+                'type' => 'text',
+                'label' => 'Nama Lengkap Penandatangan',
+            ],
+            [
+                'key' => 'ttd_nip',
+                'value' => null,
+                'group' => 'penandatangan',
+                'type' => 'text',
+                'label' => 'NIP Penandatangan',
+            ],
         ];
 
+        // db:seed berjalan pada SETIAP deploy (webhook) — baris yang sudah ada hanya
+        // boleh diperbarui metadata-nya (group/type/label); `value` adalah milik admin
+        // dan tidak boleh direset ke default seeder.
         foreach ($settings as $setting) {
-            DB::table('settings')->updateOrInsert(
-                ['key' => $setting['key']],
-                array_merge($setting, ['created_at' => now(), 'updated_at' => now()])
+            $exists = DB::table('settings')->where('key', $setting['key'])->exists();
+
+            if ($exists) {
+                DB::table('settings')->where('key', $setting['key'])->update(
+                    Arr::only($setting, ['group', 'type', 'label']) + ['updated_at' => now()]
+                );
+
+                continue;
+            }
+
+            DB::table('settings')->insert(
+                $setting + ['created_at' => now(), 'updated_at' => now()]
             );
         }
     }

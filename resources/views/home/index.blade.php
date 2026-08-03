@@ -135,13 +135,7 @@
             </div>
 
             <div class="row g-3 pt-3 border-top">
-              <div class="col-6">
-                <div class="p-3 bg-white rounded-4 border shadow-sm text-center">
-                  <span class="d-block text-muted small fw-semibold mb-1">Kode Wilayah</span>
-                  <h4 class="fw-bold text-primary m-0">{{ $siteInfo['kode_wilayah'] ?? '73.72.03' }}</h4>
-                </div>
-              </div>
-              <div class="col-6">
+              <div class="col-12">
                 <div class="p-3 bg-white rounded-4 border shadow-sm text-center">
                   <span class="d-block text-muted small fw-semibold mb-1">Kelurahan</span>
                   <h4 class="fw-bold text-success m-0">7 Wilayah</h4>

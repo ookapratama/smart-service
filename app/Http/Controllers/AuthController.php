@@ -91,10 +91,13 @@ class AuthController extends Controller
         // Log aktivitas logout sebelum logout
         $this->activityLogService->logLogout();
 
+        // Tentukan tujuan SEBELUM Auth::logout() — setelahnya user() sudah null.
+        $isWarga = $request->user()?->isWarga() ?? false;
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return $isWarga ? redirect('/') : redirect('/login');
     }
 }

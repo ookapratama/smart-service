@@ -7,7 +7,9 @@ use App\Helpers\ViewConfigHelper;
 use App\Models\Pengaduan;
 use App\Models\PengajuanSurat;
 use App\Models\Setting;
+use App\Repositories\AgendaRepository;
 use App\Repositories\BeritaRepository;
+use App\Repositories\GaleriRepository;
 use App\Repositories\JadwalPelayananRepository;
 use App\Repositories\JenisSuratRepository;
 use App\Repositories\KategoriPengaduanRepository;
@@ -55,11 +57,11 @@ class AppServiceProvider extends ServiceProvider
         );
         $this->app->bind(
             \App\Contracts\Repositories\GaleriRepository::class,
-            \App\Repositories\GaleriRepository::class
+            GaleriRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\AgendaRepository::class,
-            \App\Repositories\AgendaRepository::class
+            AgendaRepository::class
         );
         $this->app->bind(
             \App\Contracts\Repositories\JadwalPelayananRepository::class,
@@ -160,12 +162,9 @@ class AppServiceProvider extends ServiceProvider
             $siteInfo = [
                 'name' => $settingService->get('app_name', 'SOREANG SMART SERVICE'),
                 'code' => '3S',
-                'tagline' => 'Cepat, Mudah, Transparan, dan Melayani dengan Hati.',
                 'description' => $settingService->get('app_description', 'Sistem Pelayanan Publik Terintegrasi Berbasis Digital dan Kolaboratif Kecamatan Soreang'),
-                'keywords' => $settingService->get('app_keywords', 'Soreang Smart Service, 3S, Pelayanan Publik, Surat Online, Kecamatan Soreang'),
                 'logo' => $settingService->get('app_logo'),
                 'favicon' => $settingService->get('app_favicon'),
-                'theme_color' => $settingService->get('theme_color', '#0d6efd'),
 
                 // Banner & Hero settings
                 'hero_bg' => $settingService->get('hero_bg'),
@@ -181,19 +180,15 @@ class AppServiceProvider extends ServiceProvider
                 'service_subtitle' => $settingService->get('service_subtitle', 'Warga Kecamatan Soreang kini dapat mengajukan surat keterangan online, melacak tiket status permohonan secara real-time, dan menyampaikan aspirasi tanpa harus datang mengantri di kantor kelurahan.'),
 
                 // Profile settings
-                'email' => $settingService->get('profile_email') ?: $settingService->get('contact_email', 'layanan@soreang.parepare.go.id'),
-                'phone' => $settingService->get('profile_telepon') ?: $settingService->get('contact_phone', '(0421) 21055'),
+                'email' => $settingService->get('profile_email', 'layanan@soreang.parepare.go.id'),
+                'phone' => $settingService->get('profile_telepon', '(0421) 21055'),
                 'whatsapp' => $settingService->get('contact_phone', '+6281234567890'),
                 'address_line1' => $settingService->get('profile_alamat', 'Jl. Jenderal Sudirman No. 45, Kecamatan Soreang'),
                 'address_line2' => $settingService->get('profile_kota', 'Kota Parepare, Sulawesi Selatan 91131'),
                 'kecamatan' => $settingService->get('profile_kecamatan', 'Kecamatan Soreang'),
                 'kota' => $settingService->get('profile_kota', 'Kota Parepare'),
-                'kode_wilayah' => $settingService->get('profile_kode_wilayah', '73.72.03'),
                 'visi' => $settingService->get('profile_visi', '"Parepare Terkemuka & Soreang Smart Sejahtera"'),
                 'deskripsi_lengkap' => $settingService->get('profile_deskripsi_lengkap', 'Kecamatan Soreang merupakan salah satu kawasan pusat pemerintahan dan aktivitas ekonomi masyarakat di Kota Parepare. Terdiri dari 7 Kelurahan, Kecamatan Soreang mengusung inovasi pelayanan digital Soreang Smart Service (3S) untuk memudahkan pengurusan surat, pengaduan publik, serta transparansi data kependudukan.'),
-                'about_short' => $settingService->get('app_description', 'Platform digital terpadu untuk pengurusan surat online, pengaduan masyarakat, monitoring real-time, dan kolaborasi antarkelurahan.'),
-                'video_url' => $settingService->get('profile_video_url', 'https://www.youtube.com/watch?v=Y7f98aduVJ8'),
-                'map_embed' => $settingService->get('profile_map_embed'),
                 'social_links' => [
                     'facebook' => $settingService->get('social_facebook', 'https://facebook.com/soreangsmartservice'),
                     'instagram' => $settingService->get('social_instagram', 'https://instagram.com/soreang.smartservice'),
@@ -210,7 +205,6 @@ class AppServiceProvider extends ServiceProvider
             'variables' => [
                 'templateName' => $settingService->get('app_name', 'SOREANG SMART SERVICE'),
                 'templateDescription' => $settingService->get('app_description', 'Platform pelayanan publik terpadu'),
-                'templateKeyword' => $settingService->get('app_keywords', 'soreang, parepare, smart service'),
                 'templateLogo' => $settingService->get('app_logo'),
                 'templateFavicon' => $settingService->get('app_favicon'),
                 'templateVersion' => '1.0.0',
@@ -223,9 +217,6 @@ class AppServiceProvider extends ServiceProvider
                 'creatorName' => 'Ooka Pratama',
                 'creatorUrl' => '#',
                 'documentation' => '#',
-                'contactEmail' => $settingService->get('contact_email'),
-                'contactPhone' => $settingService->get('contact_phone'),
-                'socialInstagram' => $settingService->get('social_instagram'),
             ],
         ]);
     }

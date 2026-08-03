@@ -40,7 +40,7 @@
                         <td>: {{ $data->keterangan ?? '-' }}</td>
                     </tr>
                     @if ($data->detail)
-                        @if (str_contains(get_class($data->detail), 'PengajuanSurat'))
+                        @if ($data->detail_type === 'pengajuan_surat')
                             @php
                                 $fieldDefs = collect($data->detail->jenisSurat->fields ?? []);
                                 $fieldLabels = $fieldDefs->pluck('label', 'name');
@@ -69,7 +69,7 @@
                                     @endif
                                 </td>
                             </tr>
-                        @elseif (str_contains(get_class($data->detail), 'Pengaduan'))
+                        @elseif ($data->detail_type === 'pengaduan')
                             <tr>
                                 <th class="text-muted">Jenis Layanan</th>
                                 <td>: Pengaduan - {{ $data->detail->kategori->nama ?? '-' }}</td>
@@ -161,7 +161,7 @@
                 @endif
             </div>
 
-            @if ($data->detail && str_contains(get_class($data->detail), 'PengajuanSurat'))
+            @if ($data->detail && $data->detail_type === 'pengajuan_surat')
                 @php
                     $lampiranGrouped = $data->detail->media
                         ->where('collection', '!=', \App\Services\SuratService::PDF_COLLECTION)

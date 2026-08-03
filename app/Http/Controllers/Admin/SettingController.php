@@ -29,7 +29,9 @@ class SettingController extends Controller
      */
     public function update(SettingRequest $request)
     {
-        $data = $request->except(['_token', 'app_logo', 'app_favicon', 'hero_bg', 'hero_image', 'service_image']);
+        // safe() membatasi ke key yang punya rule di SettingRequest — key POST liar
+        // tidak boleh menjadi baris settings baru.
+        $data = $request->safe()->except(['app_logo', 'app_favicon', 'hero_bg', 'hero_image', 'service_image']);
 
         // Handle image uploads
         if ($request->hasFile('app_logo')) {
