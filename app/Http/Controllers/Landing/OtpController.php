@@ -117,7 +117,8 @@ class OtpController extends Controller
         }
 
         return ResponseHelper::success(
-            ['found' => (bool) $pemohon, 'phone_masked' => $result['masked_phone']],
+            ['found' => (bool) $pemohon, 'phone_masked' => $result['masked_phone']]
+                + (isset($result['debug_code']) ? ['debug_code' => $result['debug_code']] : []),
             'Kode OTP telah dikirim via WhatsApp.'
         );
     }

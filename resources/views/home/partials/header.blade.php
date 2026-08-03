@@ -66,11 +66,33 @@
           <li><a href="{{ route('galeri.public.index') }}" class="{{ request()->routeIs('galeri.public.*') ? 'active' : '' }}">Galeri</a></li>
           <li><a href="{{ route('agenda.public.index') }}" class="{{ request()->routeIs('agenda.public.*') ? 'active' : '' }}">Agenda</a></li>
           <li><a href="{{ route('panduan') }}" class="{{ request()->routeIs('panduan') ? 'active' : '' }}">Panduan</a></li>
-          <li>
-            <a href="{{ route('login') }}" class="btn btn-sm btn-primary text-white rounded-pill px-3 py-1 ms-lg-2">
-              <i class="bi bi-box-arrow-in-right me-1"></i> Login Admin
-            </a>
-          </li>
+          @guest
+            <li>
+              <a href="{{ route('warga.login') }}" class="btn btn-sm btn-primary text-white rounded-pill px-3 py-1 ms-lg-2 {{ request()->routeIs('warga.login') ? 'active' : '' }}">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Masuk
+              </a>
+            </li>
+          @endguest
+          @auth
+            <li class="dropdown">
+              <a href="#"><span><i class="bi bi-person-circle me-1"></i>{{ Str::limit(auth()->user()->name, 18) }}</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+              <ul>
+                @if (auth()->user()->isWarga())
+                  <li><a href="{{ route('tiket-saya.index') }}" class="{{ request()->routeIs('tiket-saya.*') ? 'active' : '' }}">Tiket Saya</a></li>
+                @else
+                  <li><a href="{{ route('dashboard') }}">Dashboard Admin</a></li>
+                @endif
+                <li>
+                  <form action="{{ route('logout') }}" method="POST" class="px-3 py-1">
+                    @csrf
+                    <button type="submit" class="btn btn-link btn-sm text-danger text-decoration-none p-0">
+                      <i class="bi bi-box-arrow-right me-1"></i> Keluar
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </li>
+          @endauth
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list fs-3"></i>
       </nav>

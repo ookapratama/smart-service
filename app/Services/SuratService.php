@@ -84,7 +84,7 @@ class SuratService
     {
         $pengajuan->loadMissing(['jenisSurat', 'tiket.pemohon.kelurahan']);
 
-        $pdf = Pdf::loadView($this->resolveTemplate($pengajuan->jenisSurat), [
+        $pdf = Pdf::loadView($this->resolveTemplateView($pengajuan->jenisSurat), [
             'pengajuan' => $pengajuan,
             'jenisSurat' => $pengajuan->jenisSurat,
             'tiket' => $pengajuan->tiket,
@@ -92,6 +92,7 @@ class SuratService
             'nomorSurat' => $pengajuan->nomor_surat,
             'tanggal' => now()->locale('id')->translatedFormat('d F Y'),
             'profil' => $this->profilKecamatan(),
+            'penandatangan' => $this->penandatangan(),
         ])->setPaper('a4');
 
         $contents = $pdf->output();
@@ -128,11 +129,20 @@ class SuratService
 
     /**
      * Template per jenis: template_view eksplisit → {kode}.blade.php → generik.
+     * template_view menerima nama pendek dari form admin ('keterangan',
+     * 'pengantar', 'skd') maupun nama view lengkap; keduanya diguard
+     * View::exists sehingga nilai salah jatuh aman ke generik.
      */
-    protected function resolveTemplate(?JenisSurat $jenisSurat): string
+    public function resolveTemplateView(?JenisSurat $jenisSurat): string
     {
+        $templateView = $jenisSurat?->template_view;
+
+        if ($templateView && ! str_contains($templateView, '.')) {
+            $templateView = self::TEMPLATE_PREFIX.$templateView;
+        }
+
         $candidates = array_filter([
-            $jenisSurat?->template_view,
+            $templateView,
             $jenisSurat ? self::TEMPLATE_PREFIX.Str::lower($jenisSurat->kode) : null,
         ]);
 
@@ -143,6 +153,20 @@ class SuratService
         }
 
         return self::TEMPLATE_PREFIX.'generik';
+    }
+
+    /**
+     * Penandatangan surat dari settings (group penandatangan).
+     *
+     * @return array<string, string|null>
+     */
+    protected function penandatangan(): array
+    {
+        return [
+            'jabatan' => Setting::getByKey('ttd_jabatan') ?: 'Camat Soreang',
+            'nama' => Setting::getByKey('ttd_nama'),
+            'nip' => Setting::getByKey('ttd_nip'),
+        ];
     }
 
     /**

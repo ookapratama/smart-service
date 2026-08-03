@@ -45,10 +45,16 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <div class="form-check form-switch mt-2">
-                                    <input class="form-check-input" type="checkbox" id="wajib_pengantar_rt_rw" name="wajib_pengantar_rt_rw" value="1" {{ old('wajib_pengantar_rt_rw', $data->wajib_pengantar_rt_rw) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="wajib_pengantar_rt_rw">Wajib Sertakan Pengantar RT/RW</label>
-                                </div>
+                                <label class="form-label" for="template_view">Template PDF Surat</label>
+                                <select class="form-select @error('template_view') is-invalid @enderror" id="template_view" name="template_view">
+                                    <option value="">Otomatis (kode / generik)</option>
+                                    @foreach (['keterangan' => 'Keterangan ("menerangkan bahwa")', 'pengantar' => 'Pengantar ("memberikan pengantar")', 'skd' => 'Khusus SKD', 'generik' => 'Generik'] as $tplValue => $tplLabel)
+                                        <option value="{{ $tplValue }}" {{ old('template_view', $data->template_view) === $tplValue ? 'selected' : '' }}>{{ $tplLabel }}</option>
+                                    @endforeach
+                                </select>
+                                @error('template_view')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-md-6 mb-3">
@@ -57,6 +63,8 @@
                                     <label class="form-check-label" for="is_active">Aktifkan Jenis Surat</label>
                                 </div>
                             </div>
+
+                            @include('pages.jenis-surat.partials.field-builder', ['fieldsValue' => old('fields', $data->fields ?? [])])
                         </div>
 
                         <div class="mt-4">

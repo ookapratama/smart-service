@@ -15,7 +15,8 @@ class TiketRequest extends BaseRequest
     {
         return [
             'status_to' => ['required', Rule::in(['diproses', 'selesai', 'ditolak'])],
-            'catatan' => 'nullable|string|max:1000',
+            // Penolakan tanpa alasan = warga menerima kabar buruk tanpa penjelasan.
+            'catatan' => 'required_if:status_to,ditolak|nullable|string|max:1000',
         ];
     }
 
@@ -24,6 +25,7 @@ class TiketRequest extends BaseRequest
         return [
             'status_to.required' => 'Status tujuan wajib dipilih',
             'status_to.in' => 'Status tujuan tidak valid',
+            'catatan.required_if' => 'Catatan wajib diisi saat menolak tiket — jelaskan alasannya untuk pemohon.',
         ];
     }
 }

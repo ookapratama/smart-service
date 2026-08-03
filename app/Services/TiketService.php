@@ -33,9 +33,9 @@ class TiketService extends BaseService
         $this->whatsAppNotifier = $whatsAppNotifier ?? app(WhatsAppNotifier::class);
     }
 
-    public function filtered(array $filters = [])
+    public function filtered(array $filters = [], int $perPage = 20)
     {
-        return $this->repository->filtered($filters);
+        return $this->repository->filtered($filters, $perPage);
     }
 
     /**
@@ -117,8 +117,8 @@ class TiketService extends BaseService
         }
 
         // Kirim notifikasi WhatsApp ke pemohon via Fonnte / WhatsAppNotifier jika no HP tersedia
-        if ($tiket->pemohon && !empty($tiket->pemohon->phone)) {
-            $this->kirimNotifikasiUpdateStatus($tiket, $newStatus->label(), $catatan);
+        if ($tiket->pemohon && ! empty($tiket->pemohon->phone)) {
+            $this->kirimNotifikasiUpdateStatus($tiket, $newStatus, $catatan);
         }
 
         return $tiket;
@@ -127,28 +127,14 @@ class TiketService extends BaseService
     /**
      * Kirim notifikasi WA saat petugas memperbarui status dan/atau catatan tiket.
      */
-    protected function kirimNotifikasiUpdateStatus(Tiket $tiket, string $statusLabel, ?string $catatan): void
+    protected function kirimNotifikasiUpdateStatus(Tiket $tiket, TiketStatus $status, ?string $catatan): void
     {
         $phone = $tiket->pemohon->phone;
         if (empty($phone)) {
             return;
         }
 
-        $pesanCatatan = !empty($catatan) ? "\n\nCatatan Petugas:\n" . $catatan : "";
-
-        $pesan = sprintf(
-            "Halo, %s!\n\n" .
-            "Status tiket pengaduan #%s Anda telah diperbarui menjadi [%s].%s\n\n" .
-            "PANTAU PROGRES STATUS\n" .
-            "Cek perkembangan detail pengaduan Anda di link berikut:\n" .
-            "%s\n\n" .
-            "Pemerintah Kecamatan Soreang",
-            $tiket->pemohon->name ?? 'Warga',
-            $tiket->nomor_tiket,
-            $statusLabel,
-            $pesanCatatan,
-            route('cek-status.index')
-        );
+        $pesan = $this->buatPesanUpdateStatus($tiket, $status, $catatan);
 
         $error = null;
 
@@ -167,5 +153,38 @@ class TiketService extends BaseService
             'error' => $error,
             'sent_at' => $terkirim ? now() : null,
         ]);
+    }
+
+    /**
+     * Isi pesan mengikuti jenis layanan tiket (morph alias), dan pengajuan
+     * surat yang selesai menyertakan tautan unduh langsung — gerbang unduh
+     * tetap nomor tiket + NIK, keduanya milik penerima pesan ini.
+     */
+    protected function buatPesanUpdateStatus(Tiket $tiket, TiketStatus $status, ?string $catatan): string
+    {
+        $jenisLayanan = $tiket->detail_type === 'pengajuan_surat' ? 'pengajuan surat' : 'pengaduan';
+        $pesanCatatan = ! empty($catatan) ? "\n\nCatatan Petugas:\n".$catatan : '';
+
+        $pesan = sprintf(
+            "Halo, %s!\n\n".
+            "Status tiket %s #%s Anda telah diperbarui menjadi [%s].%s\n\n".
+            "PANTAU PROGRES STATUS\n".
+            "Cek perkembangan detail %s Anda di link berikut:\n".
+            '%s',
+            $tiket->pemohon->name ?? 'Warga',
+            $jenisLayanan,
+            $tiket->nomor_tiket,
+            $status->label(),
+            $pesanCatatan,
+            $jenisLayanan,
+            route('cek-status.index')
+        );
+
+        if ($status === TiketStatus::Selesai && $tiket->detail_type === 'pengajuan_surat') {
+            $pesan .= "\n\nSurat resmi Anda sudah terbit dan dapat diunduh di:\n"
+                .route('surat.unduh', $tiket->nomor_tiket).'?nik='.$tiket->pemohon->nik;
+        }
+
+        return $pesan."\n\nPemerintah Kecamatan Soreang";
     }
 }

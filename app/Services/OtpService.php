@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\Services\WhatsAppNotifier;
 use App\Models\Pemohon;
+use App\Services\Wa\LogWhatsAppNotifier;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
@@ -59,8 +60,16 @@ class OtpService
         $target = $this->resolveTargetPhone($nik, $phone);
         $cooldownKey = $this->cooldownKey($purpose, $target);
 
-        if (Cache::has($cooldownKey)) {
-            return ['ok' => false, 'reason' => 'cooldown', 'retry_after' => self::RESEND_COOLDOWN];
+        $cooldownUntil = Cache::get($cooldownKey);
+
+        if ($cooldownUntil !== null) {
+            // Nilai cache = timestamp kedaluwarsa → retry_after adalah sisa detik
+            // sebenarnya. Fallback konstanta menangani nilai `true` lama (pra-deploy).
+            $retryAfter = is_int($cooldownUntil)
+                ? max($cooldownUntil - now()->getTimestamp(), 1)
+                : self::RESEND_COOLDOWN;
+
+            return ['ok' => false, 'reason' => 'cooldown', 'retry_after' => $retryAfter];
         }
 
         foreach ($limits as $key => $max) {
@@ -78,14 +87,25 @@ class OtpService
             'expires_at' => now()->addSeconds(self::CODE_TTL)->getTimestamp(),
         ], self::CODE_TTL);
 
-        Cache::put($cooldownKey, true, self::RESEND_COOLDOWN);
+        Cache::put($cooldownKey, now()->addSeconds(self::RESEND_COOLDOWN)->getTimestamp(), self::RESEND_COOLDOWN);
 
         $this->notifier->send(
             $target,
             "Kode OTP layanan {$purpose} Kecamatan Soreang: {$code}. Berlaku 5 menit. Jangan bagikan kode ini kepada siapa pun."
         );
 
-        return ['ok' => true, 'masked_phone' => $this->maskPhone($target)];
+        return ['ok' => true, 'masked_phone' => $this->maskPhone($target)]
+            + ($this->debugCodeEnabled() ? ['debug_code' => $code] : []);
+    }
+
+    /**
+     * debug_code hanya boleh keluar saat APP_DEBUG aktif DAN notifier terikat
+     * adalah driver log (bukan gateway asli / spy test) — gerbang ganda supaya
+     * kode tidak pernah bocor lewat respons HTTP di production.
+     */
+    protected function debugCodeEnabled(): bool
+    {
+        return (bool) config('app.debug') && $this->notifier instanceof LogWhatsAppNotifier;
     }
 
     /**
