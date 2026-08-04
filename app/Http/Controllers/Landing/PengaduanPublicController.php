@@ -186,7 +186,7 @@ class PengaduanPublicController extends Controller
             return $tiket;
         });
 
-        // Kirim notifikasi WhatsApp via Fonnte / WhatsAppNotifier
+        // Kirim notifikasi WhatsApp via WhatsAppWebJs / WhatsAppNotifier
         if ($tiket && $tiket->pemohon && !empty($tiket->pemohon->phone)) {
             $this->kirimNotifikasiTiket($tiket, $tiket->pemohon->phone);
         }
@@ -203,15 +203,13 @@ class PengaduanPublicController extends Controller
         $pesan = sprintf(
             "Halo, %s!\n\n" .
             "Laporan pengaduan Anda telah kami terima di portal Soreang Smart Service (3S).\n\n" .
-            "RINCIAN LAPORAN PENGADUAN\n" .
-            "Nomor Tiket: %s\n" .
-            "Judul: %s\n" .
-            "Tanggal: %s WIB\n" .
-            "Status: Baru / Diterima\n\n" .
-            "PANTAU PROGRES STATUS\n" .
-            "Gunakan nomor tiket di atas untuk mengecek progres tindakan petugas melalui link berikut:\n" .
-            "%s\n\n" .
-            "Pemerintah Kecamatan Soreang",
+            "*RINCIAN LAPORAN PENGADUAN*\n" .
+            "📋 *Nomor Tiket (Salin)*:\n```%s```\n" .
+            "📝 *Judul*: %s\n" .
+            "📅 *Tanggal*: %s WIB\n" .
+            "📌 *Status*: Baru / Diterima\n\n" .
+            "🔗 *Pantau Progres Status*:\n%s\n\n" .
+            "_Pemerintah Kecamatan Soreang_",
             $tiket->pemohon->name ?? 'Warga',
             $tiket->nomor_tiket,
             $tiket->judul,

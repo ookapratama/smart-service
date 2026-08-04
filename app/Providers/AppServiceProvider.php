@@ -19,8 +19,8 @@ use App\Repositories\RoleRepository;
 use App\Repositories\TiketRepository;
 use App\Repositories\UserRepository;
 use App\Services\SettingService;
-use App\Services\Wa\FonnteWhatsAppNotifier;
 use App\Services\Wa\LogWhatsAppNotifier;
+use App\Services\Wa\WhatsAppWebJsNotifier;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
@@ -86,7 +86,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(WhatsAppNotifier::class, function () {
             $drivers = [
                 'log' => LogWhatsAppNotifier::class,
-                'fonnte' => FonnteWhatsAppNotifier::class,
+                'whatsapp_web_js' => WhatsAppWebJsNotifier::class,
+                'fonnte' => WhatsAppWebJsNotifier::class,
             ];
 
             try {

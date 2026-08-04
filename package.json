@@ -4,14 +4,15 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "wa:server": "node wa-server.js"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
         "axios": "^1.11.0",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
-        "tailwindcss": "^4.0.0",        
+        "tailwindcss": "^4.0.0",
         "@babel/core": "7.23.7",
         "@babel/plugin-syntax-dynamic-import": "7.8.3",
         "@babel/plugin-transform-object-rest-spread": "7.23.4",
@@ -80,26 +81,26 @@
     ],
     "babel": {
         "presets": [
-        [
-            "@babel/env",
-            {
-            "targets": {
-                "browsers": [
-                ">= 1%",
-                "last 2 versions",
-                "not dead",
-                "Chrome >= 45",
-                "Firefox >= 38",
-                "Edge >= 12",
-                "Explorer >= 10",
-                "iOS >= 9",
-                "Safari >= 9",
-                "Android >= 4.4",
-                "Opera >= 30"
-                ]
-            }
-            }
-        ]
+            [
+                "@babel/env",
+                {
+                    "targets": {
+                        "browsers": [
+                            ">= 1%",
+                            "last 2 versions",
+                            "not dead",
+                            "Chrome >= 45",
+                            "Firefox >= 38",
+                            "Edge >= 12",
+                            "Explorer >= 10",
+                            "iOS >= 9",
+                            "Safari >= 9",
+                            "Android >= 4.4",
+                            "Opera >= 30"
+                        ]
+                    }
+                }
+            ]
         ]
     },
     "dependencies": {
@@ -180,6 +181,9 @@
         "swiper": "11.0.7",
         "timepicker": "1.14.1",
         "toastr": "2.1.4",
-        "typeahead.js": "0.11.1"
+        "typeahead.js": "0.11.1",
+        "express": "^4.21.2",
+        "qrcode-terminal": "^0.12.0",
+        "whatsapp-web.js": "^1.26.0"
     }
 }

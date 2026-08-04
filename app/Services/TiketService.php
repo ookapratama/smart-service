@@ -116,7 +116,7 @@ class TiketService extends BaseService
             }
         }
 
-        // Kirim notifikasi WhatsApp ke pemohon via Fonnte / WhatsAppNotifier jika no HP tersedia
+        // Kirim notifikasi WhatsApp ke pemohon via WhatsAppWebJs / WhatsAppNotifier jika no HP tersedia
         if ($tiket->pemohon && ! empty($tiket->pemohon->phone)) {
             $this->kirimNotifikasiUpdateStatus($tiket, $newStatus, $catatan);
         }
@@ -163,28 +163,28 @@ class TiketService extends BaseService
     protected function buatPesanUpdateStatus(Tiket $tiket, TiketStatus $status, ?string $catatan): string
     {
         $jenisLayanan = $tiket->detail_type === 'pengajuan_surat' ? 'pengajuan surat' : 'pengaduan';
-        $pesanCatatan = ! empty($catatan) ? "\n\nCatatan Petugas:\n".$catatan : '';
+        $pesanCatatan = ! empty($catatan) ? "\n\n📝 *Catatan Petugas*:\n".$catatan : '';
 
         $pesan = sprintf(
             "Halo, %s!\n\n".
-            "Status tiket %s #%s Anda telah diperbarui menjadi [%s].%s\n\n".
-            "PANTAU PROGRES STATUS\n".
-            "Cek perkembangan detail %s Anda di link berikut:\n".
-            '%s',
+            "Status tiket %s #%s Anda telah diperbarui menjadi *[%s]*.\n\n".
+            "📋 *Nomor Tiket (Salin)*:\n```%s```".
+            "%s\n\n".
+            "🔗 *Pantau Progres Status*:\n%s",
             $tiket->pemohon->name ?? 'Warga',
             $jenisLayanan,
             $tiket->nomor_tiket,
             $status->label(),
+            $tiket->nomor_tiket,
             $pesanCatatan,
-            $jenisLayanan,
             route('cek-status.index')
         );
 
         if ($status === TiketStatus::Selesai && $tiket->detail_type === 'pengajuan_surat') {
-            $pesan .= "\n\nSurat resmi Anda sudah terbit dan dapat diunduh di:\n"
+            $pesan .= "\n\n📥 *Unduh Dokumen Surat Resmi*:\n"
                 .route('surat.unduh', $tiket->nomor_tiket).'?nik='.$tiket->pemohon->nik;
         }
 
-        return $pesan."\n\nPemerintah Kecamatan Soreang";
+        return $pesan."\n\n_Pemerintah Kecamatan Soreang_";
     }
 }
