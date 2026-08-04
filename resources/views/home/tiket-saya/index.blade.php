@@ -22,6 +22,28 @@
       </div>
     </div>
 
+    <!-- Filter Layanan -->
+    <ul class="nav nav-pills mb-4 gap-2 border-bottom pb-3">
+      <li class="nav-item">
+        <a class="nav-link rounded-pill px-3 fw-semibold {{ request('type', 'all') === 'all' ? 'active' : 'bg-light text-dark' }}" 
+           href="{{ route('tiket-saya.index') }}">
+          <i class="bi bi-grid-fill me-1"></i> Semua Tiket
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link rounded-pill px-3 fw-semibold {{ request('type') === 'pengajuan_surat' ? 'active' : 'bg-light text-dark' }}" 
+           href="{{ route('tiket-saya.index', ['type' => 'pengajuan_surat']) }}">
+          <i class="bi bi-file-earmark-text me-1"></i> Pengajuan Surat
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link rounded-pill px-3 fw-semibold {{ request('type') === 'pengaduan' ? 'active' : 'bg-light text-dark' }}" 
+           href="{{ route('tiket-saya.index', ['type' => 'pengaduan']) }}">
+          <i class="bi bi-megaphone me-1"></i> Pengaduan
+        </a>
+      </li>
+    </ul>
+
     @forelse ($tikets as $tiket)
       <a href="{{ route('tiket-saya.show', $tiket->nomor_tiket) }}"
          class="card border-0 shadow-sm rounded-4 mb-3 text-decoration-none text-body hover-scale">

@@ -49,26 +49,37 @@
           </div>
           <div class="card-body p-4">
 
-            <div id="cekNikStep">
-              <p class="text-muted small mb-3">
-                Masukkan NIK Anda. Jika NIK sudah pernah terdaftar, kode OTP akan dikirim otomatis ke nomor WhatsApp yang sudah tersimpan.
-              </p>
-              <div class="row g-2 align-items-end">
-                <div class="col-sm-8">
-                  <label for="nik" class="form-label fw-semibold">NIK (No. KTP) <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control @error('nik') is-invalid @enderror" id="nik" name="nik" value="{{ old('nik') }}" maxlength="16" placeholder="16 digit NIK sesuai KTP" required>
-                  @error('nik')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                  @enderror
-                </div>
-                <div class="col-sm-4">
-                  <button type="button" class="btn btn-success w-100 rounded-3 fw-semibold" id="btnCekNik">
-                    <i class="bi bi-search me-1"></i> Cek NIK
-                  </button>
+            @if(isset($autofillPemohon) && $autofillPemohon)
+              <div class="alert alert-success border-0 rounded-3 d-flex align-items-center mb-0">
+                <i class="bi bi-shield-check-fill fs-3 me-3 text-success flex-shrink-0"></i>
+                <div>
+                  <strong class="text-success fs-6">Terverifikasi sebagai {{ $autofillPemohon->name }}</strong>
+                  <span class="d-block small text-muted">NIK: <code>{{ $autofillPemohon->nik }}</code> &middot; WA: {{ $autofillPemohon->phone }}</span>
                 </div>
               </div>
-              <div class="text-danger small mt-2 d-none" id="cekNikError"></div>
-            </div>
+              <input type="hidden" id="nik" name="nik" value="{{ $autofillPemohon->nik }}">
+            @else
+              <div id="cekNikStep">
+                <p class="text-muted small mb-3">
+                  Masukkan NIK Anda. Jika NIK sudah pernah terdaftar, kode OTP akan dikirim otomatis ke nomor WhatsApp yang sudah tersimpan.
+                </p>
+                <div class="row g-2 align-items-end">
+                  <div class="col-sm-8">
+                    <label for="nik" class="form-label fw-semibold">NIK (No. KTP) <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control @error('nik') is-invalid @enderror" id="nik" name="nik" value="{{ old('nik') }}" maxlength="16" placeholder="16 digit NIK sesuai KTP" required>
+                    @error('nik')
+                      <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                  </div>
+                  <div class="col-sm-4">
+                    <button type="button" class="btn btn-success w-100 rounded-3 fw-semibold" id="btnCekNik">
+                      <i class="bi bi-search me-1"></i> Cek NIK
+                    </button>
+                  </div>
+                </div>
+                <div class="text-danger small mt-2 d-none" id="cekNikError"></div>
+              </div>
+            @endif
 
             <!-- Compact OTP widget: hanya untuk NIK yang sudah ditemukan -->
             <div id="foundOtpStepVerify" class="d-none">
@@ -106,7 +117,7 @@
           </div>
         </div>
 
-        <div id="restOfForm" class="d-none">
+        <div id="restOfForm" class="{{ (isset($autofillPemohon) && $autofillPemohon) || $otpVerifiedNik ? '' : 'd-none' }}">
 
           <!-- SECTION 1: IDENTITAS PEMOHON -->
           <div class="card border-0 shadow-sm rounded-4 mb-4">
@@ -120,7 +131,7 @@
 
                 <div class="col-md-6">
                   <label for="nama" class="form-label fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama') }}" placeholder="Nama sesuai KTP" required>
+                  <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama', $autofillPemohon->name ?? '') }}" placeholder="Nama sesuai KTP" required>
                   @error('nama')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -128,7 +139,7 @@
 
                 <div class="col-md-6">
                   <label for="phone" class="form-label fw-semibold">No. WhatsApp Aktif <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}" placeholder="Contoh: 081234567890" required>
+                  <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone', $autofillPemohon->phone ?? '') }}" placeholder="Contoh: 081234567890" required>
                   <small class="text-muted">Kode OTP verifikasi akan dikirim ke nomor ini.</small>
                   @error('phone')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -140,7 +151,7 @@
                   <select class="form-select @error('kelurahan_id') is-invalid @enderror" id="kelurahan_id" name="kelurahan_id">
                     <option value="">Pilih Kelurahan</option>
                     @foreach($kelurahanList as $k)
-                      <option value="{{ $k->id }}" {{ old('kelurahan_id') == $k->id ? 'selected' : '' }}>Kelurahan {{ $k->nama }}</option>
+                      <option value="{{ $k->id }}" {{ old('kelurahan_id', $autofillPemohon->kelurahan_id ?? '') == $k->id ? 'selected' : '' }}>Kelurahan {{ $k->nama }}</option>
                     @endforeach
                   </select>
                   @error('kelurahan_id')
@@ -150,7 +161,7 @@
 
                 <div class="col-12">
                   <label for="alamat" class="form-label fw-semibold">Alamat Lengkap Tempat Tinggal</label>
-                  <input type="text" class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" value="{{ old('alamat') }}" placeholder="Jl. Raya Soreang No. 12 RT 02/05">
+                  <input type="text" class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" value="{{ old('alamat', $autofillPemohon->alamat ?? '') }}" placeholder="Jl. Raya Soreang No. 12 RT 02/05">
                   @error('alamat')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -298,10 +309,10 @@
               </div>
 
               <div class="d-grid gap-2">
-                <button type="submit" class="btn btn-primary btn-md rounded-3 py-2 fw-bold shadow-sm" id="btnSubmitSurat" disabled>
+                <button type="submit" class="btn btn-primary btn-md rounded-3 py-2 fw-bold shadow-sm" id="btnSubmitSurat" {{ (isset($autofillPemohon) && $autofillPemohon) || $otpVerifiedNik ? '' : 'disabled' }}>
                   <i class="bi bi-send-fill me-2"></i> Kirim Pengajuan Surat
                 </button>
-                <small class="text-muted text-center" id="submitHint">Verifikasi nomor WhatsApp terlebih dahulu untuk mengaktifkan tombol kirim.</small>
+                <small class="text-muted text-center {{ (isset($autofillPemohon) && $autofillPemohon) || $otpVerifiedNik ? 'd-none' : '' }}" id="submitHint">Verifikasi nomor WhatsApp terlebih dahulu untuk mengaktifkan tombol kirim.</small>
                 <a href="{{ route('surat.index') }}" class="btn btn-outline-secondary btn-md rounded-3 py-2">
                   Batal / Kembali
                 </a>

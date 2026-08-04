@@ -43,23 +43,36 @@
           <div class="card-body p-4">
             <div class="row g-3">
               
-              <!-- NIK Input & Verifikasi Button -->
-              <div class="col-12">
-                <label for="nik" class="form-label fw-semibold">NIK (No. KTP) <span class="text-danger">*</span></label>
-                <div class="input-group">
-                  <input type="text" class="form-control form-control-lg fs-6 @error('nik') is-invalid @enderror" id="nik" name="nik" value="{{ old('nik') }}" maxlength="16" placeholder="Masukkan 16 digit NIK sesuai KTP" required>
-                  <button class="btn btn-primary fw-bold px-4" type="button" id="btn-verifikasi-nik">
-                    <i class="bi bi-shield-check me-1"></i> Verifikasi NIK
-                  </button>
+              @if(isset($autofillPemohon) && $autofillPemohon)
+                <div class="col-12">
+                  <div class="alert alert-success border-0 rounded-3 p-3 mb-0 d-flex align-items-center">
+                    <i class="bi bi-shield-check-fill fs-3 me-3 text-success flex-shrink-0"></i>
+                    <div>
+                      <strong class="text-success fs-6">Terverifikasi sebagai {{ $autofillPemohon->name }}</strong>
+                      <span class="d-block small text-muted">NIK: <code>{{ $autofillPemohon->nik }}</code> &middot; WA: {{ $autofillPemohon->phone }}</span>
+                    </div>
+                  </div>
+                  <input type="hidden" name="nik" value="{{ $autofillPemohon->nik }}">
                 </div>
-                <div id="nik-feedback" class="mt-2"></div>
-                @error('nik')
-                  <div class="text-danger small mt-1">{{ $message }}</div>
-                @enderror
-              </div>
+              @else
+                <!-- NIK Input & Verifikasi Button -->
+                <div class="col-12">
+                  <label for="nik" class="form-label fw-semibold">NIK (No. KTP) <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <input type="text" class="form-control form-control-lg fs-6 @error('nik') is-invalid @enderror" id="nik" name="nik" value="{{ old('nik') }}" maxlength="16" placeholder="Masukkan 16 digit NIK sesuai KTP" required>
+                    <button class="btn btn-primary fw-bold px-4" type="button" id="btn-verifikasi-nik">
+                      <i class="bi bi-shield-check me-1"></i> Verifikasi NIK
+                    </button>
+                  </div>
+                  <div id="nik-feedback" class="mt-2"></div>
+                  @error('nik')
+                    <div class="text-danger small mt-1">{{ $message }}</div>
+                  @enderror
+                </div>
+              @endif
 
               <!-- Container Input Form Pemohon Baru / Terverifikasi -->
-              <div id="pemohon-fields-container" class="col-12 border-top pt-3" style="display: {{ (old('nik') || $errors->any()) ? 'block' : 'none' }};">
+              <div id="pemohon-fields-container" class="col-12 border-top pt-3" style="display: {{ (isset($autofillPemohon) && $autofillPemohon) || old('nik') || $errors->any() ? 'block' : 'none' }};">
                 <div class="alert alert-light border rounded-3 p-3 mb-0">
                   <div class="d-flex align-items-center gap-2 mb-3 text-primary fw-semibold border-bottom pb-2">
                     <i class="bi bi-person-lines-fill"></i> Rincian Data Pelapor
@@ -68,7 +81,7 @@
                     
                     <div class="col-md-6">
                       <label for="nama" class="form-label fw-semibold">Nama Lengkap <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama') }}" placeholder="Contoh: Ahmad Subagja">
+                      <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama" value="{{ old('nama', $autofillPemohon->name ?? '') }}" placeholder="Contoh: Ahmad Subagja">
                       @error('nama')
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -76,7 +89,7 @@
 
                     <div class="col-md-6">
                       <label for="email" class="form-label fw-semibold">Alamat Email <span class="text-danger">*</span></label>
-                      <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" placeholder="nama@email.com">
+                      <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', $autofillPemohon->email ?? '') }}" placeholder="nama@email.com">
                       @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -84,7 +97,7 @@
 
                     <div class="col-md-6">
                       <label for="phone" class="form-label fw-semibold">No. Telepon / WhatsApp <span class="text-danger">*</span></label>
-                      <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone') }}" placeholder="Contoh: 081234567890">
+                      <input type="text" class="form-control @error('phone') is-invalid @enderror" id="phone" name="phone" value="{{ old('phone', $autofillPemohon->phone ?? '') }}" placeholder="Contoh: 081234567890">
                       @error('phone')
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -95,7 +108,7 @@
                       <select class="form-select @error('kelurahan_id') is-invalid @enderror" id="kelurahan_id" name="kelurahan_id">
                         <option value="">Pilih Kelurahan</option>
                         @foreach($kelurahanList as $k)
-                          <option value="{{ $k->id }}" {{ old('kelurahan_id') == $k->id ? 'selected' : '' }}>Kelurahan {{ $k->nama }}</option>
+                          <option value="{{ $k->id }}" {{ old('kelurahan_id', $autofillPemohon->kelurahan_id ?? '') == $k->id ? 'selected' : '' }}>Kelurahan {{ $k->nama }}</option>
                         @endforeach
                       </select>
                       @error('kelurahan_id')
@@ -105,7 +118,7 @@
 
                     <div class="col-12">
                       <label for="alamat" class="form-label fw-semibold">Alamat Lengkap Tempat Tinggal</label>
-                      <input type="text" class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" value="{{ old('alamat') }}" placeholder="Jl. Raya Soreang No. 12 RT 02/05">
+                      <input type="text" class="form-control @error('alamat') is-invalid @enderror" id="alamat" name="alamat" value="{{ old('alamat', $autofillPemohon->alamat ?? '') }}" placeholder="Jl. Raya Soreang No. 12 RT 02/05">
                       @error('alamat')
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -134,7 +147,7 @@
               <div>
                 <span class="text-muted d-block small fw-medium">Identitas Nama Pelapor:</span>
                 <strong class="fs-6 text-primary" id="display-nama-pelapor">
-                  {{ old('nama') ? old('nama') : '(Belum diverifikasi - silakan masukkan NIK dan klik Verifikasi NIK)' }}
+                  {{ old('nama', $autofillPemohon->name ?? '') ?: '(Belum diverifikasi - silakan masukkan NIK dan klik Verifikasi NIK)' }}
                 </strong>
               </div>
             </div>
@@ -222,6 +235,7 @@
                 <label for="lampiran" class="form-label fw-semibold">Lampirkan Bukti Foto / Dokumen Pendukung (Opsional)</label>
                 <input type="file" class="form-control @error('lampiran') is-invalid @enderror" id="lampiran" name="lampiran" accept="image/*,.pdf">
                 <small class="text-muted mt-1 d-block">Format: JPG, PNG, WEBP, atau PDF. Maksimal ukuran file: 3 MB.</small>
+                <div id="lampiran-preview" class="mt-2"></div>
                 @error('lampiran')
                   <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -361,6 +375,35 @@
         if (e.key === 'Enter') {
           e.preventDefault();
           checkNik();
+        }
+      });
+    }
+
+    // Live Preview Lampiran Gambar / Dokumen
+    const lampiranInput = document.getElementById('lampiran');
+    const lampiranPreview = document.getElementById('lampiran-preview');
+    if (lampiranInput && lampiranPreview) {
+      lampiranInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            lampiranPreview.innerHTML = `
+              <div class="p-2 border rounded-3 bg-light d-inline-block shadow-sm mt-1">
+                <div class="small fw-semibold text-primary mb-1"><i class="bi bi-image me-1"></i> Preview Lampiran Foto:</div>
+                <img src="${e.target.result}" class="rounded-2" style="max-height: 160px; max-width: 100%; object-fit: contain;">
+              </div>
+            `;
+          };
+          reader.readAsDataURL(file);
+        } else if (file) {
+          lampiranPreview.innerHTML = `
+            <div class="p-2 border rounded-3 bg-light small text-muted mt-1">
+              <i class="bi bi-file-earmark-pdf text-danger me-1 fs-6"></i> File Lampiran: <strong>${file.name}</strong> (${(file.size / 1024 / 1024).toFixed(2)} MB)
+            </div>
+          `;
+        } else {
+          lampiranPreview.innerHTML = '';
         }
       });
     }

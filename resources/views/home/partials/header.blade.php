@@ -1,32 +1,6 @@
 <header id="header" class="header sticky-top" style="z-index: 9999 !important;">
 
-  <!-- Top Bar -->
-  <div class="topbar d-flex align-items-center bg-primary text-white py-2" style="font-size: 0.85rem;">
-    <div class="container d-flex justify-content-center justify-content-md-between">
-      <div class="contact-info d-flex align-items-center gap-3">
-        <span class="d-flex align-items-center">
-          <i class="bi bi-envelope me-1"></i>
-          <a href="mailto:{{ $siteInfo['email'] ?? 'layanan@soreang.parepare.go.id' }}" class="text-white text-decoration-none">{{ $siteInfo['email'] ?? 'layanan@soreang.parepare.go.id' }}</a>
-        </span>
-        <span class="d-flex align-items-center ms-3">
-          <i class="bi bi-telephone me-1"></i>
-          <span class="text-white">{{ $siteInfo['phone'] ?? '(0421) 21055' }}</span>
-        </span>
-      </div>
-      <div class="social-links d-none d-md-flex align-items-center gap-3">
-        @if(!empty($siteInfo['social_links']['instagram']))
-          <a href="{{ $siteInfo['social_links']['instagram'] }}" target="_blank" class="text-white opacity-75 hover-opacity-100"><i class="bi bi-instagram"></i></a>
-        @endif
-        @if(!empty($siteInfo['social_links']['facebook']))
-          <a href="{{ $siteInfo['social_links']['facebook'] }}" target="_blank" class="text-white opacity-75 hover-opacity-100"><i class="bi bi-facebook"></i></a>
-        @endif
-        @if(!empty($siteInfo['social_links']['youtube']))
-          <a href="{{ $siteInfo['social_links']['youtube'] }}" target="_blank" class="text-white opacity-75 hover-opacity-100"><i class="bi bi-youtube"></i></a>
-        @endif
-        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $siteInfo['whatsapp'] ?? '6281234567890') }}" target="_blank" class="text-white opacity-75 hover-opacity-100"><i class="bi bi-whatsapp"></i></a>
-      </div>
-    </div>
-  </div><!-- End Top Bar -->
+
 
   <div class="branding d-flex align-items-center bg-white shadow-sm py-2">
     <div class="container position-relative d-flex align-items-center justify-content-between">

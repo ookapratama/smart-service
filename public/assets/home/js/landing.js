@@ -140,12 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                     ${responHtml}
                     ${suratHtml}
-                    <div class="mt-4 pt-3 border-top d-flex justify-content-between align-items-center">
-                      <span class="text-success small fw-semibold"><i class="bi bi-shield-check me-1"></i> Terverifikasi Resmi Sistem 3S</span>
-                      <a href="/login" class="btn btn-outline-primary btn-sm fw-bold px-3">
-                        Masuk Portal Petugas <i class="bi bi-arrow-right ms-1"></i>
-                      </a>
-                    </div>
+                    
                   </div>
                 </div>
               `;

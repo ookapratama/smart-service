@@ -30,12 +30,18 @@ class TiketSayaController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $tikets = Tiket::where('pemohon_id', $pemohon->id)
+        $type = $request->query('type');
+        $query = Tiket::where('pemohon_id', $pemohon->id)
             ->with('detail')
-            ->latest()
-            ->paginate(10);
+            ->latest();
 
-        return view('home.tiket-saya.index', compact('tikets', 'pemohon'));
+        if (in_array($type, ['pengajuan_surat', 'pengaduan'], true)) {
+            $query->where('detail_type', $type);
+        }
+
+        $tikets = $query->paginate(10)->withQueryString();
+
+        return view('home.tiket-saya.index', compact('tikets', 'pemohon', 'type'));
     }
 
     public function show(Request $request, string $nomorTiket)
@@ -44,7 +50,7 @@ class TiketSayaController extends Controller
 
         abort_unless($pemohon !== null, 404);
 
-        $tiket = Tiket::with(['detail', 'statusLogs.user', 'pemohon.kelurahan'])
+        $tiket = Tiket::with(['detail.media', 'detail.kategori', 'statusLogs.user', 'pemohon.kelurahan'])
             ->where('nomor_tiket', $nomorTiket)
             ->where('pemohon_id', $pemohon->id)
             ->firstOrFail();

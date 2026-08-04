@@ -43,12 +43,14 @@ class PengaduanPublicController extends Controller
     /**
      * Halaman Form Pengaduan Publik
      */
-    public function create()
+    public function create(Request $request)
     {
         $kategoriList = KategoriPengaduan::where('is_active', true)->get();
         $kelurahanList = Kelurahan::where('is_active', true)->orderBy('nama')->get();
 
-        return view('home.pengaduan.create', compact('kategoriList', 'kelurahanList'));
+        $autofillPemohon = $request->user()?->pemohon;
+
+        return view('home.pengaduan.create', compact('kategoriList', 'kelurahanList', 'autofillPemohon'));
     }
 
     /**
@@ -83,7 +85,7 @@ class PengaduanPublicController extends Controller
 
         return response()->json([
             'exists' => false,
-            'message' => 'NIK belum terdaftar di sistem. Silakan lengkapi data pemohon.',
+            'message' => 'NIK belum terdaftar.',
         ]);
     }
 
@@ -92,6 +94,18 @@ class PengaduanPublicController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->user()?->pemohon) {
+            $pemohonAuth = $request->user()->pemohon;
+            $request->merge([
+                'nik' => $request->input('nik') ?: $pemohonAuth->nik,
+                'nama' => $request->input('nama') ?: $pemohonAuth->name,
+                'email' => $request->input('email') ?: $pemohonAuth->email,
+                'phone' => $request->input('phone') ?: $pemohonAuth->phone,
+                'kelurahan_id' => $request->input('kelurahan_id') ?: $pemohonAuth->kelurahan_id,
+                'alamat' => $request->input('alamat') ?: $pemohonAuth->alamat,
+            ]);
+        }
+
         $existingPemohon = Pemohon::where('nik', $request->nik)->first();
 
         $validated = $request->validate([
