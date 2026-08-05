@@ -16,7 +16,10 @@ use App\Models\Tiket;
 use App\Services\FileUploadService;
 use App\Services\TiketService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 
 class PengaduanPublicController extends Controller
 {
@@ -43,12 +46,26 @@ class PengaduanPublicController extends Controller
     /**
      * Halaman Form Pengaduan Publik
      */
-    public function create()
+    public function create(Request $request): View
     {
-        $kategoriList = KategoriPengaduan::where('is_active', true)->get();
+        $kategoriList = KategoriPengaduan::where('is_active', true)->orderBy('nama')->get();
         $kelurahanList = Kelurahan::where('is_active', true)->orderBy('nama')->get();
 
-        return view('home.pengaduan.create', compact('kategoriList', 'kelurahanList'));
+        $flag = $request->session()->get(OtpController::SESSION_KEY);
+        $otpVerifiedNik = null;
+
+        if (is_array($flag)
+            && ($flag['purpose'] ?? null) === OtpController::PURPOSE_PERSURATAN
+            && ($flag['expires_at'] ?? 0) >= now()->getTimestamp()) {
+            $otpVerifiedNik = $flag['nik'] ?? null;
+        }
+
+        $autofillPemohon = $request->user()?->pemohon;
+        if ($autofillPemohon && ! $otpVerifiedNik) {
+            $otpVerifiedNik = $autofillPemohon->nik;
+        }
+
+        return view('home.pengaduan.create', compact('kategoriList', 'kelurahanList', 'otpVerifiedNik', 'autofillPemohon'));
     }
 
     /**
@@ -83,7 +100,7 @@ class PengaduanPublicController extends Controller
 
         return response()->json([
             'exists' => false,
-            'message' => 'NIK belum terdaftar di sistem. Silakan lengkapi data pemohon.',
+            'message' => 'NIK belum terdaftar.',
         ]);
     }
 
@@ -92,6 +109,18 @@ class PengaduanPublicController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->user()?->pemohon) {
+            $pemohonAuth = $request->user()->pemohon;
+            $request->merge([
+                'nik' => $request->input('nik') ?: $pemohonAuth->nik,
+                'nama' => $request->input('nama') ?: $pemohonAuth->name,
+                'email' => $request->input('email') ?: $pemohonAuth->email,
+                'phone' => $request->input('phone') ?: $pemohonAuth->phone,
+                'kelurahan_id' => $request->input('kelurahan_id') ?: $pemohonAuth->kelurahan_id,
+                'alamat' => $request->input('alamat') ?: $pemohonAuth->alamat,
+            ]);
+        }
+
         $existingPemohon = Pemohon::where('nik', $request->nik)->first();
 
         $validated = $request->validate([
@@ -122,7 +151,6 @@ class PengaduanPublicController extends Controller
         ]);
 
         $tiket = DB::transaction(function () use ($request, $validated, $existingPemohon) {
-            // 1. Find or Create Pemohon — jika eksis, gunakan data tersimpan / perbarui jika diisi
             if ($existingPemohon) {
                 $pemohon = $existingPemohon;
                 $updateData = array_filter([
@@ -132,7 +160,7 @@ class PengaduanPublicController extends Controller
                     'alamat' => $validated['alamat'] ?? null,
                     'kelurahan_id' => $validated['kelurahan_id'] ?? null,
                 ]);
-                if (!empty($updateData)) {
+                if (! empty($updateData)) {
                     $pemohon->update($updateData);
                 }
             } else {
@@ -146,7 +174,6 @@ class PengaduanPublicController extends Controller
                 ]);
             }
 
-            // 2. Create Detail Pengaduan
             $pengaduan = Pengaduan::create([
                 'kategori_pengaduan_id' => $validated['kategori_pengaduan_id'],
                 'deskripsi' => $validated['deskripsi'],
@@ -156,16 +183,13 @@ class PengaduanPublicController extends Controller
                 'tanggal_kejadian' => $validated['tanggal_kejadian'] ?? null,
             ]);
 
-            // Handle Media attachment upload if present
             if ($request->hasFile('lampiran')) {
                 $media = $this->fileUploadService->upload($request->file('lampiran'), 'pengaduan', 'public');
                 $pengaduan->media()->save($media);
             }
 
-            // 3. Generate Thread-safe Nomor Tiket
             $nomorTiket = $this->tiketService->generateNomorTiket();
 
-            // 4. Create Tiket via morph relation
             $tiket = $pengaduan->tiket()->create([
                 'nomor_tiket' => $nomorTiket,
                 'pemohon_id' => $pemohon->id,
@@ -175,7 +199,6 @@ class PengaduanPublicController extends Controller
                 'keterangan' => $validated['deskripsi'],
             ]);
 
-            // Create initial status log
             $tiket->statusLogs()->create([
                 'status_from' => TiketStatus::Baru,
                 'status_to' => TiketStatus::Baru,
@@ -186,13 +209,40 @@ class PengaduanPublicController extends Controller
             return $tiket;
         });
 
-        // Kirim notifikasi WhatsApp via Fonnte / WhatsAppNotifier
-        if ($tiket && $tiket->pemohon && !empty($tiket->pemohon->phone)) {
+        if ($tiket && $tiket->pemohon && ! empty($tiket->pemohon->phone)) {
             $this->kirimNotifikasiTiket($tiket, $tiket->pemohon->phone);
         }
 
+        if (! Auth::check() && $tiket && $tiket->pemohon) {
+            $user = $tiket->pemohon->provisionWargaUser();
+            Auth::login($user, remember: true);
+            $request->session()->regenerate();
+        }
+
+        $request->session()->forget(OtpController::SESSION_KEY);
+
         return redirect()->route('pengaduan.sukses', $tiket->nomor_tiket)
             ->with('success', 'Laporan pengaduan Anda berhasil terkirim!');
+    }
+
+    /**
+     * Submit hanya sah jika session menyimpan flag OTP yang masih berlaku.
+     */
+    protected function assertOtpVerified(Request $request): void
+    {
+        $flag = $request->session()->get(OtpController::SESSION_KEY);
+
+        $valid = is_array($flag)
+            && ($flag['purpose'] ?? null) === OtpController::PURPOSE_PERSURATAN
+            && ($flag['expires_at'] ?? 0) >= now()->getTimestamp()
+            && ($flag['nik'] ?? null) === $request->input('nik')
+            && ($flag['phone'] ?? null) === $request->input('phone');
+
+        if (! $valid) {
+            throw ValidationException::withMessages([
+                'otp' => 'Verifikasi OTP WhatsApp diperlukan sebelum mengirim laporan pengaduan. Silakan verifikasi ulang.',
+            ]);
+        }
     }
 
     /**
@@ -201,17 +251,15 @@ class PengaduanPublicController extends Controller
     protected function kirimNotifikasiTiket(Tiket $tiket, string $phone): void
     {
         $pesan = sprintf(
-            "Halo, %s!\n\n" .
-            "Laporan pengaduan Anda telah kami terima di portal Soreang Smart Service (3S).\n\n" .
-            "RINCIAN LAPORAN PENGADUAN\n" .
-            "Nomor Tiket: %s\n" .
-            "Judul: %s\n" .
-            "Tanggal: %s WIB\n" .
-            "Status: Baru / Diterima\n\n" .
-            "PANTAU PROGRES STATUS\n" .
-            "Gunakan nomor tiket di atas untuk mengecek progres tindakan petugas melalui link berikut:\n" .
-            "%s\n\n" .
-            "Pemerintah Kecamatan Soreang",
+            "Halo, %s!\n\n".
+            "Laporan pengaduan Anda telah kami terima di portal Soreang Smart Service (3S).\n\n".
+            "*RINCIAN LAPORAN PENGADUAN*\n".
+            "📋 *Nomor Tiket (Salin)*:\n```%s```\n".
+            "📝 *Judul*: %s\n".
+            "📅 *Tanggal*: %s WIB\n".
+            "📌 *Status*: Baru / Diterima\n\n".
+            "🔗 *Pantau Progres Status*:\n%s\n\n".
+            '_Pemerintah Kecamatan Soreang_',
             $tiket->pemohon->name ?? 'Warga',
             $tiket->nomor_tiket,
             $tiket->judul,

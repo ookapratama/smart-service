@@ -50,6 +50,59 @@
                   <td><code>{{ $tiket->detail->nomor_surat }}</code></td>
                 </tr>
               @endif
+
+              @if ($tiket->detail_type === 'pengaduan' && $tiket->detail?->media?->isNotEmpty())
+                <tr>
+                  <th class="text-muted fw-normal align-top">Foto / Lampiran Bukti</th>
+                  <td>
+                    <div class="d-flex flex-wrap gap-3 mt-1">
+                      @foreach ($tiket->detail->media as $index => $mediaItem)
+                        @php
+                          $ext = strtolower(pathinfo($mediaItem->path ?? '', PATHINFO_EXTENSION));
+                          $isImg = $mediaItem->isImage() || in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif']);
+                          $imgUrl = asset('storage/' . $mediaItem->path);
+                        @endphp
+                        @if ($isImg)
+                          <div class="border rounded-3 p-2 bg-light shadow-sm text-center" style="max-width: 280px;">
+                            <img src="{{ $imgUrl }}" 
+                                 alt="Foto Pengaduan" 
+                                 class="img-fluid rounded-2 mb-2" 
+                                 style="max-height: 220px; width: 100%; object-fit: cover; cursor: pointer;"
+                                 data-bs-toggle="modal" 
+                                 data-bs-target="#imageModal{{ $index }}">
+                            <span class="badge bg-white text-dark border rounded-pill px-3 py-1 small">
+                              <i class="bi bi-search me-1"></i> Klik untuk perbesar
+                            </span>
+                          </div>
+
+                          <!-- Modal Review Gambar -->
+                          <div class="modal fade" id="imageModal{{ $index }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                              <div class="modal-content border-0 rounded-4">
+                                <div class="modal-header border-bottom">
+                                  <h6 class="modal-title fw-bold"><i class="bi bi-image me-1"></i> Review Foto Pengaduan</h6>
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center p-3 bg-dark rounded-bottom-4">
+                                  <img src="{{ $imgUrl }}" alt="Foto Pengaduan Full" class="img-fluid rounded shadow" style="max-height: 80vh; object-fit: contain;">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        @else
+                          <div class="border rounded-3 p-2 bg-light shadow-sm text-center" style="max-width: 280px;">
+                            <div class="p-3 text-muted">
+                              <i class="bi bi-file-earmark-text fs-1 d-block mb-1 text-primary"></i>
+                              <small class="d-block text-truncate fw-semibold mb-1" style="max-width: 240px;">{{ $mediaItem->original_name }}</small>
+                              <span class="badge bg-secondary rounded-pill px-2 py-1 small">{{ $mediaItem->size_formatted }}</span>
+                            </div>
+                          </div>
+                        @endif
+                      @endforeach
+                    </div>
+                  </td>
+                </tr>
+              @endif
             </table>
 
             @if ($suratSiap)

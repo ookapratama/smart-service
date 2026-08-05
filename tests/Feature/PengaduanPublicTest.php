@@ -123,6 +123,6 @@ test('officer updating status sends wa notification with catatan', function () {
 
     $latestNotif = NotifikasiWa::orderByDesc('id')->first();
     expect($latestNotif)->not->toBeNull();
-    expect($latestNotif->pesan)->toContain('telah diperbarui menjadi [Diproses]');
+    expect($latestNotif->pesan)->toContain('telah diperbarui menjadi *[Diproses]*');
     expect($latestNotif->pesan)->toContain('Petugas sedang menuju lokasi.');
 });

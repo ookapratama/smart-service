@@ -155,3 +155,27 @@ test('should show status timeline and detail on own ticket', function () {
         ->assertSee($tiket->nomor_tiket)
         ->assertSee('Pengaduan diterima via portal.');
 });
+
+test('should return json html partial on ajax request with filter type and keyword search', function () {
+    [$user, $pemohon] = buatWargaDenganPemohon('7371015566770001');
+
+    $surat = tiketSuratMilik($pemohon);
+    $aduan = tiketAduanMilik($pemohon);
+
+    // Test filter by type=pengaduan via AJAX
+    $resAduan = $this->actingAs($user)
+        ->getJson(route('tiket-saya.index', ['type' => 'pengaduan', 'ajax' => 1]))
+        ->assertOk()
+        ->assertJsonStructure(['status', 'html', 'total']);
+
+    expect($resAduan->json('html'))->toContain($aduan->nomor_tiket);
+    expect($resAduan->json('html'))->not->toContain($surat->nomor_tiket);
+
+    // Test search keyword via AJAX
+    $resSearch = $this->actingAs($user)
+        ->getJson(route('tiket-saya.index', ['q' => $surat->nomor_tiket, 'ajax' => 1]))
+        ->assertOk();
+
+    expect($resSearch->json('html'))->toContain($surat->nomor_tiket);
+    expect($resSearch->json('html'))->not->toContain($aduan->nomor_tiket);
+});

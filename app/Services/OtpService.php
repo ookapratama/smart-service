@@ -91,7 +91,7 @@ class OtpService
 
         $this->notifier->send(
             $target,
-            "Kode OTP layanan {$purpose} Kecamatan Soreang: {$code}. Berlaku 5 menit. Jangan bagikan kode ini kepada siapa pun."
+            "*Kode OTP SMART Service Kecamatan Soreang*\n\n📋 *Kode OTP (Salin)*:\n```{$code}```\n\n_Kode berlaku 5 menit. Jangan bagikan kode ini kepada siapa pun._"
         );
 
         return ['ok' => true, 'masked_phone' => $this->maskPhone($target)]
@@ -105,7 +105,10 @@ class OtpService
      */
     protected function debugCodeEnabled(): bool
     {
-        return (bool) config('app.debug') && $this->notifier instanceof LogWhatsAppNotifier;
+        return (bool) config('app.debug') && (
+            $this->notifier instanceof LogWhatsAppNotifier ||
+            $this->notifier instanceof \App\Services\Wa\WhatsAppWebJsNotifier
+        );
     }
 
     /**
