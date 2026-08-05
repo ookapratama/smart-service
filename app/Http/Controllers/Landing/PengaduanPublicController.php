@@ -16,6 +16,7 @@ use App\Models\Tiket;
 use App\Services\FileUploadService;
 use App\Services\TiketService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -211,6 +212,14 @@ class PengaduanPublicController extends Controller
         if ($tiket && $tiket->pemohon && ! empty($tiket->pemohon->phone)) {
             $this->kirimNotifikasiTiket($tiket, $tiket->pemohon->phone);
         }
+
+        if (! Auth::check() && $tiket && $tiket->pemohon) {
+            $user = $tiket->pemohon->provisionWargaUser();
+            Auth::login($user, remember: true);
+            $request->session()->regenerate();
+        }
+
+        $request->session()->forget(OtpController::SESSION_KEY);
 
         return redirect()->route('pengaduan.sukses', $tiket->nomor_tiket)
             ->with('success', 'Laporan pengaduan Anda berhasil terkirim!');

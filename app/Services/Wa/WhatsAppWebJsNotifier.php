@@ -43,6 +43,16 @@ class WhatsAppWebJsNotifier implements WhatsAppNotifier
             return false;
         }
 
+        $formattedConsole = sprintf(
+            "\n=================== [WA-WEB-JS] ===================\n" .
+            "TO     : %s\n" .
+            "MESSAGE:\n%s\n" .
+            "=====================================================\n",
+            $targetPhone,
+            $message
+        );
+        error_log($formattedConsole);
+
         $payload = array_merge([
             'phone' => $targetPhone,
             'number' => $targetPhone,

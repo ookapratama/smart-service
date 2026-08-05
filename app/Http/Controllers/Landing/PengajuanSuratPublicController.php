@@ -18,6 +18,7 @@ use App\Services\SuratService;
 use App\Services\TiketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -180,6 +181,13 @@ class PengajuanSuratPublicController extends Controller
         }
 
         $this->kirimNotifikasiTiket($tiket, $validated['phone']);
+
+        if (! Auth::check() && $tiket->pemohon) {
+            $user = $tiket->pemohon->provisionWargaUser();
+            Auth::login($user, remember: true);
+            $request->session()->regenerate();
+        }
+
         $request->session()->forget(OtpController::SESSION_KEY);
 
         return redirect()->route('surat.sukses', $tiket->nomor_tiket)

@@ -222,6 +222,8 @@ app.post('/send-message', async (req, res) => {
 
         const chatId = cleaned.endsWith('@c.us') ? cleaned : `${cleaned}@c.us`;
 
+        console.log(`\n=================== [WA-SERVER] ===================\nTO     : ${chatId}\nMESSAGE:\n${message}\n=====================================================\n`);
+
         let sentMsg;
 
         if (Array.isArray(buttons) && buttons.length > 0) {

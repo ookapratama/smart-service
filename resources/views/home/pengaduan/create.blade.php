@@ -409,6 +409,7 @@
 
     function logDebugCode(json) {
       if (json.data && json.data.debug_code) {
+        console.log('%c[DEV OTP] Kode OTP: ' + json.data.debug_code, 'background: #28a745; color: #ffffff; font-weight: bold; font-size: 14px; padding: 4px 8px; border-radius: 4px;');
         console.log('[DEV] Kode OTP:', json.data.debug_code);
       }
     }
