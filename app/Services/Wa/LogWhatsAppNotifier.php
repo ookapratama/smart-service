@@ -16,6 +16,18 @@ class LogWhatsAppNotifier implements WhatsAppNotifier
     {
         Log::info(sprintf('%s to=%s message=%s options=%s', self::LOG_PREFIX, $phone, $message, json_encode($options)));
 
+        $formattedConsole = sprintf(
+            "\n=================== %s ===================\n" .
+            "TO     : %s\n" .
+            "MESSAGE:\n%s\n" .
+            "=====================================================\n",
+            self::LOG_PREFIX,
+            $phone,
+            $message
+        );
+
+        error_log($formattedConsole);
+
         return true;
     }
 }

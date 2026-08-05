@@ -96,8 +96,10 @@ class OtpController extends Controller
             );
         }
 
+        $purpose = $request->input('purpose', self::PURPOSE_PERSURATAN);
+
         $result = $this->otpService->requestCode(
-            self::PURPOSE_PERSURATAN,
+            $purpose,
             $validated['nik'],
             $targetPhone,
             $ip,
@@ -137,13 +139,16 @@ class OtpController extends Controller
             'nik' => 'required|digits:16',
             'phone' => 'nullable|string|max:50',
             'code' => 'required|digits:6',
+            'purpose' => 'nullable|string',
         ], [
             'code.required' => 'Kode OTP wajib diisi.',
             'code.digits' => 'Kode OTP terdiri dari 6 digit angka.',
         ]);
 
+        $purpose = $validated['purpose'] ?? self::PURPOSE_PERSURATAN;
+
         $result = $this->otpService->verifyCode(
-            self::PURPOSE_PERSURATAN,
+            $purpose,
             $validated['nik'],
             $validated['phone'] ?? null,
             $validated['code']
@@ -160,14 +165,15 @@ class OtpController extends Controller
             return ResponseHelper::error($message, 422);
         }
 
-        $request->session()->put(self::SESSION_KEY, [
-            'purpose' => self::PURPOSE_PERSURATAN,
+        $sessionData = [
+            'purpose' => $purpose,
             'nik' => $validated['nik'],
-            // Server truth (nomor yang benar-benar dikirimi kode), bukan
-            // self-asserted dari input client — lihat OtpService::verifyCode.
             'phone' => $result['phone'],
             'expires_at' => now()->addSeconds(OtpService::SESSION_TTL)->getTimestamp(),
-        ]);
+        ];
+
+        $request->session()->put("otp_verified_{$purpose}", $sessionData);
+        $request->session()->put(self::SESSION_KEY, $sessionData);
 
         $pemohon = Pemohon::where('nik', $validated['nik'])->first();
 

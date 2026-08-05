@@ -42,8 +42,15 @@ test('whatsapp web js notifier sendWithButtons formats structured message text',
 });
 
 test('whatsapp_web_js driver resolves via app service provider', function () {
+    $_ENV['WA_DRIVER'] = 'whatsapp_web_js';
+    $_SERVER['WA_DRIVER'] = 'whatsapp_web_js';
+    putenv('WA_DRIVER=whatsapp_web_js');
     config(['services.whatsapp_web_js.url' => 'http://127.0.0.1:3000/send-message']);
 
     $notifier = app(WhatsAppNotifier::class);
     expect($notifier)->toBeInstanceOf(WhatsAppWebJsNotifier::class);
+
+    $_ENV['WA_DRIVER'] = 'log';
+    $_SERVER['WA_DRIVER'] = 'log';
+    putenv('WA_DRIVER=log');
 });

@@ -30,7 +30,7 @@ class TiketSayaController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $type = $request->query('type');
+        $type = $request->query('type', 'all');
         $query = Tiket::where('pemohon_id', $pemohon->id)
             ->with('detail')
             ->latest();
@@ -39,7 +39,23 @@ class TiketSayaController extends Controller
             $query->where('detail_type', $type);
         }
 
+        if ($request->filled('q')) {
+            $keyword = $request->input('q');
+            $query->where(function ($q) use ($keyword) {
+                $q->where('nomor_tiket', 'like', "%{$keyword}%")
+                  ->orWhere('judul', 'like', "%{$keyword}%");
+            });
+        }
+
         $tikets = $query->paginate(10)->withQueryString();
+
+        if ($request->ajax() || $request->has('ajax') || $request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'html'   => view('home.tiket-saya.partials.grid', compact('tikets'))->render(),
+                'total'  => $tikets->total(),
+            ]);
+        }
 
         return view('home.tiket-saya.index', compact('tikets', 'pemohon', 'type'));
     }

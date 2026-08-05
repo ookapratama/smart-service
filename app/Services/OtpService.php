@@ -105,7 +105,10 @@ class OtpService
      */
     protected function debugCodeEnabled(): bool
     {
-        return (bool) config('app.debug') && $this->notifier instanceof LogWhatsAppNotifier;
+        return (bool) config('app.debug') && (
+            $this->notifier instanceof LogWhatsAppNotifier ||
+            $this->notifier instanceof \App\Services\Wa\WhatsAppWebJsNotifier
+        );
     }
 
     /**
