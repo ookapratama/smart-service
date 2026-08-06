@@ -39,9 +39,9 @@ return [
         'webhook_token' => env('DEPLOY_WEBHOOK_TOKEN'),
     ],
 
-    'fonnte' => [
-        'token' => env('FONNTE_TOKEN'),
-        'url' => env('FONNTE_URL', 'https://api.fonnte.com/send'),
+    'whatsapp_web_js' => [
+        'url' => env('WA_WEB_JS_URL', 'http://127.0.0.1:3000/send-message'),
+        'secret' => env('WA_WEB_JS_SECRET'),
     ],
 
 ];

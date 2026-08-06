@@ -42,4 +42,32 @@ class Pemohon extends Model
     {
         return $this->hasMany(Tiket::class);
     }
+
+    public function provisionWargaUser(): User
+    {
+        $this->phone_verified_at ??= now();
+
+        if ($this->user_id && $this->user) {
+            $this->save();
+
+            return $this->user;
+        }
+
+        $wargaRole = Role::firstOrCreate(
+            ['slug' => 'warga'],
+            ['name' => 'Warga']
+        );
+
+        $user = User::create([
+            'name' => $this->name ?: 'Warga '.$this->nik,
+            'email' => $this->email ?? null,
+            'password' => null,
+            'role_id' => $wargaRole->id,
+        ]);
+
+        $this->user_id = $user->id;
+        $this->save();
+
+        return $user;
+    }
 }

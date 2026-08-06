@@ -18,6 +18,7 @@ use App\Services\SuratService;
 use App\Services\TiketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -63,7 +64,12 @@ class PengajuanSuratPublicController extends Controller
             $otpVerifiedNik = $flag['nik'] ?? null;
         }
 
-        return view('home.surat.create', compact('jenisSurat', 'kelurahanList', 'otpVerifiedNik'));
+        $autofillPemohon = $request->user()?->pemohon;
+        if ($autofillPemohon && ! $otpVerifiedNik) {
+            $otpVerifiedNik = $autofillPemohon->nik;
+        }
+
+        return view('home.surat.create', compact('jenisSurat', 'kelurahanList', 'otpVerifiedNik', 'autofillPemohon'));
     }
 
     /**
@@ -75,9 +81,22 @@ class PengajuanSuratPublicController extends Controller
 
         $jenisSurat = JenisSurat::where('is_active', true)->findOrFail($request->integer('jenis_surat_id'));
 
-        // Gerbang OTP lebih dulu (§4): tanpa bukti kepemilikan nomor WA,
-        // tidak ada gunanya memproses isian form lebih jauh.
-        $this->assertOtpVerified($request);
+        if ($request->user()?->pemohon) {
+            $pemohonAuth = $request->user()->pemohon;
+            $request->merge([
+                'nik' => $request->input('nik') ?: $pemohonAuth->nik,
+                'nama' => $request->input('nama') ?: $pemohonAuth->name,
+                'phone' => $request->input('phone') ?: $pemohonAuth->phone,
+                'kelurahan_id' => $request->input('kelurahan_id') ?: $pemohonAuth->kelurahan_id,
+                'alamat' => $request->input('alamat') ?: $pemohonAuth->alamat,
+            ]);
+        }
+
+        // Gerbang OTP lebih dulu (§4): bagi pengguna publik anonim.
+        // Pengguna terautentikasi (warga login) identitasnya sudah terverifikasi.
+        if (! ($request->user() && $request->user()->pemohon)) {
+            $this->assertOtpVerified($request);
+        }
 
         $validated = $request->validate(array_merge([
             'nama' => 'required|string|max:255',
@@ -162,6 +181,13 @@ class PengajuanSuratPublicController extends Controller
         }
 
         $this->kirimNotifikasiTiket($tiket, $validated['phone']);
+
+        if (! Auth::check() && $tiket->pemohon) {
+            $user = $tiket->pemohon->provisionWargaUser();
+            Auth::login($user, remember: true);
+            $request->session()->regenerate();
+        }
+
         $request->session()->forget(OtpController::SESSION_KEY);
 
         return redirect()->route('surat.sukses', $tiket->nomor_tiket)

@@ -117,24 +117,6 @@ class WargaAuthController extends Controller
      */
     protected function provisionUser(Pemohon $pemohon): User
     {
-        $pemohon->phone_verified_at ??= now();
-
-        if ($pemohon->user_id) {
-            $pemohon->save();
-
-            return $pemohon->user;
-        }
-
-        $user = User::create([
-            'name' => $pemohon->name,
-            'email' => null,
-            'password' => null,
-            'role_id' => Role::where('slug', 'warga')->firstOrFail()->id,
-        ]);
-
-        $pemohon->user_id = $user->id;
-        $pemohon->save();
-
-        return $user;
+        return $pemohon->provisionWargaUser();
     }
 }

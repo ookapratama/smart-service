@@ -62,12 +62,12 @@ test('should reject invalid wa_driver value', function () {
         ->assertSessionHasErrors('wa_driver');
 });
 
-test('should accept fonnte as wa_driver value', function () {
+test('should accept whatsapp_web_js as wa_driver value', function () {
     $this->actingAs($this->admin)
-        ->post(route('settings.update'), ['wa_driver' => 'fonnte'])
+        ->post(route('settings.update'), ['wa_driver' => 'whatsapp_web_js'])
         ->assertRedirect();
 
-    expect(DB::table('settings')->where('key', 'wa_driver')->value('value'))->toBe('fonnte');
+    expect(DB::table('settings')->where('key', 'wa_driver')->value('value'))->toBe('whatsapp_web_js');
 });
 
 test('should reject get request to clear-cache route', function () {

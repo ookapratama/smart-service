@@ -4,7 +4,7 @@
 
 @php
    $selectOptions = [
-      'wa_driver' => ['log' => 'Log (testing — kode hanya dicatat di log)', 'fonnte' => 'Fonnte Gateway'],
+      'wa_driver' => ['log' => 'Log (testing — kode hanya dicatat di log)', 'whatsapp_web_js' => 'WhatsApp Web JS Gateway'],
    ];
    $iconMap = [
       'profile_telepon' => 'ri-phone-line',

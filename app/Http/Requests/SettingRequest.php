@@ -41,7 +41,7 @@ class SettingRequest extends BaseRequest
             'maintenance_mode' => 'nullable|in:0,1',
             'allow_registration' => 'nullable|in:0,1',
 
-            'wa_driver' => 'nullable|in:log,fonnte',
+            'wa_driver' => 'nullable|in:log,whatsapp_web_js,fonnte',
             'wa_gateway_url' => 'nullable|string|max:255',
             'wa_gateway_token' => 'nullable|string|max:255',
             'tiket_prefix' => 'nullable|string|max:50',
