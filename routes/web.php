@@ -74,7 +74,7 @@ Route::post('/otp/verify', [OtpController::class, 'verify'])->name('otp.verify')
 
 // Login warga passwordless by NIK (§4) — endpoint terpisah dari wizard
 // persuratan karena kontrak anti-enumeration-nya berbeda (lihat controller).
-Route::get('/masuk', [AuthController::class, 'showLogin'])->name('warga.login')->middleware('guest');
+Route::get('/masuk', [WargaAuthController::class, 'showLogin'])->name('warga.login')->middleware('guest');
 Route::post('/masuk/otp', [WargaAuthController::class, 'requestOtp'])->name('warga.login.otp')->middleware('throttle:10,1');
 Route::post('/masuk/verifikasi', [WargaAuthController::class, 'verifyOtp'])->name('warga.login.verify')->middleware('throttle:20,1');
 

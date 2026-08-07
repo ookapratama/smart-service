@@ -77,6 +77,7 @@
             <!-- Compact OTP widget: hanya untuk NIK yang sudah ditemukan -->
             <div id="foundOtpStepVerify" class="d-none">
               <div class="alert alert-info border-0 rounded-3 py-2 small" id="foundOtpSentInfo"></div>
+              <div class="small mt-n1 mb-2" id="foundOtpSentInfoDebug"></div>
               <div class="row g-2 align-items-end">
                 <div class="col-sm-5">
                   <label for="foundOtpCode" class="form-label fw-semibold">Kode OTP (6 digit)</label>
@@ -302,6 +303,7 @@
 
               <div id="otpStepVerify" class="d-none">
                 <div class="alert alert-info border-0 rounded-3 py-2 small" id="otpSentInfo"></div>
+                <div class="small mt-n1 mb-2" id="otpSentInfoDebug"></div>
                 <div class="row g-2 align-items-end">
                   <div class="col-sm-5">
                     <label for="otpCode" class="form-label fw-semibold">Kode OTP (6 digit)</label>
@@ -407,11 +409,10 @@
       return errors ? Object.values(errors)[0][0] : json.message;
     }
 
-    function logDebugCode(json) {
-      if (json.data && json.data.debug_code) {
-        console.log('%c[DEV OTP] Kode OTP: ' + json.data.debug_code, 'background: #28a745; color: #ffffff; font-weight: bold; font-size: 14px; padding: 4px 8px; border-radius: 4px;');
-        console.log('[DEV] Kode OTP:', json.data.debug_code);
-      }
+    function debugCodeHtml(json) {
+      if (!json.data || !json.data.debug_code) return '';
+      return '<span class="badge bg-warning text-dark">🧪 Mode Testing</span> ' +
+        'Kode OTP: <strong>' + json.data.debug_code + '</strong> — WhatsApp tidak benar-benar dikirim di lingkungan ini.';
     }
 
     function showErrorIn(el, message) {
@@ -480,7 +481,6 @@
           return;
         }
 
-        logDebugCode(result.json);
         nikInput.readOnly = true;
         cekNikStep.classList.add('d-none');
 
@@ -489,6 +489,7 @@
           document.getElementById('foundOtpSentInfo').innerHTML =
             '<i class="bi bi-whatsapp me-1"></i> Kode OTP telah dikirim ke nomor <strong>' +
             result.json.data.phone_masked + '</strong>. Berlaku 5 menit.';
+          document.getElementById('foundOtpSentInfoDebug').innerHTML = debugCodeHtml(result.json);
           startFoundCountdown(60);
         } else {
           restOfForm.classList.remove('d-none');
@@ -580,12 +581,12 @@
           showErrorIn(otpError, firstErrorMessage(result.json));
           return;
         }
-        logDebugCode(result.json);
         document.getElementById('otpStepRequest').classList.add('d-none');
         document.getElementById('otpStepVerify').classList.remove('d-none');
         document.getElementById('otpSentInfo').innerHTML =
           '<i class="bi bi-whatsapp me-1"></i> Kode OTP telah dikirim ke nomor <strong>' +
           result.json.data.phone_masked + '</strong>. Berlaku 5 menit.';
+        document.getElementById('otpSentInfoDebug').innerHTML = debugCodeHtml(result.json);
         startCountdown(60);
       }).catch(function () {
         btn.disabled = false;

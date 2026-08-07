@@ -10,6 +10,7 @@ use App\Services\OtpService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 /**
  * Login warga passwordless by NIK (S3_MVP_DESIGN.md §4). Berbeda dari wizard
@@ -26,6 +27,11 @@ class WargaAuthController extends Controller
     protected const PESAN_VERIFIKASI_GAGAL = 'Kode OTP salah atau sudah kedaluwarsa. Silakan periksa kembali atau minta kode baru.';
 
     public function __construct(protected OtpService $otpService) {}
+
+    public function showLogin(): View
+    {
+        return view('home.masuk');
+    }
 
     /**
      * Kirim OTP login. Respons SELALU pesan generik yang sama — throttle,
